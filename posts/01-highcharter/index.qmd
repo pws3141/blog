@@ -1,0 +1,117 @@
+---
+title: "Using Highcharter"
+author: "Paul Smith"
+date: "2024-12-16"
+categories: [code, accessibility, graphics, r]
+image: "./fig/highcharter_logo.png"
+---
+
+
+## Introduction
+
+Inspired by the [quarto and me blog](https://quartoand.me/blog/2021-11_adventures-with-the-highcharts-accessibility-module-part-1/), I am looking into using [{highcharter}](https://jkunst.com/highcharter/) within R. This package is a wrapper for [Highcharts](https://www.highcharts.com/blog/products/highcharts/) -- an interactive charting library^[this needs a license for commercial and governmental use]. 
+
+In this post I will only be considering a scatter graph. Different plots -- including survival curves -- will come later.
+
+My main requirements are mostly subjective:
+
+- Looks nice
+- Is interactive in a *nice* and *obvious* way
+- Is accessible, following advice given by the [Government Analysis Function](https://analysisfunction.civilservice.gov.uk/policy-store/accessibility-legislation-what-you-need-to-know/)
+
+## Getting started with highcharter
+
+Lets use the [{palmerpenguins}](https://allisonhorst.github.io/palmerpenguins/) data^[because penguins are nicer than [eugenicists](https://en.wikipedia.org/wiki/Ronald_Fisher#Eugenics)].
+
+This is also the first time I have used the base R pipe `|>`, after a life-time (well, 5 years) of using `%>%`. The differences between the two are explain in this [tidyverse blog](https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/). This means that the below code will not work on R versions prior to 4.1.0.
+
+
+```{r}
+#| warning: false
+
+library(highcharter)
+library(palmerpenguins)
+
+#data(package = 'palmerpenguins')
+
+penguins
+```
+
+A basic scatter graph, using the `hchart` function. Here, `hcaes` is similar in spirit to `ggplot`'s `aes`.
+
+```{r}
+hchart(penguins,"scatter", 
+       hcaes(x = flipper_length_mm, y = bill_length_mm, group = species))
+```
+
+::: {.column-margin}
+![](./fig/culmen_depth.png)
+:::
+
+### Simple changes
+
+Lets change a few things about the plot:
+
+1. Add $x$ and $y$ axis labels;
+2. Add a title and subtitle;
+3. Add a source;
+4. Change the colours to the Government Analysis Function [categorical data colour palette](https://analysisfunction.civilservice.gov.uk/policy-store/data-visualisation-colours-in-charts/#section-5); 
+5. make the hover box specify 'flipper length' and 'bill length', with units.
+
+::: {.column-margin}
+![Government analysis function colour palette](./fig/gaf_colours.png)
+:::
+
+```{r}
+hchart(penguins,"scatter", 
+       hcaes(x = flipper_length_mm, y = bill_length_mm, group = species)) |>
+  # x axis label
+  hc_xAxis(title = list(text = "Flipper Length (mm)")) |>
+  # y axis label
+  hc_yAxis(title = list(text = "Bill Length (mm)")) |>
+  # title and subtitle
+  hc_title(text = "Gentoo's have <i>big</i> flippers!",
+           margin = 20, # space between title (or subtitle) and plot [default = 15]
+           align = "left",
+           stlyle = list(useHTML = TRUE)) |>
+  hc_subtitle(text = "A scatter graph showing the relationship between flipper length 
+              and bill length, for Adelie, Chinstrap and Gentoo penguins") |>
+  # a source
+ hc_credits(
+    text = "Chart created using R and highcharter",
+    href = "http://jkunst.com/highcharter",
+    enabled = TRUE
+    ) |>
+  # hover box options
+  hc_tooltip(
+    headerFormat = "<b>{series.name}</b><br>",
+    pointFormat = "Flipper Length: {point.x} mm<br>Bill Length: {point.y} mm"
+    #> valueSuffix applies globally but only when values are displayed individually
+    #> here, displayed twice so hard-coded into 'pointFormat'
+    #>valueSuffix = " mm"
+  ) |>
+  hc_colors(c("#12436D", "#28A197", "#801650"))
+  
+```
+
+## A map
+
+```{r}
+data(GNI2014, package = "treemap")
+
+hcmap(
+  "custom/world-robinson-lowres",
+  data = GNI2014,
+  name = "Gross national income per capita",
+  value = "GNI",
+  borderWidth = 0,
+  nullColor = "#d3d3d3",
+  joinBy = c("iso-a3", "iso3")
+) |>
+  hc_colorAxis(
+    stops = color_stops(colors = viridisLite::inferno(10, begin = 0.1)),
+    type = "logarithmic"
+  )
+```
+
+## Adding accessibility

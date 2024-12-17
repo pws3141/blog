@@ -1,0 +1,37 @@
+[
+  {
+    "objectID": "posts/01-highcharter/index.html",
+    "href": "posts/01-highcharter/index.html",
+    "title": "Using Highcharter",
+    "section": "",
+    "text": "Inspired by the quarto and me blog, I am looking into using {highcharter} within R. This package is a wrapper for Highcharts – an interactive charting library1.\n1 this needs a license for commercial and governmental useIn this post I will only be considering a scatter graph. Different plots – including survival curves – will come later.\nMy main requirements are mostly subjective:\n\nLooks nice\nIs interactive in a nice and obvious way\nIs accessible, following advice given by the Government Analysis Function"
+  },
+  {
+    "objectID": "posts/01-highcharter/index.html#introduction",
+    "href": "posts/01-highcharter/index.html#introduction",
+    "title": "Using Highcharter",
+    "section": "",
+    "text": "Inspired by the quarto and me blog, I am looking into using {highcharter} within R. This package is a wrapper for Highcharts – an interactive charting library1.\n1 this needs a license for commercial and governmental useIn this post I will only be considering a scatter graph. Different plots – including survival curves – will come later.\nMy main requirements are mostly subjective:\n\nLooks nice\nIs interactive in a nice and obvious way\nIs accessible, following advice given by the Government Analysis Function"
+  },
+  {
+    "objectID": "posts/01-highcharter/index.html#getting-started-with-highcharter",
+    "href": "posts/01-highcharter/index.html#getting-started-with-highcharter",
+    "title": "Using Highcharter",
+    "section": "Getting started with highcharter",
+    "text": "Getting started with highcharter\nLets use the {palmerpenguins} data2.\n2 because penguins are nicer than eugenicistsThis is also the first time I have used the base R pipe |&gt;, after a life-time (well, 5 years) of using %&gt;%. The differences between the two are explain in this tidyverse blog. This means that the below code will not work on R versions prior to 4.1.0.\n\n\nCode\nlibrary(highcharter)\nlibrary(palmerpenguins)\n\n#data(package = 'palmerpenguins')\n\npenguins\n\n\n\n  \n\n\n\nA basic scatter graph, using the hchart function. Here, hcaes is similar in spirit to ggplot’s aes.\n\n\nCode\nhchart(penguins,\"scatter\", \n       hcaes(x = flipper_length_mm, y = bill_length_mm, group = species))\n\n\n\n\n\n\n\n\n\n\nSimple changes\nLets change a few things about the plot:\n\nAdd \\(x\\) and \\(y\\) axis labels;\nAdd a title and subtitle;\nAdd a source;\nChange the colours to the Government Analysis Function categorical data colour palette;\nmake the hover box specify ‘flipper length’ and ‘bill length’, with units.\n\n\n\n\n\n\nGovernment analysis function colour palette\n\n\n\n\nCode\nhchart(penguins,\"scatter\", \n       hcaes(x = flipper_length_mm, y = bill_length_mm, group = species)) |&gt;\n  # x axis label\n  hc_xAxis(title = list(text = \"Flipper Length (mm)\")) |&gt;\n  # y axis label\n  hc_yAxis(title = list(text = \"Bill Length (mm)\")) |&gt;\n  # title and subtitle\n  hc_title(text = \"Gentoo's have &lt;i&gt;big&lt;/i&gt; flippers!\",\n           margin = 20, # space between title (or subtitle) and plot [default = 15]\n           align = \"left\",\n           stlyle = list(useHTML = TRUE)) |&gt;\n  hc_subtitle(text = \"A scatter graph showing the relationship between flipper length \n              and bill length, for Adelie, Chinstrap and Gentoo penguins\") |&gt;\n  # a source\n hc_credits(\n    text = \"Chart created using R and highcharter\",\n    href = \"http://jkunst.com/highcharter\",\n    enabled = TRUE\n    ) |&gt;\n  # hover box options\n  hc_tooltip(\n    headerFormat = \"&lt;b&gt;{series.name}&lt;/b&gt;&lt;br&gt;\",\n    pointFormat = \"Flipper Length: {point.x} mm&lt;br&gt;Bill Length: {point.y} mm\"\n    #&gt; valueSuffix applies globally but only when values are displayed individually\n    #&gt; here, displayed twice so hard-coded into 'pointFormat'\n    #&gt;valueSuffix = \" mm\"\n  ) |&gt;\n  hc_colors(c(\"#12436D\", \"#28A197\", \"#801650\"))"
+  },
+  {
+    "objectID": "posts/01-highcharter/index.html#a-map",
+    "href": "posts/01-highcharter/index.html#a-map",
+    "title": "Using Highcharter",
+    "section": "A map",
+    "text": "A map\n\n\nCode\ndata(GNI2014, package = \"treemap\")\n\nhcmap(\n  \"custom/world-robinson-lowres\",\n  data = GNI2014,\n  name = \"Gross national income per capita\",\n  value = \"GNI\",\n  borderWidth = 0,\n  nullColor = \"#d3d3d3\",\n  joinBy = c(\"iso-a3\", \"iso3\")\n) |&gt;\n  hc_colorAxis(\n    stops = color_stops(colors = viridisLite::inferno(10, begin = 0.1)),\n    type = \"logarithmic\"\n  )"
+  },
+  {
+    "objectID": "posts/01-highcharter/index.html#adding-accessibility",
+    "href": "posts/01-highcharter/index.html#adding-accessibility",
+    "title": "Using Highcharter",
+    "section": "Adding accessibility",
+    "text": "Adding accessibility"
+  }
+]
