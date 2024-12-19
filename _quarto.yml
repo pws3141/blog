@@ -20,6 +20,7 @@ format:
     df-print: paged # pages html tables: https://quarto.org/docs/computations/r.html#data-frames
 execute:
   echo: true
+bibliography: ref.bib
 reference-location: margin
 citation-location: margin
 fig-cap-location: margin

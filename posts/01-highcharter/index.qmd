@@ -6,12 +6,15 @@ categories: [code, accessibility, graphics, r]
 image: "./fig/highcharter_logo.png"
 ---
 
-
 ## Introduction
 
-Inspired by the [quarto and me blog](https://quartoand.me/blog/2021-11_adventures-with-the-highcharts-accessibility-module-part-1/), I am looking into using [{highcharter}](https://jkunst.com/highcharter/) within R. This package is a wrapper for [Highcharts](https://www.highcharts.com/blog/products/highcharts/) -- an interactive charting library^[this needs a license for commercial and governmental use]. 
+Inspired by the [quarto and me blog](https://quartoand.me/blog/2021-11_adventures-with-the-highcharts-accessibility-module-part-1/), I am looking into using [{highcharter}](https://jkunst.com/highcharter/) [@kunst2022highcharter]. This package is a wrapper for [Highcharts](https://www.highcharts.com/blog/products/highcharts/) -- an interactive charting library^[this needs a license for commercial and governmental use]. 
 
 In this post I will only be considering a scatter graph. Different plots -- including survival curves -- will come later.
+
+::: {.column-margin}
+![](./fig/highcharter_logo.png)
+:::
 
 My main requirements are mostly subjective:
 
@@ -19,9 +22,9 @@ My main requirements are mostly subjective:
 - Is interactive in a *nice* and *obvious* way
 - Is accessible, following advice given by the [Government Analysis Function](https://analysisfunction.civilservice.gov.uk/policy-store/accessibility-legislation-what-you-need-to-know/)
 
-## Getting started with highcharter
+## Getting started with {highcharter}
 
-Lets use the [{palmerpenguins}](https://allisonhorst.github.io/palmerpenguins/) data^[because penguins are nicer than [eugenicists](https://en.wikipedia.org/wiki/Ronald_Fisher#Eugenics)].
+Lets use the [{palmerpenguins}](https://allisonhorst.github.io/palmerpenguins/) data^[because penguins are nicer than [eugenicists](https://www.meganstodel.com/posts/no-to-iris/)] [@horst2020penguins].
 
 This is also the first time I have used the base R pipe `|>`, after a life-time (well, 5 years) of using `%>%`. The differences between the two are explain in this [tidyverse blog](https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/). This means that the below code will not work on R versions prior to 4.1.0.
 
@@ -56,14 +59,14 @@ Lets change a few things about the plot:
 2. Add a title and subtitle;
 3. Add a source;
 4. Change the colours to the Government Analysis Function [categorical data colour palette](https://analysisfunction.civilservice.gov.uk/policy-store/data-visualisation-colours-in-charts/#section-5); 
-5. make the hover box specify 'flipper length' and 'bill length', with units.
+4. Make the hover box specify 'flipper length' and 'bill length'.
 
 ::: {.column-margin}
 ![Government analysis function colour palette](./fig/gaf_colours.png)
 :::
 
 ```{r}
-hchart(penguins,"scatter", 
+hc_penguins <- hchart(penguins,"scatter", 
        hcaes(x = flipper_length_mm, y = bill_length_mm, group = species)) |>
   # x axis label
   hc_xAxis(title = list(text = "Flipper Length (mm)")) |>
@@ -75,7 +78,8 @@ hchart(penguins,"scatter",
            align = "left",
            stlyle = list(useHTML = TRUE)) |>
   hc_subtitle(text = "A scatter graph showing the relationship between flipper length 
-              and bill length, for Adelie, Chinstrap and Gentoo penguins") |>
+              and bill length, for Adelie, Chinstrap and Gentoo penguins",
+              align = "left") |>
   # a source
  hc_credits(
     text = "Chart created using R and highcharter",
@@ -92,26 +96,79 @@ hchart(penguins,"scatter",
   ) |>
   hc_colors(c("#12436D", "#28A197", "#801650"))
   
-```
-
-## A map
-
-```{r}
-data(GNI2014, package = "treemap")
-
-hcmap(
-  "custom/world-robinson-lowres",
-  data = GNI2014,
-  name = "Gross national income per capita",
-  value = "GNI",
-  borderWidth = 0,
-  nullColor = "#d3d3d3",
-  joinBy = c("iso-a3", "iso3")
-) |>
-  hc_colorAxis(
-    stops = color_stops(colors = viridisLite::inferno(10, begin = 0.1)),
-    type = "logarithmic"
-  )
+hc_penguins
 ```
 
 ## Adding accessibility
+
+Here we assume the visually aspects of the graph are accessible.[^longnote1] 
+In this section I will add the following capabilities to the graph.
+
+[^longnote1]: This is probably a big assumption. I am assuming the following information given by the Government Analysis Function (which apply to *static* charts) has been applied:
+
+    - Guidance on [designing charts](https://analysisfunction.civilservice.gov.uk/policy-store/data-visualisation-charts/).
+    - Guidance on [the use of colour](https://analysisfunction.civilservice.gov.uk/policy-store/data-visualisation-colours-in-charts/). For alternative colour palettes, consider [Paul Tol's notes](https://personal.sron.nl/~pault/)
+    
+- The ability to download the data;
+- Keyboard navigation;
+- Alt text, following guidance given by Amy Cesal in her blog post, ["Writing Alt Text for Data Visualization"](https://medium.com/nightingale/writing-alt-text-for-data-visualization-2a218ef43f81).
+
+::: {.column-margin}
+![Example alt-text format for data viz, from Amy Cesal's [Medium post](https://medium.com/nightingale/writing-alt-text-for-data-visualization-2a218ef43f81)](./fig/alt_text.png)
+:::
+
+First, lets try and include a menu to export the data and the plot as an image -- this requires using a module. Examples of using modules and plug-ins^[I'm not sure what the difference is between a 'module' and a 'plug-in', except that the '.js' files seem to live in different folders.] in {highcharter} are given in the [modules vignette](https://jkunst.com/highcharter/articles/modules.html).
+
+```{r}
+hc_penguins2 <- hc_penguins |>
+  #hc_add_dependency(name = "modules/exporting.js") |> 
+  #hc_add_dependency(name = "modules/export-data.js") |> 
+  hc_exporting(
+    enabled = TRUE,
+    filename = "palmer_penguins"
+  )
+
+hc_penguins2
+```
+
+::: {.callout-note}
+## Comment on `hc_add_dependency`
+
+In the [quartoandme blog](https://quartoand.me/blog/2021-11_adventures-with-the-highcharts-accessibility-module-part-1/#highcharts-accessibility), the following lines are included in the 'working example':
+
+```r
+  hc_add_dependency(name = "modules/accessibility.js") |> 
+  hc_add_dependency(name = "modules/exporting.js") |> 
+  hc_exporting(
+    enabled = TRUE
+  )
+```
+
+But, (I think) the `hc_exporting()` function automatically includes the `exporting.js` and `export-data.js` modules when `enabled = TRUE`, so the two `hc_add_dependency` calls are unnecessary. I'm willing to be proved wrong here.
+:::
+
+To get keyboard navigation working, we need to use the [accessibility Highchart module](https://www.highcharts.com/docs/accessibility/accessibility-module).
+
+```{r}
+hc_penguins3 <- hc_penguins |>
+  #hc_add_dependency(name = "modules/exporting.js") |> 
+  #hc_add_dependency(name = "modules/export-data.js") |> 
+  hc_add_dependency(name = "modules/accessibility.js") |> 
+  hc_exporting(
+    accessibility = list(
+      enabled = FALSE # default value is TRUE
+      ),
+    enabled = TRUE,
+    filename = "palmer_penguins"
+  )
+
+#hc_penguins3
+```
+
+::: {.callout-important}
+# This doesn't seem to work
+
+Currently, including the `hc_penguins3` plot results in all plots being removed from this Quarto document. I'm not sure why this is.
+
+Running R 4.4.2 on RStudio RStudio 2024.09.1+394 "Cranberry Hibiscus".
+:::
