@@ -18,6 +18,7 @@ format:
     df-print: paged # pages html tables: https://quarto.org/docs/computations/r.html#data-frames
 execute:
   echo: true
+  freeze: auto
 bibliography: ref.bib
 reference-location: margin
 citation-location: margin
