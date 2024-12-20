@@ -1,5 +1,5 @@
 ---
-title: "Using Highcharter"
+title: "Getting Started with Accessible Highcharter"
 author: "Paul Smith"
 date: "2024-12-16"
 categories: [code, accessibility, graphics, r]
@@ -113,9 +113,7 @@ In this section I will add the following capabilities to the graph.
 - Keyboard navigation;
 - Alt text, following guidance given by Amy Cesal in her blog post, ["Writing Alt Text for Data Visualization"](https://medium.com/nightingale/writing-alt-text-for-data-visualization-2a218ef43f81).
 
-::: {.column-margin}
-![Example alt-text format for data viz, from Amy Cesal's [Medium post](https://medium.com/nightingale/writing-alt-text-for-data-visualization-2a218ef43f81)](./fig/alt_text.png)
-:::
+### Exporting the data 
 
 First, lets try and include a menu to export the data and the plot as an image -- this requires using a module. Examples of using modules and plug-ins^[I'm not sure what the difference is between a 'module' and a 'plug-in', except that the '.js' files seem to live in different folders.] in {highcharter} are given in the [modules vignette](https://jkunst.com/highcharter/articles/modules.html).
 
@@ -147,7 +145,34 @@ In the [quartoandme blog](https://quartoand.me/blog/2021-11_adventures-with-the-
 But, (I think) the `hc_exporting()` function automatically includes the `exporting.js` and `export-data.js` modules when `enabled = TRUE`, so the two `hc_add_dependency` calls are unnecessary. I'm willing to be proved wrong here.
 :::
 
+### Keyboard navigation
+
 To get keyboard navigation working, we need to use the [accessibility Highchart module](https://www.highcharts.com/docs/accessibility/accessibility-module).
+
+::: {.callout-important}
+# Required changes to {highcharter} v0.9.4
+
+If using v0.9.4 of {highcharter}, then copying the code below will result in no plot being output. This is a known issue, and is discussed in the GitHub repo issue [755](https://github.com/jbkunst/highcharter/issues/755).
+
+There are two ways to fix this issue:
+
+1. Uncomment the accessibility module in the 'highcharts.yaml' file.^[Discussed by [batpigandme](https://github.com/jbkunst/highcharter/issues/755#issuecomment-1066744631) in their reply to GitHub issue 755.] On my Mac, this is found at `/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/library/highcharter/htmlwidgets` (for your computer, use `.libPaths()` to find the default path for packages). The line
+```bash
+    # - modules/accessibility.js
+```
+        needs to be edited to be
+```bash
+    - modules/accessibility.js
+```
+        before loading the package into R.
+
+
+2. Install an older version of {highcharter}, for example,^[taken from [mfherman](https://github.com/jbkunst/highcharter/issues/755#issuecomment-1064659208)'s reply to GitHub issue 755.]
+```r
+remotes::install_github("jbkunst/highcharter@8ff41366c8c411b497b5378d27be48617360f81f")
+```
+
+:::
 
 ```{r}
 hc_penguins3 <- hc_penguins |>
@@ -160,15 +185,160 @@ hc_penguins3 <- hc_penguins |>
       ),
     enabled = TRUE,
     filename = "palmer_penguins"
-  )
+  ) |>
+  hc_plotOptions(
+    accessibility = list(
+      enabled = TRUE,
+      keyboardNavigation = list(enabled = TRUE)
+      )
+    )
 
-#hc_penguins3
+hc_penguins3
 ```
 
-::: {.callout-important}
-# This doesn't seem to work
-
-Currently, including the `hc_penguins3` plot results in all plots being removed from this Quarto document. I'm not sure why this is.
-
-Running R 4.4.2 on RStudio RStudio 2024.09.1+394 "Cranberry Hibiscus".
+### Alt text
+::: {.column-margin}
+![Example alt-text format for data viz, from Amy Cesal's [Medium post](https://medium.com/nightingale/writing-alt-text-for-data-visualization-2a218ef43f81)](./fig/alt_text.png)
 :::
+
+In this section we add alt-text to the plot, to allow those using screen readers to understand the plot.
+    )
+
+First, lets add accessible descriptions to the plot, by enabling the accessibility options in `hc_xAxis` and `hc_yAxis`.
+
+```{r}
+hc_penguins4 <- hchart(penguins,"scatter", 
+       hcaes(x = flipper_length_mm, y = bill_length_mm, group = species)) |>
+  hc_add_dependency(name = "modules/accessibility.js") |> 
+  # x axis label
+  hc_xAxis(title = list(text = "Flipper Length (mm)"),
+           accessibility = list(
+                   enabled = TRUE,
+                   description = "flipper length in millimeters"
+           )) |>
+  # y axis label
+  hc_yAxis(title = list(text = "Bill Length (mm)"),
+           accessibility = list(
+                   enabled = TRUE,
+                   description = "bill length in millimeters"
+           )) |>
+  # title and subtitle
+  hc_title(text = "Gentoo's have <i>big</i> flippers!",
+           margin = 20, # space between title (or subtitle) and plot [default = 15]
+           align = "left",
+           stlyle = list(useHTML = TRUE)) |>
+  hc_subtitle(text = "A scatter graph showing the relationship between flipper length 
+              and bill length, for Adelie, Chinstrap and Gentoo penguins",
+              align = "left") |>
+  # a source
+ hc_credits(
+    text = "Chart created using R and highcharter",
+    href = "http://jkunst.com/highcharter",
+    enabled = TRUE
+    ) |>
+  # hover box options
+  hc_tooltip(
+    headerFormat = "<b>{series.name}</b><br>",
+    pointFormat = "Flipper Length: {point.x} mm<br>Bill Length: {point.y} mm"
+    #> valueSuffix applies globally but only when values are displayed individually
+    #> here, displayed twice so hard-coded into 'pointFormat'
+    #>valueSuffix = " mm"
+  ) |>
+  hc_colors(c("#12436D", "#28A197", "#801650")) |>
+  hc_exporting(
+    accessibility = list(
+      enabled = FALSE # default value is TRUE
+      ),
+    enabled = TRUE,
+    filename = "palmer_penguins"
+  ) |>
+  hc_plotOptions(
+    accessibility = list(
+      enabled = TRUE,
+      keyboardNavigation = list(enabled = TRUE)
+      )
+    )
+  
+hc_penguins4
+```
+
+Note that the desciption in `hc_xAxis` and `hc_yAxis` does not start with a capital letter. The reason why is clear from looking at the `html` output below. Here, `aria-hidden="false"` refers to [Accessible Rich Internet Applications](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA), and is telling screen readers not to ignore this section.
+
+```html
+<div id="highcharts-screen-reader-region-before-4"
+aria-label="Chart screen reader information, Gentoo's have big flippers!."
+style="position: relative;" role="region" aria-hidden="false">
+...
+<h4>Gentoo's have big flippers!</h4>
+<div>Scatter chart with 3 data series.</div>
+...
+<div>The chart has 1 X axis displaying flipper length in millimeters. Range: 171.41 to 231.59.</div>
+<div>The chart has 1 Y axis displaying bill length in millimeters. Range: 30 to 65.</div></div></div>
+```
+
+
+The alt-text is saved as a string to the `alt_text_penguins` object.
+
+```{r}
+alt_text_penguins <- "A scatter plot displays the relationship between bill
+        length (mm) on the y-axis and flipper length (mm) on the x-axis for
+        three penguin species: Adelie, Chinstrap, and Gentoo. Each species is
+        represented by a different colour: dark blue for Adelie, teal for Chinstrap,
+        and burgundy for Gentoo. Gentoo penguins have the largest flipper and bill
+        lengths, forming a distinct cluster towards the upper right of the graph.
+        Adelie penguins have smaller flipper and bill lengths, clustering at the lower
+        left, while Chinstrap penguins are positioned between the other two species.
+        The chart highlights that Gentoo penguins have notably large flippers."
+```
+
+#### Using Highchart sccessibility desciption
+
+The simple way to include this alt-text in the plot would be to use the `hc_chart()` function with the `accessibility.description` option set to equal `alt_text_penguins`. But, as discussed in the Highcharts accessibility [documentation](https://api.highcharts.com/highcharts/accessibility.description), 
+
+> Note: Since Highcharts now supports captions and linked descriptions, it is preferred to define the description using those methods, as a visible caption/description benefits all users. If the `accessibility.description` option is defined, the linked description is ignored, and the caption is hidden from screen reader users.
+
+```{r}
+hc_penguins4 |>
+  hc_chart(
+    accessibility = list(
+      description = alt_text_penguins
+    )
+  )
+```
+
+#### Using `linkedDescription`
+
+Here, we first define an external HTML element, where the `<div>` with an ID (`chart-description`) contains the description of the chart. Then, then the `linkedDescription` option in `hc_chart(accessibility = ...)` connects the chart to the `<div>` by its ID.
+
+::: {.column-margin}
+If `accessibility.description` is also defined in the chart, it will override the linked description, as mentioned in the documentation.
+:::
+
+```{r}
+# Add an external description for the chart
+description_id <- "chart-description"
+
+cat(sprintf(
+  '<div id="%s">
+    A scatter plot displays the relationship between bill length (mm) on the y-axis 
+    and flipper length (mm) on the x-axis for three penguin species: Adelie, Chinstrap, 
+    and Gentoo. Each species is represented by a different colour: dark blue for Adelie, 
+    teal for Chinstrap, and burgundy for Gentoo. Gentoo penguins have the largest flipper 
+    and bill lengths, forming a distinct cluster towards the upper right of the graph. 
+    Adelie penguins have smaller flipper and bill lengths, clustering at the lower left, 
+    while Chinstrap penguins are positioned between the other two species. 
+    The chart highlights that Gentoo penguins have notably large flippers.
+  </div>',
+  description_id
+))
+```
+
+```{r}
+hc_penguins4 |>
+  hc_chart(
+    accessibility = list(
+      linkedDescription = description_id
+    )
+  )
+```
+
