@@ -181,7 +181,7 @@ hc_penguins3 <- hc_penguins |>
   hc_add_dependency(name = "modules/accessibility.js") |> 
   hc_exporting(
     accessibility = list(
-      enabled = FALSE # default value is TRUE
+      enabled = TRUE # default value is TRUE
       ),
     enabled = TRUE,
     filename = "palmer_penguins"
@@ -247,7 +247,7 @@ hc_penguins4 <- hchart(penguins,"scatter",
   hc_colors(c("#12436D", "#28A197", "#801650")) |>
   hc_exporting(
     accessibility = list(
-      enabled = FALSE # default value is TRUE
+      enabled = TRUE # default value is TRUE
       ),
     enabled = TRUE,
     filename = "palmer_penguins"
@@ -291,7 +291,7 @@ alt_text_penguins <- "A scatter plot displays the relationship between bill
         The chart highlights that Gentoo penguins have notably large flippers."
 ```
 
-#### Using Highchart sccessibility desciption
+#### Using Highchart accessibility description
 
 The simple way to include this alt-text in the plot would be to use the `hc_chart()` function with the `accessibility.description` option set to equal `alt_text_penguins`. But, as discussed in the Highcharts accessibility [documentation](https://api.highcharts.com/highcharts/accessibility.description), 
 
