@@ -4,16 +4,13 @@ image: profile.jpg
 about:
   template: jolla
   links:
-    - icon: twitter
-      text: Twitter
-      href: https://twitter.com
     - icon: linkedin
       text: LinkedIn
-      href: https://linkedin.com
+      href: https://www.linkedin.com/in/pws3141/
     - icon: github
       text: Github
-      href: https://github.com
+      href: https://github.com/pws3141
 
 ---
 
-About this blog
+This is a little space on the internet where probably nobody walks except me and my thoughts. Mainly about maths and R, sometimes both, very occasionally neither. I hope some of these posts are useful to someone.
