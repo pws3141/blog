@@ -342,3 +342,17 @@ hc_penguins4 |>
   )
 ```
 
+## Finished
+
+What have we achieved here? I think we have some good looking graphs, which contain some accessibility features to increase integration with screen-readers. The {highcharter} package seems relatively easy to use, even though the syntax is a little different to what I'm used to (from base R and {ggplot2}). 
+
+We have:
+
+1. Added $x$ and $y$ axis labels, and used these labels in the hover box text.
+2. Added a title, subtitle, and a source.
+3. Changed the colours of the points.
+4. Allowed for exporting of the data, via `hc_exporting()`.
+5. Allowed for keyboard navigation, including in the drop-down menu, using `hc_add_dependency()`.
+6. Added alt-text, via both `description` and `linkedDescription` options.
+
+The next time I look at Highcharts and {highcharter}, I will be creating different graphs to see what capabilities Highcharts has, and whether it could be useful in my work.
