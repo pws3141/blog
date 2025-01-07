@@ -7,13 +7,6 @@
     "text": "Getting Started with Accessible Highcharter\n\n\n\n\n\n\ncode\n\n\naccessibility\n\n\ngraphics\n\n\nr\n\n\n\n\n\n\n\n\n\nDec 16, 2024\n\n\nPaul Smith\n\n\n\n\n\n\nNo matching items"
   },
   {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "This is a little space on the internet where probably nobody walks except me and my thoughts. Mainly about maths and R, sometimes both, very occasionally neither. I hope some of these posts are useful to someone."
-  },
-  {
     "objectID": "posts/01-highcharter/index.html",
     "href": "posts/01-highcharter/index.html",
     "title": "Getting Started with Accessible Highcharter",
@@ -47,5 +40,26 @@
     "title": "Getting Started with Accessible Highcharter",
     "section": "Finished",
     "text": "Finished\nWhat have we achieved here? I think we have some good looking graphs, which contain some accessibility features to increase integration with screen-readers. The {highcharter} package seems relatively easy to use, even though the syntax is a little different to what I’m used to (from base R and {ggplot2}).\nWe have:\n\nAdded \\(x\\) and \\(y\\) axis labels, and used these labels in the hover box text.\nAdded a title, subtitle, and a source.\nChanged the colours of the points.\nAllowed for exporting of the data, via hc_exporting().\nAllowed for keyboard navigation, including in the drop-down menu, using hc_add_dependency().\nAdded alt-text, via both description and linkedDescription options.\n\nThe next time I look at Highcharts and {highcharter}, I will be creating different graphs to see what capabilities Highcharts has, and whether it could be useful in my work."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "This is a little space on the internet where probably nobody walks except me and my thoughts. Mainly about maths and R, sometimes both, very occasionally neither. I hope some of these posts are useful to someone."
+  },
+  {
+    "objectID": "about.html#education",
+    "href": "about.html#education",
+    "title": "About",
+    "section": "Education",
+    "text": "Education\nUniversity of Leeds | PhD in Statistics | September 2016 - August 2020\nUniversity of Bristol | MMath | September 2011 - June 2015\nUniversity of Hull | PGCE | September 2020 - June 2021"
+  },
+  {
+    "objectID": "about.html#experience",
+    "href": "about.html#experience",
+    "title": "About",
+    "section": "Experience",
+    "text": "Experience\nNHS Blood and Transplant, Bristol | Statistician | November 2023 - present\nEquality and Human Rights Commission, Cardiff | Statistician | April 2023 - October 2023 (Maternity Cover)\nSecondary School, Bath | Maths Teacher | September 2020 - August 2022\nKPMG, London | Investment Advisor | September 2015 - August 2016"
   }
 ]
