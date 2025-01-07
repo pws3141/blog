@@ -1,0 +1,122 @@
+---
+title: "Some Highcharter Graphs"
+author: "Paul Smith"
+date: "2025-01-06"
+categories: [code, graphics, r]
+image: "./fig/highcharter_logo.png"
+---
+
+## Introduction
+
+In my [previous post](../01-highcharter/index.qmd) about {highcharter}, I considered changing some of the defaults for a scatter graph to make it look more appealing and be more accessible. This post will focus on plotting different types of graphs.
+
+I'm using data obtained from the [{medicaldata}](https://higgi13425.github.io/medicaldata/) package [@higgins2021medical].
+
+```{r}
+#| warning: false
+
+library(highcharter)
+library(tibble) # tibbles
+library(forcats) # working with factors
+library(dplyr) # mutate
+library(stringr) # str_to_title
+
+#library(gapminder)
+library(medicaldata)
+```
+
+Loading the Covid data^[Description of the dataset can be found [here](https://htmlpreview.github.io/?https://github.com/higgi13425/medicaldata/blob/master/man/description_docs/covid_desc.html)], and ensuring factors are coded correctly.
+
+```{r}
+covid <- tibble(medicaldata::covid_testing)
+
+covid <- covid |>
+  mutate(across(c(gender, test_id, demo_group, drive_thru_ind, result, payor_group, patient_class), as_factor))
+
+# look at levels of the factors
+#sapply(covid[, c("gender", "test_id", "demo_group", "drive_thru_ind", "result", "payor_group", "patient_class")], levels)
+
+covid
+```
+
+## Bar charts
+
+Let's start with a simple bar chart, showing the frequency of negative and positive Covid results.
+
+First we create counts of positive, negative and invalid results.
+
+```{r}
+result_counts <- covid |>
+  count(result) |>
+  # capitalise first letter
+  mutate(result = str_to_title(as.character(result))) |>
+  arrange(desc(n))
+```
+
+```{r}
+# Create the bar chart
+hchart(
+    result_counts,
+    type = "bar",
+    hcaes(x = result, y = n),
+    name = "Results"
+  ) |>
+  hc_title(text = "Results of Covid Tests") |>
+  hc_xAxis(title = list(text = "Result")) |>
+  hc_yAxis(title = list(text = "Count")) |>
+  hc_colors("#003087") |>
+  # a source
+  hc_credits(
+    text = "Data obtained from the {medicaldata} package",
+    href = "https://higgi13425.github.io/medicaldata/",
+    enabled = TRUE
+    ) 
+```
+
+### Grouped bar chart
+
+Group results by gender.
+
+```{r}
+result_counts_gender <- covid |>
+  group_by(gender) |>
+  count(result) |>
+  # capitalise first letter
+  mutate(result = str_to_title(as.character(result)))
+```
+
+::: {.callout-note}
+# The hover box issues
+
+The hard part here seems to be getting the hover box to output the correct things. Specifically, I don't know how to get the names of the y-axis titles ("Positive", *etc.*), without doing nested `if` statements. It must involve the `formatter` but I'm not sure how.
+:::
+
+```{r}
+hchart(
+  result_counts_gender,
+  type = "bar",
+  hcaes(x = result, y = n, group = gender) 
+  ) |>
+  hc_colors(c("#003087", "#006747")) |>
+  hc_title(text = "Lots of people don't have Covid",
+           align = "left") |>
+  hc_subtitle(text = "A bar chart showing Covid test results, split by gender.",
+              align = "left") |>
+  hc_xAxis(title = list(text = "Result")) |>
+  hc_yAxis(title = list(text = "Count")) |>
+  # a source
+  hc_credits(
+    text = "Data obtained from the {medicaldata} package",
+    href = "https://higgi13425.github.io/medicaldata/",
+    enabled = TRUE
+    ) |>
+   hc_tooltip(
+      formatter = JS("function () {
+       if (this.series.name === 'male') {
+        return `<b>Male</b></br>${this.y} ${this.point.x} results`
+      } else if (this.series.name === 'female') {
+        return `<b>Female</b></br> ${this.y} ${this.point.x} results`
+      }}")
+   )
+
+```

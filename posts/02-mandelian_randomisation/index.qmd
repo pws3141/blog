@@ -1,0 +1,28 @@
+---
+title: "A First Foray into Genetics, GWAS, and Mendelian Randomisation"
+author: "Paul Smith"
+date: "2024-12-22"
+categories: [genetics, gwas, mendelian randomisation]
+image: "./fig/mendel.jpg"
+draft: true
+---
+
+## Introduction
+
+In the previous few weeks I have been trying to learn about Mendelian Randomisation, which has resulted in me doing a whistle-stop tour around genetics, codons, and genetic-wide association studies (GWAS). This post is a collection of my notes and thoughts.^[Please let me know if there are any mistakes or misconceptions]
+
+## Genetics for dummys
+
+::: {.callout-note}
+Before diving in, it's worth remarking that the field of genetics was created before anyone had any idea about the structure of a cell, what DNA looked like, and what chromosomes were. This means the language around this topic can be somewhat confusing for a newcomer, as old terms are still floating around, and overlapping with newer more precise terms.
+:::
+
+### A short history
+
+TODO: 
+
+- Gregor Mendel: "recessive" and "dominant" 
+- The birth of genetics: 1900 - 1940, basic patterns of genetic inheritance
+- DNA (1940s and 50s), and the discovery of the double helix (Rosalind Franklin, James Watson and Francis Crick, 1953)
+- Biobanks
+- GWAS

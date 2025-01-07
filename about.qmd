@@ -2,7 +2,7 @@
 title: "About"
 image: profile.jpg
 about:
-  template: jolla
+  template: broadside
   links:
     - icon: linkedin
       text: LinkedIn
@@ -14,3 +14,24 @@ about:
 ---
 
 This is a little space on the internet where probably nobody walks except me and my thoughts. Mainly about maths and R, sometimes both, very occasionally neither. I hope some of these posts are useful to someone.
+
+## Education
+
+University of Leeds |
+PhD in Statistics | September 2016 - August 2020
+
+University of Bristol |
+MMath | September 2011 - June 2015
+
+University of Hull |
+PGCE | September 2020 - June 2021
+
+## Experience
+
+NHS Blood and Transplant, Bristol | Statistician | November 2023 - present
+
+Equality and Human Rights Commission, Cardiff | Statistician | April 2023 - October 2023 (Maternity Cover)
+
+Secondary School, Bath | Maths Teacher | September 2020 - August 2022
+
+KPMG, London | Investment Advisor | September 2015 - August 2016
