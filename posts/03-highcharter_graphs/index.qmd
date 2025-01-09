@@ -16,13 +16,22 @@ I'm using data obtained from the [{medicaldata}](https://higgi13425.github.io/me
 #| warning: false
 
 library(highcharter)
-library(tibble) # tibbles
-library(forcats) # working with factors
-library(dplyr) # mutate
-library(stringr) # str_to_title
+#library(tibble) # tibbles
+#library(forcats) # working with factors
+#library(dplyr) # mutate
+#library(stringr) # str_to_title
+library(tidyverse)
 
 #library(gapminder)
+# use 'remotes::install_github("higgi13425/medicaldata")' to access the 'thiomon' dataset
 library(medicaldata)
+
+# obtaining MP information
+# remotes::install_github("houseofcommonslibrary/clmnis")
+library(clmnis)
+
+library(fontawesome)
+
 ```
 
 Loading the Covid data^[Description of the dataset can be found [here](https://htmlpreview.github.io/?https://github.com/higgi13425/medicaldata/blob/master/man/description_docs/covid_desc.html)], and ensuring factors are coded correctly.
@@ -89,6 +98,8 @@ result_counts_gender <- covid |>
 # The hover box issues
 
 The hard part here seems to be getting the hover box to output the correct things. Specifically, I don't know how to get the names of the y-axis titles ("Positive", *etc.*), without doing nested `if` statements. It must involve the `formatter` but I'm not sure how.
+
+**FIXED**: use `this.key` to get the names.
 :::
 
 ```{r}
@@ -112,11 +123,162 @@ hchart(
     ) |>
    hc_tooltip(
       formatter = JS("function () {
-       if (this.series.name === 'male') {
-        return `<b>Male</b></br>${this.y} ${this.point.x} results`
-      } else if (this.series.name === 'female') {
-        return `<b>Female</b></br> ${this.y} ${this.point.x} results`
+       if (this.series.name == 'male') {
+        return `<b>Male</b></br>${this.y} ${this.key} results`
+      } else if (this.series.name == 'female') {
+        return `<b>Female</b></br> ${this.y} ${this.key} results`
       }}")
    )
+
+```
+
+## Icons plot
+
+Let's look at the gender split in parliament as of 31st December 2024. We can extract the data using [{clmnis}](https://github.com/houseofcommonslibrary/clmnis), which is an R package for downloading data from the UK Parliament's [Members Names Information Service](https://data.parliament.uk/membersdataplatform/memberquery.aspx) (MNIS).
+
+Obtaining the data:
+
+```{r}
+mps <- clmnis::fetch_mps(on_date = "2024-12-31")
+
+mps_gender <- mps |>
+  count(gender) |>
+  mutate(
+    gender = case_match(
+      gender,
+      "M" ~ "Male MPs",
+      "F" ~ "Female MPs"
+    )
+  ) |>
+  add_column(col = c("#4477AA", "#EE6677"))
+        
+```
+
+
+Plotting a simple *icon* chart.
+
+```{r}
+hchart(
+  mps_gender,
+  "item",
+  hcaes(
+    name = gender,
+    y = n,
+    color = col
+  ),
+  name = "Number of MPs",
+  showInLegend = TRUE,
+  size = "100%",
+  center = list("50%", "75%"),
+  startAngle = -100,
+  endAngle  = 100
+) %>%
+  hc_title(
+    text = "Male MPs make up a significant majority of the House of Commons",
+    align = "left"
+    ) %>%
+  hc_subtitle(
+    text = "An item chart showing the proportion of male and femal MPs in the House of Commons, on 31st December 2024.",
+    align = "left"
+    ) |>
+  hc_legend(labelFormat = '{name} <span style="opacity: 0.4">{y}</span>')
+
+```
+
+What if we want female and male symbols instead of circles, and the icons arranges in a rectangle?
+
+First, lets add the icons to the tibble. We will use the [{fontawesome}](https://rstudio.github.io/fontawesome/) package [@iannone2024fontawesome] to get the symbols and use the function given in the [{highcharter} vignette](https://jkunst.com/highcharter/articles/fontawesome.html).
+
+```{r}
+fa_to_png_to_datauri <- function(name, ...) {
+  tmpfl <- tempfile(fileext = ".png")
+  fontawesome::fa_png(name, file = tmpfl, ...)
+  knitr::image_uri(tmpfl)
+
+}
+
+female_icon <- fa_to_png_to_datauri(name = "person-dress", width = 22, fill = mps_gender$col[1])
+male_icon <- fa_to_png_to_datauri(name = "person",    width = 22, fill = mps_gender$col[1])
+```
+
+Adding these symbols to the tibble.
+
+```{r}
+mps_gender_icon <- mps_gender |>
+              add_column(marker = str_glue("url({data_uri})", data_uri = c(female_icon, male_icon)))
+```
+
+Creating the new icon plot.
+
+```{r}
+hchart(
+  mps_gender_icon,
+  "item",
+  hcaes(
+    name = gender,
+    y = n,
+    color = col
+  ),
+  name = "Number of MPs",
+  showInLegend = TRUE,
+  size = "100%"
+) |>
+  hc_title(
+    text = "Male MPs make up a significant majority of the House of Commons",
+    align = "left"
+    ) |>
+  hc_subtitle(
+    text = "An item chart showing the proportion of male and femal MPs in the House of Commons, on 31st December 2024.",
+    align = "left"
+    ) |>
+  hc_legend(labelFormat = '{name} <span style="opacity: 0.4">{y}</span>') |>
+  hc_plotOptions(
+    item = list(
+      layout = "vertical",
+      rows = 18 # Specify the number of rows here
+    )
+  )
+```
+
+```{r}
+df2 <- tibble(
+  type = c("fruit", "samminch", "pizza"),
+  amount = c(46, 54, 80),
+  faico = c("apple", "bread-slice", "pizza-slice"),
+  col = c("#d35400", "#907E4D", "#F89101")
+)
+
+df2
+```
+
+```{r}
+df2 <- df2 |>
+  mutate(
+    uri = map2_chr(faico, col, ~fa_to_png_to_datauri(.x, fill = .y)),
+    marker = map(uri, ~ list(symbol = str_glue("url({data_uri})", data_uri = .x)))
+  )
+
+hchart(
+  df2,
+  "item",
+  hcaes(name = type, y = amount),
+  name = "What I eat",
+  showInLegend = TRUE
+  ) |>
+  hc_plotOptions(
+    # avoid hide series due bug
+    series = list(point = list(events = list(legendItemClick = JS("function(e) {e.preventDefault() }"))))
+  ) |>
+  hc_legend(
+    labelFormat =  '{name} <span style="opacity: 0.4">{y}</span>'
+  ) |>
+  hc_colors(pull(df2, col))
+```
+
+
+## Line graphs
+
+```{r}
+thoimon <- tibble(medicaldata::thiomon)
 
 ```
