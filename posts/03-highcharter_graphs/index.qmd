@@ -157,6 +157,10 @@ mps_gender <- mps |>
 
 Plotting a simple *icon* chart.
 
+::: {.panel-tabset}
+
+## Parliament view
+
 ```{r}
 hchart(
   mps_gender,
@@ -185,9 +189,42 @@ hchart(
 
 ```
 
+## Circle view
+
+To change the plot to a circular layout, set `startAngle = -180` and `endAngle = 180` and change the `center` argument.
+
+```{r}
+hchart(
+  mps_gender,
+  "item",
+  hcaes(
+    name = gender,
+    y = n,
+    color = col
+  ),
+  name = "Number of MPs",
+  showInLegend = TRUE,
+  size = "100%",
+  center = list("50%", "50%"),
+  startAngle = -180,
+  endAngle  = 180
+) %>%
+  hc_title(
+    text = "Male MPs make up a significant majority of the House of Commons",
+    align = "left"
+    ) %>%
+  hc_subtitle(
+    text = "An item chart showing the proportion of male and femal MPs in the House of Commons, on 31st December 2024.",
+    align = "left"
+    ) |>
+  hc_legend(labelFormat = '{name} <span style="opacity: 0.4">{y}</span>')
+
+```
+:::
+
 What if we want female and male symbols instead of circles, and the icons arranges in a rectangle?
 
-First, lets add the icons to the tibble. We will use the [{fontawesome}](https://rstudio.github.io/fontawesome/) package [@iannone2024fontawesome] to get the symbols and use the function given in the [{highcharter} vignette](https://jkunst.com/highcharter/articles/fontawesome.html).
+First, lets add the icons to the tibble. We will use the [{fontawesome}](https://rstudio.github.io/fontawesome/) package [@iannone2024fontawesome], alongside the function given in the [{highcharter} vignette](https://jkunst.com/highcharter/articles/fontawesome.html) to obtain the symbols.
 
 ```{r}
 fa_to_png_to_datauri <- function(name, ...) {
@@ -196,16 +233,20 @@ fa_to_png_to_datauri <- function(name, ...) {
   knitr::image_uri(tmpfl)
 
 }
-
-female_icon <- fa_to_png_to_datauri(name = "person-dress", width = 22, fill = mps_gender$col[1])
-male_icon <- fa_to_png_to_datauri(name = "person",    width = 22, fill = mps_gender$col[1])
 ```
 
-Adding these symbols to the tibble.
+Adding the ['person'](https://fontawesome.com/icons/person?f=classic&s=solid) and ['person-dress'](https://fontawesome.com/icons/person-dress?f=classic&s=solid) symbols to the tibble.
 
 ```{r}
 mps_gender_icon <- mps_gender |>
-              add_column(marker = str_glue("url({data_uri})", data_uri = c(female_icon, male_icon)))
+  add_column(faico = c("person-dress", "person"))
+
+mps_gender_icon <- mps_gender_icon |>
+  mutate(
+    uri = map2_chr(faico, col, ~fa_to_png_to_datauri(.x, fill = .y)),
+    marker = map(uri, ~ list(symbol = str_glue("url({data_uri})", data_uri = .x)))
+  )
+
 ```
 
 Creating the new icon plot.
@@ -240,45 +281,9 @@ hchart(
   )
 ```
 
-```{r}
-df2 <- tibble(
-  type = c("fruit", "samminch", "pizza"),
-  amount = c(46, 54, 80),
-  faico = c("apple", "bread-slice", "pizza-slice"),
-  col = c("#d35400", "#907E4D", "#F89101")
-)
-
-df2
-```
-
-```{r}
-df2 <- df2 |>
-  mutate(
-    uri = map2_chr(faico, col, ~fa_to_png_to_datauri(.x, fill = .y)),
-    marker = map(uri, ~ list(symbol = str_glue("url({data_uri})", data_uri = .x)))
-  )
-
-hchart(
-  df2,
-  "item",
-  hcaes(name = type, y = amount),
-  name = "What I eat",
-  showInLegend = TRUE
-  ) |>
-  hc_plotOptions(
-    # avoid hide series due bug
-    series = list(point = list(events = list(legendItemClick = JS("function(e) {e.preventDefault() }"))))
-  ) |>
-  hc_legend(
-    labelFormat =  '{name} <span style="opacity: 0.4">{y}</span>'
-  ) |>
-  hc_colors(pull(df2, col))
-```
-
 
 ## Line graphs
 
 ```{r}
 thoimon <- tibble(medicaldata::thiomon)
-
 ```
