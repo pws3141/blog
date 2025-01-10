@@ -4,7 +4,6 @@ author: "Paul Smith"
 date: "2024-12-22"
 categories: [genetics, gwas, mendelian randomisation]
 image: "./fig/mendel.jpg"
-draft: true
 ---
 
 ## Introduction
@@ -17,6 +16,29 @@ In the previous few weeks I have been trying to learn about Mendelian Randomisat
 Before diving in, it's worth remarking that the field of genetics was created before anyone had any idea about the structure of a cell, what DNA looked like, and what chromosomes were. This means the language around this topic can be somewhat confusing for a newcomer, as old terms are still floating around, and overlapping with newer more precise terms.
 :::
 
+Let's start by describing the basic mechanics of genetic material and cells. In
+humans, most cell contains DNA, which is packaged in 23 chromosomes^[by being
+tightly coiled around proteins known as histones]. DNA is a long code created
+from four nucleotides -- adenine (A), guanine (G), cytosine (C), and thymine (T) --
+which are paired with each other (AT and CG) to create base pairs. Parts of the
+DNA do a specific job, and are known as genes. These genes either code for
+proteins, or help control other genes. Genes are small sections of DNA that
+have the ability to be copied into an RNA sequence, which can then encode for
+proteins (or perform other tasks).
+
+A single-nucleotide polymorphism (SNP) is when there is a substitution in a single nucleotide.
+A SNP in a gene can create differences within populations, for example in the
+ability to metabolise alcohol. Most of the time, however, they do not create
+any differences, as when the RNA from genes are read, they are done in codons.
+A codon is a set of three base pairs, and therefore there are $2^4 = 64$
+different combinations of the four nucleotides ($61$ of which specify amino
+acids). However, as there are only $20$ amino acids, there are many codons with
+different bae pairs that produce the same amino acids. For example, UCU, UCC,
+UCA, UCG, AGU, AGC all produce the Serine amino acid.^[The full table showing
+these combinations can be seen
+[here](https://en.wikipedia.org/wiki/DNA_and_RNA_codon_tables#Translation_table_1)]
+
+
 ### A short history
 
 TODO: 
@@ -26,3 +48,10 @@ TODO:
 - DNA (1940s and 50s), and the discovery of the double helix (Rosalind Franklin, James Watson and Francis Crick, 1953)
 - Biobanks
 - GWAS
+
+Lets start with Gregor Mendel, as he is the "father of modern genetics". I won't go into detail on him, as [Wikipedia](https://en.wikipedia.org/wiki/Gregor_Mendel) can do that for me. However, two quick points to make:
+
+1. The [*Laws of Inheritance*](https://en.wikipedia.org/wiki/Mendelian_inheritance#Mendel's_laws_of_inheritance) are important pre-requisite conditions for Mendelian Randomisation to work.
+2. The genius of Mendel was his ability to understand that the underlying process was random and he was only observing a realisation of this random process.
+
+
