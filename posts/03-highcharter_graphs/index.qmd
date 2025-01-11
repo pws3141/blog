@@ -8,21 +8,24 @@ image: "./fig/highcharter_logo.png"
 
 ## Introduction
 
-In my [previous post](../01-highcharter/index.qmd) about {highcharter}, I considered changing some of the defaults for a scatter graph to make it look more appealing and be more accessible. This post will focus on plotting different types of graphs.
+In my [previous post](../01-highcharter/index.qmd) about {highcharter}, I considered changing some of the defaults for a scatter graph to make it look more appealing and be more accessible. This post will focus on plotting the following different types of graphs:
 
-I'm using data obtained from the [{medicaldata}](https://higgi13425.github.io/medicaldata/) package [@higgins2021medical].
+- Bar charts, including grouped bar charts
+- Icon plots
+- Line graphs
+- Survival plots (Kaplan-Meier and Cox proportional hazards)
+- Maps
+
+
+First, we will load the packages we require in this post. The {highcharter} [@kunst2022highcharter] and {tidyverse} [@wickham2019tidyverse] packages are used throughout. The {medicaldata} package [@higgins2021medical] is used to create the bar charts, line graphs and survival plots. The icon plots use data obtained via the {clmnis} package [@dempsey2025clmnis], *and the maps use data from the {gapminder} package*.
 
 ```{r}
 #| warning: false
 
 library(highcharter)
-#library(tibble) # tibbles
-#library(forcats) # working with factors
-#library(dplyr) # mutate
-#library(stringr) # str_to_title
 library(tidyverse)
 
-#library(gapminder)
+# medical data package
 # use 'remotes::install_github("higgi13425/medicaldata")' to access the 'thiomon' dataset
 library(medicaldata)
 
@@ -31,9 +34,11 @@ library(medicaldata)
 library(clmnis)
 
 library(fontawesome)
-
 ```
 
+## Bar charts
+
+For the bar charts, I'm using data obtained from the [{medicaldata}](https://higgi13425.github.io/medicaldata/) package.
 Loading the Covid data^[Description of the dataset can be found [here](https://htmlpreview.github.io/?https://github.com/higgi13425/medicaldata/blob/master/man/description_docs/covid_desc.html)], and ensuring factors are coded correctly.
 
 ```{r}
@@ -48,7 +53,6 @@ covid <- covid |>
 covid
 ```
 
-## Bar charts
 
 Let's start with a simple bar chart, showing the frequency of negative and positive Covid results.
 
@@ -134,13 +138,17 @@ hchart(
 
 ## Icons plot
 
-Let's look at the gender split in parliament as of 31st December 2024. We can extract the data using [{clmnis}](https://github.com/houseofcommonslibrary/clmnis), which is an R package for downloading data from the UK Parliament's [Members Names Information Service](https://data.parliament.uk/membersdataplatform/memberquery.aspx) (MNIS).
+Let's look at the gender split in parliament as of 31st December 2024. We can extract the data using [{clmnis}](https://github.com/houseofcommonslibrary/clmnis) [@dempsey2025clmnis], which is an R package for downloading data from the UK Parliament's [Members Names Information Service](https://data.parliament.uk/membersdataplatform/memberquery.aspx) (MNIS).
 
 Obtaining the data:
 
 ```{r}
 mps <- clmnis::fetch_mps(on_date = "2024-12-31")
 
+mps
+```
+
+```{r}
 mps_gender <- mps |>
   count(gender) |>
   mutate(
@@ -152,10 +160,13 @@ mps_gender <- mps |>
   ) |>
   add_column(col = c("#4477AA", "#EE6677"))
         
+mps_gender
 ```
 
 
-Plotting a simple *icon* chart.
+### A basic icon chart 
+
+Plotting a simple *icon* chart. Choose between the "parliament view" and the "circular view" by selecting the relevant tab below.
 
 ::: {.panel-tabset}
 
@@ -221,6 +232,8 @@ hchart(
 
 ```
 :::
+
+### Adding symbols to the icon chart
 
 What if we want female and male symbols instead of circles, and the icons arranges in a rectangle?
 

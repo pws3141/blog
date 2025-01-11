@@ -33,7 +33,7 @@ any differences, as when the RNA from genes are read, they are done in codons.
 A codon is a set of three base pairs, and therefore there are $2^4 = 64$
 different combinations of the four nucleotides ($61$ of which specify amino
 acids). However, as there are only $20$ amino acids, there are many codons with
-different bae pairs that produce the same amino acids. For example, UCU, UCC,
+different base pairs that produce the same amino acids. For example, UCU, UCC,
 UCA, UCG, AGU, AGC all produce the Serine amino acid.^[The full table showing
 these combinations can be seen
 [here](https://en.wikipedia.org/wiki/DNA_and_RNA_codon_tables#Translation_table_1)]
@@ -41,17 +41,33 @@ these combinations can be seen
 
 ### A short history
 
-TODO: 
-
-- Gregor Mendel: "recessive" and "dominant" 
-- The birth of genetics: 1900 - 1940, basic patterns of genetic inheritance
-- DNA (1940s and 50s), and the discovery of the double helix (Rosalind Franklin, James Watson and Francis Crick, 1953)
-- Biobanks
-- GWAS
-
-Lets start with Gregor Mendel, as he is the "father of modern genetics". I won't go into detail on him, as [Wikipedia](https://en.wikipedia.org/wiki/Gregor_Mendel) can do that for me. However, two quick points to make:
+Lets start with Gregor Mendel, as he is the "father of modern genetics" and well known for his experiments into the inheritance of pea plants. I won't go into detail on him, as [Wikipedia](https://en.wikipedia.org/wiki/Gregor_Mendel) can do that for me. However, two quick points to make:
 
 1. The [*Laws of Inheritance*](https://en.wikipedia.org/wiki/Mendelian_inheritance#Mendel's_laws_of_inheritance) are important pre-requisite conditions for Mendelian Randomisation to work.
 2. The genius of Mendel was his ability to understand that the underlying process was random and he was only observing a realisation of this random process.
 
+The double-helix structure of DNA was discovered by Rosalind Franklin, James
+Watson and Francis Crick in 1953. This knowledge of the structure allowed the
+further discoveries of how proteins are translated from RNA, which is
+transcribed by DNA.
 
+#### Biobanks 
+
+In the last twenty years or so, large biobanks have been created. These store the genetic and health information of individuals, either at a single point in time or with a temporal aspect. Two examples of large biobanks are:
+
+1. The [UK Biobank](https://www.ukbiobank.ac.uk/) has information on around half-a-million individuals aged between 40 and 69. 
+2. The [Avon Longitudinal Study of Parents and Children](https://www.bristol.ac.uk/alspac/). Here, more than 14,000 pregnant women were recruited into the study in 1991/92, with their children, and grandchildren, being followed up in detail.
+
+One important caveat for these biobanks when using them for research is that
+they are not representative of the population of the UK. For example, it is
+known that the individuals in the UK Biobank are more likely to be in a higher
+social-economic bracket, with fewer lung cancers and other health issues than
+the general population. This makes performing analysis and obtaining
+generalisable result (using GWAS^[genome-wise association studies] and Mendelian Randomisation) more difficult.
+
+#### Genome-wise associated studies
+
+Genome-wide association studies (GWAS) attempt to find associations between genetic variants and phenotypes. The genetic variants considered are usually SNPs, as opposed to indels^[[insertions and deletions](https://www.sciencedirect.com/science/article/abs/pii/B9780124047488000095)]. As biobank sequencing is normally short-read (*i.e.* only a small section of DNA is read at a time) and the location of these short-reads are random,^[I am not sure if they are truely random along the whole of the DNA - it might just be that there is some uncertainty in the exact location] it is trickier to notice indels compared to SNPs.
+It is also worth noting here that when an individual's genome is sequenced, the result isn't the sequence of DNA in a specific cell, but instead is an average. This means that the SNPs in the sequences obtained were present in most of the cells within the individual so most likely have been there since the very early cell division stages. Therefore, if certain SNPs are associated with phenotypes, then the relationship can be thought of a "lifetime" association.
+
+## Mendelian Randomisation
