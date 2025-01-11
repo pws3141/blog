@@ -1,7 +1,7 @@
 ---
 title: "A First Foray into Genetics, GWAS, and Mendelian Randomisation"
 author: "Paul Smith"
-date: "2024-12-22"
+date: "2025-01-11"
 categories: [genetics, gwas, mendelian randomisation]
 image: "./fig/mendel.jpg"
 ---

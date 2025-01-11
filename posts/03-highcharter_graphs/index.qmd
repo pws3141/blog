@@ -1,7 +1,7 @@
 ---
 title: "Some Highcharter Graphs"
 author: "Paul Smith"
-date: "2025-01-06"
+date: "2025-01-12"
 categories: [code, graphics, r]
 image: "./fig/highcharter_logo.png"
 ---

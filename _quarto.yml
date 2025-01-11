@@ -9,8 +9,6 @@ website:
       - icon: github
         href: https://github.com/pws3141/pws3141.github.io
   drafts:
-    - posts/02-mandelian_randomisation/index.qmd
-    - posts/03-highcharter_graphs/index.qmd
   draft-mode: unlinked
 format:
   html:
