@@ -23,7 +23,9 @@ First, we will load the packages we require in this post. The {highcharter} [@ku
 #| warning: false
 
 library(highcharter)
+library(paletteer) # colour palettes
 library(tidyverse)
+library(gapminder)
 
 # medical data package
 # use 'remotes::install_github("higgi13425/medicaldata")' to access the 'thiomon' dataset
@@ -83,7 +85,20 @@ hchart(
     text = "Data obtained from the {medicaldata} package",
     href = "https://higgi13425.github.io/medicaldata/",
     enabled = TRUE
-    ) 
+    ) |>
+  hc_exporting(
+    accessibility = list(
+      enabled = TRUE # default value is TRUE
+      ),
+    enabled = TRUE,
+    filename = "covid_bar"
+  ) |>
+  hc_plotOptions(
+    accessibility = list(
+      enabled = TRUE,
+      keyboardNavigation = list(enabled = TRUE)
+      )
+    )
 ```
 
 ### Grouped bar chart
@@ -132,7 +147,20 @@ hchart(
       } else if (this.series.name == 'female') {
         return `<b>Female</b></br> ${this.y} ${this.key} results`
       }}")
-   )
+   ) |>
+  hc_exporting(
+    accessibility = list(
+      enabled = TRUE # default value is TRUE
+      ),
+    enabled = TRUE,
+    filename = "covid_bar"
+  ) |>
+  hc_plotOptions(
+    accessibility = list(
+      enabled = TRUE,
+      keyboardNavigation = list(enabled = TRUE)
+      )
+    )
 
 ```
 
@@ -196,7 +224,20 @@ hchart(
     text = "An item chart showing the proportion of male and femal MPs in the House of Commons, on 31st December 2024.",
     align = "left"
     ) |>
-  hc_legend(labelFormat = '{name} <span style="opacity: 0.4">{y}</span>')
+  hc_legend(labelFormat = '{name} <span style="opacity: 0.4">{y}</span>') |>
+  hc_exporting(
+    accessibility = list(
+      enabled = TRUE # default value is TRUE
+      ),
+    enabled = TRUE,
+    filename = "mp_icon_plot"
+  ) |>
+  hc_plotOptions(
+    accessibility = list(
+      enabled = TRUE,
+      keyboardNavigation = list(enabled = TRUE)
+      )
+    )
 
 ```
 
@@ -228,7 +269,20 @@ hchart(
     text = "An item chart showing the proportion of male and femal MPs in the House of Commons, on 31st December 2024.",
     align = "left"
     ) |>
-  hc_legend(labelFormat = '{name} <span style="opacity: 0.4">{y}</span>')
+  hc_legend(labelFormat = '{name} <span style="opacity: 0.4">{y}</span>') |>
+  hc_exporting(
+    accessibility = list(
+      enabled = TRUE # default value is TRUE
+      ),
+    enabled = TRUE,
+    filename = "mp_icon_plot"
+  ) |>
+  hc_plotOptions(
+    accessibility = list(
+      enabled = TRUE,
+      keyboardNavigation = list(enabled = TRUE)
+      )
+    )
 
 ```
 :::
@@ -291,12 +345,308 @@ hchart(
       layout = "vertical",
       rows = 18 # Specify the number of rows here
     )
-  )
+  ) |>
+  hc_exporting(
+    accessibility = list(
+      enabled = TRUE # default value is TRUE
+      ),
+    enabled = TRUE,
+    filename = "mp_icon_plot"
+  ) |>
+  hc_plotOptions(
+    accessibility = list(
+      enabled = TRUE,
+      keyboardNavigation = list(enabled = TRUE)
+      )
+    )
 ```
 
 
 ## Line graphs
 
+Using data obtained from the {gapminder} package [@bryan2023gapminder], we will produce a line graph. A few new things here:
+
+- We have used the {paletteer} package [@hvitfeldt2021paletteer] to obtain a colour palette.
+- We have added labels to the lines directly, using [`plotOptions.series.label`](https://api.highcharts.com/highcharts/plotOptions.series.label).
+- We have set the linewidth directed, in `plotOptions`.
+- We have removed markers from the lines except when hovered over, in `plotOptions`.
+
 ```{r}
-thoimon <- tibble(medicaldata::thiomon)
+gapminder_line <- gapminder |>
+  filter(country %in% c("United Kingdom","France","Germany","Italy","Netherlands"))
+
+hchart(gapminder_line, 
+       "line",
+        hcaes(x = year, y = pop, group = country)) |>
+  hc_title(
+    text = "The Netherlands has a much smaller population than Germany.",
+    align = "left"
+    ) |>
+  hc_subtitle(
+    text = "A line chart showing changes in population between 1952 and 2007.",
+    align = "left"
+    ) |>
+  hc_xAxis(title = list(text = "Year")) |>
+  hc_yAxis(title = list(text = "Population")) |>
+  # a source
+  hc_credits(
+    text = "Data obtained from the {gapminder} package",
+    href = "https://www.gapminder.org/",
+    enabled = TRUE
+    ) |>
+  hc_colors(colors = as.character(paletteer::paletteer_d("lisa::FridaKahlo"))) |>
+  hc_exporting(
+    accessibility = list(
+      enabled = TRUE # default value is TRUE
+      ),
+    enabled = TRUE,
+    filename = "population_line"
+  ) |>
+  hc_plotOptions(
+    series = list(
+   label = list(
+        enabled = TRUE, # add labels to lines
+        style = list(
+          fontWeight = "bold",
+          color = "#333"
+        ),
+        connectorAllowed = FALSE # include line connecting label to series?
+      ),
+      lineWidth = 2,
+      marker = list(
+        enabled = FALSE, # remove markers
+        symbol = "circle",
+        states = list(
+          hover = list(
+            enabled = TRUE # enable markers if hovered over
+          )
+        )
+      )),
+    accessibility = list(
+      enabled = TRUE,
+      keyboardNavigation = list(enabled = TRUE)
+      )
+    )
+```
+
+## Stream graphs
+
+Copying the line graph we produced above.
+
+```{r}
+hchart(gapminder_line, 
+       "streamgraph", zoomType = "x",
+        hcaes(x = year, y = pop, group = country)) |>
+  hc_title(
+    text = "The populations in these countries are relatively steady over time.",
+    align = "left"
+    ) |>
+  hc_subtitle(
+    text = "A line chart showing changes in population between 1952 and 2007.",
+    align = "left"
+    ) |>
+  hc_xAxis(title = list(text = "Year")) |>
+  hc_yAxis(visible = FALSE, 
+           startOnTick = FALSE, endOnTick = FALSE, 
+           title = list(text = "Population")) |>
+  # a source
+  hc_credits(
+    text = "Data obtained from the {gapminder} package",
+    href = "https://www.gapminder.org/",
+    enabled = TRUE
+    ) |>
+  hc_colors(colors = as.character(paletteer::paletteer_d("lisa::FridaKahlo"))) |>
+  hc_exporting(
+    accessibility = list(
+      enabled = TRUE # default value is TRUE
+      ),
+    enabled = TRUE,
+    filename = "population_line"
+  ) |>
+  hc_plotOptions(
+    series = list(
+   label = list(
+        enabled = TRUE, # add labels to lines
+        style = list(
+          fontWeight = "bold",
+          color = "#555555"
+        ),
+        connectorAllowed = FALSE # include line connecting label to series?
+      ),
+      lineWidth = 2,
+      marker = list(
+        enabled = FALSE, # remove markers
+        symbol = "circle",
+        states = list(
+          hover = list(
+            enabled = FALSE # enable markers if hovered over
+          )
+        )
+      )),
+    accessibility = list(
+      enabled = TRUE,
+      keyboardNavigation = list(enabled = TRUE)
+      )
+    )
+```
+
+Copying the example given in the [Highchart demos](https://www.highcharts.com/demo/highcharts/streamgraph). First, we will create a list of data -- medals won by countries in the Winter Olympics, which is taken from [Olympedia](https://www.olympedia.org/statistics).
+
+```{r}
+custom_colors <- as.character(paletteer_d(`"awtools::bpalette"`, n = 3))
+  
+# Categories
+categories <- c(
+  '',
+  '1924 Chamonix', '1928 St. Moritz', '1932 Lake Placid', 
+  '1936 Garmisch-Partenkirchen', '1940 <i>Cancelled (Sapporo)</i>', 
+  '1944 <i>Cancelled (Cortina d\'Ampezzo)</i>', '1948 St. Moritz', 
+  '1952 Oslo', '1956 Cortina d\'Ampezzo', '1960 Squaw Valley', 
+  '1964 Innsbruck', '1968 Grenoble', '1972 Sapporo', 
+  '1976 Innsbruck', '1980 Lake Placid', '1984 Sarajevo', 
+  '1988 Calgary', '1992 Albertville', '1994 Lillehammer', 
+  '1998 Nagano', '2002 Salt Lake City', '2006 Turin', 
+  '2010 Vancouver', '2014 Sochi', '2018 PyeongChang', 
+  '2022 Beijing'
+)
+
+# medal data
+medal_data <- list(
+  list(name = "Finland", 
+       data = c(0, 11, 4, 3, 6, 0, 0, 6, 9, 7, 8, 10, 5, 5, 7, 9, 13, 7, 7, 6, 12, 7, 9, 5, 5, 6, 8)),
+  list(name = "Austria", 
+       data = c(0, 3, 4, 2, 4, 0, 0, 8, 8, 11, 6, 12, 11, 5, 6, 7, 1, 10, 21, 9, 17, 17, 23, 16, 17, 14, 18)),
+  list(name = "Sweden", 
+       data = c(0, 2, 5, 3, 7, 0, 0, 10, 4, 10, 7, 7, 8, 4, 2, 4, 8, 6, 4, 3, 3, 7, 14, 11, 15, 14, 18))
+)
+```
+
+ Now we will create the stream graph. A few novel things here:
+
+- I built the graph before adding the data. Note that the data is only added in the very last line, using `hc_add_series_list()
+- Annotations were added using `hc_annotations()`.
+
+```{r}
+# Create the chart
+highchart() |>
+  hc_chart(type = "streamgraph", zoomType = "x", marginBottom = 30) |>
+  hc_colors(colors = custom_colors) |>
+  hc_title(text = "Winter Olympic Medal Wins", align = "left", floating = TRUE) |>
+  hc_subtitle(
+    text = 'Source: <a href="https://www.olympedia.org/statistics">olympedia.org</a>', 
+    align = "left", y = 30, floating = TRUE
+  ) |>
+  hc_xAxis(
+    categories = categories, 
+    crosshair = TRUE,
+    labels = list(
+      align = "left", 
+      rotation = 270, 
+      reserveSpace = FALSE),
+    lineWidth = 0, # remove x-axis line
+    tickWidth = 0 # remove x-axis tick
+  ) |>
+  hc_yAxis(visible = FALSE, 
+           startOnTick = FALSE, endOnTick = FALSE, 
+           minPadding = 0.1, maxPadding = 0.15) |>
+  hc_legend(enabled = FALSE) |>
+  hc_annotations(
+    list(
+      labels = list(
+        list(point = list(x = 5.5, xAxis = 0, y = 0, yAxis = 0), 
+             text = "Cancelled<br>during<br>World War II"),
+        list(point = list(x = 18, xAxis = 0, y = 15, yAxis = 0), 
+             text = "Soviet Union fell,<br>Germany united"),
+        list(point = list(x = 24.25, xAxis = 0, y = 20, yAxis = 0), 
+             text = "Russia banned from<br>the Olympic Games<br> in 2017")
+      )
+    )
+  ) |>
+  hc_plotOptions(
+    series = list(
+      label = list(
+        minFontSize = 5, 
+        maxFontSize = 15, 
+        style = list(color = "rgba(255,255,255,0.75)")),
+      accessibility = list(exposeAsGroupOnly = TRUE)
+    )
+  ) |>
+  hc_add_series_list(medal_data)
+
+```
+
+## Other charts
+
+I have shamelessly stolen this next chart from Joshua Kunst who created it in a [{highcharter} article](https://jkunst.com/highcharter/articles/showcase.html), and in turn stole the idea from the [Wall Street Journal](https://graphics.wsj.com/infectious-diseases-and-vaccines/). But, it is such a nice chart that I can't not reproduce it here.
+
+```{r}
+data(vaccines)
+
+fntltp <- JS("function(){
+  return this.point.x + ' ' +  this.series.yAxis.categories[this.point.y] + ': ' +
+  Highcharts.numberFormat(this.point.value, 2);
+}")
+
+plotline <- list(
+  color = "#fde725", value = 1963, width = 2, zIndex = 5,
+  label = list(
+    text = "Vaccine Intoduced", verticalAlign = "top",
+    style = list(color = "#606060"), textAlign = "left",
+    rotation = 0, y = -5
+  )
+)
+
+hchart(
+  vaccines, 
+  "heatmap", 
+  hcaes(
+    x = year,
+    y = state, 
+    value = count
+    )
+  ) |>
+  hc_colorAxis(
+    stops = color_stops(10, viridisLite::inferno(10, direction = -1)),
+    type = "logarithmic"
+  ) |>
+  hc_yAxis(
+    title = list(text = ""),
+    reversed = TRUE, 
+    offset = -20,
+    tickLength = 0,
+    gridLineWidth = 0, 
+    minorGridLineWidth = 0,
+    labels = list(style = list(fontSize = "9px"))
+  ) |>
+  hc_tooltip(
+    formatter = fntltp
+    ) |>
+  hc_xAxis(
+    plotLines = list(plotline)) |>
+  hc_title(
+    text = "Infectious Diseases and Vaccines"
+    ) |>
+  hc_subtitle(
+    text = "Number of cases per 100,000 people"
+  ) |> 
+  hc_legend(
+    layout = "horizontal",
+    verticalAlign = "top",
+    align = "left",
+    valueDecimals = 0
+  ) |>
+  hc_size(height = 900)  |>
+  hc_exporting(
+    accessibility = list(
+      enabled = TRUE # default value is TRUE
+      ),
+    enabled = TRUE,
+    filename = "vaccines"
+  ) |>
+  hc_plotOptions(
+    accessibility = list(
+      enabled = TRUE,
+      keyboardNavigation = list(enabled = TRUE)
+      )
+    )
 ```
