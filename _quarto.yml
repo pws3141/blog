@@ -15,7 +15,7 @@ format:
     code-fold: show
     grid:
       margin-width: 350px
-    df-print: paged # pages html tables: https://quarto.org/docs/computations/r.html#data-frames
+    df-print: paged
     toc: true
     toc-location: left
 execute:
@@ -27,3 +27,5 @@ citation-location: margin
 fig-cap-location: margin
 tbl-cap-location: margin
 link-citations: true
+citation: true
+google-scholar: true

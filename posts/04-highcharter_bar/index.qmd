@@ -1,6 +1,7 @@
 ---
 title: "A Bidirectional Bar Chart using Highcharter"
-author: "Paul Smith"
+author:
+  - name: Paul Smith
 date: "2025-02-19"
 categories: [code, graphics, r]
 image: "./fig/highcharter_logo.png"
@@ -8,7 +9,7 @@ execute:
   df-print: default
 ---
 
-This is just a quick post, as a follow on to my previous highcharter posts ([one](../01-highcharter/index.qmd) and [two](../01-highcharter/index.qmd)).
+This is just a quick post, as a follow on to my previous highcharter posts ([one](../01-highcharter/index.qmd) and [two](../03-highcharter_graphs/index.qmd)).
 
 I wanted a bar chart that looks like @fig-example, which was made using [Flourish](https://flourish.studio/).
 
@@ -183,5 +184,8 @@ highchart() |>
   ) 
 
 ```
+
+
+## Fin
 
 I think the end result is pretty good.
