@@ -16,6 +16,8 @@ format:
     grid:
       margin-width: 350px
     df-print: paged # pages html tables: https://quarto.org/docs/computations/r.html#data-frames
+    toc: true
+    toc-location: left
 execute:
   echo: true
   freeze: auto

@@ -13,11 +13,10 @@ In my [previous post](../01-highcharter/index.qmd) about {highcharter}, I consid
 - Bar charts, including grouped bar charts
 - Icon plots
 - Line graphs
-- Survival plots (Kaplan-Meier and Cox proportional hazards)
-- Maps
+- Stream graphs
 
 
-First, we will load the packages we require in this post. The {highcharter} [@kunst2022highcharter] and {tidyverse} [@wickham2019tidyverse] packages are used throughout. The {medicaldata} package [@higgins2021medical] is used to create the bar charts, line graphs and survival plots. The icon plots use data obtained via the {clmnis} package [@dempsey2025clmnis], *and the maps use data from the {gapminder} package*.
+First, we will load the packages we require in this post. The {highcharter} [@kunst2022highcharter] and {tidyverse} [@wickham2019tidyverse] packages are used throughout. The {medicaldata} package [@higgins2021medical] is used to create the bar charts and (some of) the line graphs. The icon plots use data obtained via the {clmnis} package [@dempsey2025clmnis].
 
 ```{r}
 #| warning: false

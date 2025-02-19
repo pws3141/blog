@@ -1,0 +1,187 @@
+---
+title: "A Bidirectional Bar Chart using Highcharter"
+author: "Paul Smith"
+date: "2025-02-19"
+categories: [code, graphics, r]
+image: "./fig/highcharter_logo.png"
+execute:
+  df-print: default
+---
+
+This is just a quick post, as a follow on to my previous highcharter posts ([one](../01-highcharter/index.qmd) and [two](../01-highcharter/index.qmd)).
+
+I wanted a bar chart that looks like @fig-example, which was made using [Flourish](https://flourish.studio/).
+
+![A bidirectional bar chart created using Flourish](./fig/flourish_example.png){#fig-example}
+
+```{r}
+library(data.table)
+library(highcharter)
+```
+
+:::{.column-margin}
+On a separate note, I've started preferring `data.table` over the tidyverse. It is super fast, and feels like the syntax is very well thought out. It also allows me to start experimenting with [`{mlr3}`](https://mlr3.mlr-org.com/).
+:::
+
+## The data
+
+The data looks like this.
+
+```{r}
+bar_data <- data.table(
+  donation_and_transplantation_summary = c(
+    "Waiting for an organ",
+    "Opt-Out from the ODR",
+    "Deceased organ donor transplants",
+    "Died on the waiting list",
+    "Living organ donor transplants",
+    "Living donors",
+    "Opt-in to the Organ Donor Register (ODR)",
+    "Eligible deceased donors",
+    "Deceased donors"
+  ),
+  black_percent = c(-11, -7, -10, -8, -4, -3, -2, -3, -1),
+  asian_percent = c(19, 18, 17, 13, 9, 8, 7, 7, 4)
+)
+
+bar_data
+```
+
+## The chart
+
+```{r}
+#| fig-asp: 0.8
+
+highchart() |>
+  # Set the chart type
+  hc_chart(type = "bar") |>
+  # Provide x-axis categories (the labels for each bar)
+  hc_xAxis(
+    list(
+      categories = bar_data$donation_and_transplantation_summary,
+      reversed = FALSE
+    )
+    #list( # mirror axis on right side
+    #  opposite = TRUE,
+    #  categories = bar_data$donation_and_transplantation_summary,
+    #  reversed = FALSE,
+    #  linkedTo = 0
+    #  )
+    ) |>
+  hc_yAxis(
+    gridLineColor = "#f2f5f3",
+    labels = list(
+      # positive values on both sides, appended with '%'
+      formatter = JS("function() { return Math.abs(this.value) + '%'; }")
+    ),
+    plotBands = list( 
+      list(
+      color = '#e2e1e1', from = 0, to = 9,
+      label = list(
+        text = "9% Asian population",
+        align = 'left',
+        y = -1,
+        x = 10
+        )
+      ),
+      list(
+      color = '#e2e1e1', from = -4, to = 0,
+      label = list(
+        text = "4% Black population",
+        align = 'right',
+        y = -1
+        )      
+      )
+    )
+  ) |>
+  hc_plotOptions(
+    series = list(
+      # put bars for the same category on the same line
+      stacking = "normal",
+      pointPadding = 0.01,  # Padding between each column or bar, in x axis units... Defaults to 0.1.
+      groupPadding = 0.05  # Padding between each value groups, in x axis units... Defaults to 0.2.
+    )
+  ) |>
+  hc_title(
+    text = "<span style='color:#62b19c;'>Black</span> and 
+            <span style='color:#bd82d5;'>Asian</span> 
+            ethnic minorities are over-represented in transplant statistics",
+    useHTML = TRUE,
+    style = list(
+      fontWeight = 'bold'
+    ),
+    align = "left"
+  )  |>
+  hc_subtitle(
+    text = "Percentage of these groups relative to the population of England and Wales in 2023/24",
+    align = 'left'
+  ) |>
+  hc_credits(
+    enabled = TRUE,
+    text = "Ethnicity Differences in Organ Donation and Transplantion report for 2023/24 and 2021 population census estimates.",
+    href = "https://www.odt.nhs.uk/statistics-and-reports/annual-report-on-ethnicity-differences/"  
+    ) |>
+  hc_annotations(
+    list(
+        draggable = '',
+        labelOptions = list(
+          shape = 'connector',
+          justify = FALSE,
+          crop = TRUE,
+          style = list(
+            fontSize = "10px",
+            textOutline = "1px white",
+            fontWeight = "normal",
+            color = "#4a4a4a" 
+            )
+        ),
+        labels =
+          list(point = list(xAxis = 0, yAxis = 0, y = 9, x = 6.5),
+               text = "Within the grey zone shows<br>under-representation, while<br>outside the grey zone indicates<br>over-representation compared<br>to the population of England<br>and Wales.",
+               x = 100, # offset in pixels
+               y = 50
+               )
+    )
+  ) |>
+  hc_legend(
+    align = "right",
+    verticalAlign = "bottom",
+    layout = "horizontal"
+  ) |>
+  hc_tooltip(
+    formatter = JS(
+      "function() {
+         return '<b>' + this.series.name + '</b><br/>' +
+                this.point.category + ': ' +
+                Highcharts.numberFormat(Math.abs(this.point.y), 0) + '%';
+       }"
+    )
+  ) |>
+  hc_exporting(
+    accessibility = list(
+      enabled = TRUE # default value is TRUE
+      ),
+    enabled = TRUE,
+    filename = "ethnic_minority_bar"
+  ) |>
+  hc_plotOptions(
+    accessibility = list(
+      enabled = TRUE,
+      keyboardNavigation = list(enabled = TRUE)
+      )
+    ) |>
+  # Add a series of numeric values for the bars
+  hc_add_series(
+    name = "Asian population",
+    data = bar_data$asian_percent,
+    color = '#bd82d5'
+  ) |>
+  hc_add_series(
+    name = "Black population",
+    data = bar_data$black_percent,
+    color = '#62b19c'
+  ) 
+
+```
+
+I think the end result is pretty good.
