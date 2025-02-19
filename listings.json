@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/04-highcharter_bar/index.html",
       "/posts/03-highcharter_graphs/index.html",
       "/posts/02-mandelian_randomisation/index.html",
       "/posts/01-highcharter/index.html"
