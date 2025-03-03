@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.40">
+<meta name="generator" content="quarto-1.6.42">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -91,10 +91,10 @@ div.csl-indent {
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-364e472494432c036d7e7dfcbf171edd.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-96f1539d32e037de96a9a8424bc20d60.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -218,6 +218,10 @@ window.Quarto = {
 <meta name="citation_reference" content="citation_title=Welcome to the tidyverse;,citation_author=Hadley Wickham;,citation_author=Mara Averick;,citation_author=Jennifer Bryan;,citation_author=Winston Chang;,citation_author=Lucy D’Agostino McGowan;,citation_author=Romain François;,citation_author=Garrett Grolemund;,citation_author=Alex Hayes;,citation_author=Lionel Henry;,citation_author=Jim Hester;,citation_author=Max Kuhn;,citation_author=Thomas Lin Pedersen;,citation_author=Evan Miller;,citation_author=Stephan Milton Bache;,citation_author=Kirill Müller;,citation_author=Jeroen Ooms;,citation_author=David Robinson;,citation_author=Dana Paige Seidel;,citation_author=Vitalie Spinu;,citation_author=Kohske Takahashi;,citation_author=Davis Vaughan;,citation_author=Claus Wilke;,citation_author=Kara Woo;,citation_author=Hiroaki Yutani;,citation_publication_date=2019;,citation_cover_date=2019;,citation_year=2019;,citation_issue=43;,citation_doi=10.21105/joss.01686;,citation_volume=4;,citation_journal_title=Journal of Open Source Software;">
 <meta name="citation_reference" content="citation_title=Paletteer: Comprehensive collection of color palettes;,citation_author=Emil Hvitfeldt;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_fulltext_html_url=https://github.com/EmilHvitfeldt/paletteer;">
 <meta name="citation_reference" content="citation_title=Gapminder: Data from gapminder;,citation_author=Jennifer Bryan;,citation_publication_date=2023;,citation_cover_date=2023;,citation_year=2023;,citation_fulltext_html_url=https://CRAN.R-project.org/package=gapminder;">
+<meta name="citation_reference" content="citation_title=mlr3: A modern object-oriented machine learning framework in R;,citation_author=Michel Lang;,citation_author=Martin Binder;,citation_author=Jakob Richter;,citation_author=Patrick Schratz;,citation_author=Florian Pfisterer;,citation_author=Stefan Coors;,citation_author=Quay Au;,citation_author=Giuseppe Casalicchio;,citation_author=Lars Kotthoff;,citation_author=Bernd Bischl;,citation_publication_date=2019-12;,citation_cover_date=2019-12;,citation_year=2019;,citation_fulltext_html_url=https://joss.theoj.org/papers/10.21105/joss.01903;,citation_doi=10.21105/joss.01903;,citation_journal_title=Journal of Open Source Software;">
+<meta name="citation_reference" content="citation_title=Applied machine learning using mlr3 in R;,citation_editor=Bernd Bischl;,citation_editor=Raphael Sonabend;,citation_editor=Lars Kotthoff;,citation_editor=Michel Lang;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_fulltext_html_url=https://mlr3book.mlr-org.com;,citation_isbn=9781032507545;">
+<meta name="citation_reference" content="citation_title=Data and basic modeling;,citation_author=Natalie Foss;,citation_author=Lars Kotthoff;,citation_editor=Bernd Bischl;,citation_editor=Raphael Sonabend;,citation_editor=Lars Kotthoff;,citation_editor=Michel Lang;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_fulltext_html_url=https://mlr3book.mlr-org.com/data_and_basic_modeling.html;,citation_inbook_title=Applied machine learning using mlr3 in R;">
+<meta name="citation_reference" content="citation_title=Validation in prediction research: The waste by data splitting;,citation_author=Ewout W Steyerberg;,citation_publication_date=2018;,citation_cover_date=2018;,citation_year=2018;,citation_volume=103;,citation_journal_title=Journal of clinical epidemiology;,citation_publisher=Elsevier;">
 </head>
 
 <body class="floating nav-fixed slimcontent">
@@ -1113,25 +1117,64 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         }
       };
     }
-      // Attach click handler to the DT
-      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-      for (const annoteDlNode of annoteDls) {
-        annoteDlNode.addEventListener('click', (event) => {
-          const clickedEl = event.target;
-          if (clickedEl !== selectedAnnoteEl) {
-            unselectCodeLines();
-            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-            if (activeEl) {
-              activeEl.classList.remove('code-annotation-active');
-            }
-            selectCodeLines(clickedEl);
-            clickedEl.classList.add('code-annotation-active');
-          } else {
-            // Unselect the line
-            unselectCodeLines();
-            clickedEl.classList.remove('code-annotation-active');
+      const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
+      for (let i=0; i<annoteTargets.length; i++) {
+        const annoteTarget = annoteTargets[i];
+        const targetCell = annoteTarget.getAttribute("data-target-cell");
+        const targetAnnotation = annoteTarget.getAttribute("data-target-annotation");
+        const contentFn = () => {
+          const content = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          if (content) {
+            const tipContent = content.cloneNode(true);
+            tipContent.classList.add("code-annotation-tip-content");
+            return tipContent.outerHTML;
           }
-        });
+        }
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          onShow: (instance) => {
+            selectCodeLines(instance.reference);
+            instance.reference.classList.add('code-annotation-active');
+            window.tippy.hideAll();
+          },
+          onHide: (instance) => {
+            unselectCodeLines();
+            instance.reference.classList.remove('code-annotation-active');
+          },
+          maxWidth: 300,
+          delay: [50, 0],
+          duration: [200, 0],
+          offset: [5, 10],
+          arrow: true,
+          appendTo: function(el) {
+            return el.parentElement.parentElement.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto',
+          placement: 'right',
+          popperOptions: {
+            modifiers: [
+            {
+              name: 'flip',
+              options: {
+                flipVariations: false, // true by default
+                allowedAutoPlacements: ['right'],
+                fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
+              },
+            },
+            {
+              name: 'preventOverflow',
+              options: {
+                mainAxis: false,
+                altAxis: false
+              }
+            }
+            ]        
+          }      
+        };
+        window.tippy(annoteTarget, config); 
       }
   const findCites = (el) => {
     const parentEl = el.parentElement;
