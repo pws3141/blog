@@ -1,0 +1,345 @@
+---
+title: "Getting Started with {mlr3}"
+subtitle: "Data and Basic Modeling"
+author:
+  - name: Paul Smith
+date: "2025-03-03"
+categories: [code, r, machine learning, mlr3]
+image: "./fig/mlr3_logo.svg"
+format:
+  html:
+    code-fold: false
+execute:
+  df-print: default
+---
+
+# Introduction
+
+I am attempting to learn how to use `{mlr3}` [@lang2019mlr3], by reading through the book
+[Applied Machine Learning Using mlr3 in R](https://mlr3book.mlr-org.com/)
+[@bischl2024usingmlr3].
+
+In this first blog post, I am going through the exercises given in Section
+2 [@foss2024data]. This involves creating a classification tree model, on the
+`PimaIndiansDiabetes2` (from the `{mlbench}` package), to predict whether
+a person has diabetes or not. No (proper) evaluation or validation is done here -- that'll be for a later post.
+
+## Prerequisites
+
+```{r}
+library(mlr3)
+library(mlr3viz)
+library(ggplot2)
+library(patchwork)
+library(data.table)
+options(datatable.print.nrows = 20)
+```
+
+# Exercises
+
+## Question 1 {#sec-question-one}
+Train a classification model with the `"classif.rpart"` learner on the Pima
+Indians Diabetes dataset. Do this without using `tsk("pima")`, and instead by
+constructing a task from the dataset in the `mlbench` package:
+`data(PimaIndiansDiabetes2, package = "mlbench")`.
+
+:::{.callout-note collapse = true}
+# Missing data
+
+Note: The dataset has `NA`s
+in its features. You can either rely on `rpart`'s capability to handle them
+internally (surrogate splits) or remove them from the initial `data.frame`
+using `na.omit()`.
+
+The rpart algorithm has a built-in method called surrogate splits, which allows
+it to handle missing values without removing data. If a feature value is
+missing at a particular split, rpart:
+
+1.	Tries to use an alternative feature (a surrogate variable) that closely
+    mimics the main splitting feature.
+2.	If no good surrogate is found, it assigns the most common class (for
+    classification) or the mean value (for regression) within that split.
+
+:::
+
+  - Make sure to define the `pos` outcome as the positive class.
+  - Train the model on a random 80% subset of the given data and evaluate its
+    performance with the classification error measure on the remaining data.
+
+### Answer
+
+Loading the data:
+
+```{r}
+data(PimaIndiansDiabetes2, package = "mlbench")
+pima <- as.data.table(PimaIndiansDiabetes2)
+pima
+```
+
+I want to predict whether each person has diabetes, using a CART
+('classification and regression tree').
+
+#### Creating a task 
+
+First, I create the `task`. I am defining `pos` to be the positive class in
+this step. It can also be done later by setting `tsk_pima$positive = "pos"`.
+
+```{r}
+tsk_pima <- as_task_classif(pima, target = "diabetes", positive = "pos")
+tsk_pima
+```
+
+```{r}
+#| warning: false
+#| fig-asp: 1
+#| fig-width: 7.5
+#| fig-cap: A pairs plot of the `pima` dataset. Note that it is unbalanced, as there are more negative diabetes outcomes than positive.
+#| label: fig-pima-pairs
+
+#autoplot(tsk_pima, type = "duo") +
+  #theme(strip.text.y = element_text(angle = -0, size = 8))
+
+autoplot(tsk_pima, type = "pairs")
+```
+
+Let's see how unbalanced the data is...
+
+```{r}
+pima[, .N, by = "diabetes"]
+```
+
+#### Splitting the data
+
+Create a split of $80\%$ training and $20\%$ test data.
+
+:::{.callout-important}
+I know this is bad practice. Most of the time (see below for caveats), all the
+data should be used to fit the model, and then internal validation done via resampling (*e.g.* using
+bootstrap or cross-validation).
+
+From Frank Harrell's [blog](https://www.fharrell.com/post/split-val/),
+
+> data splitting is an unstable method for validating models or classifiers,
+especially when the number of subjects is less than about 20,000 (fewer if
+signal:noise ratio is high). This is because were you to split the data again,
+develop a new model on the training sample, and test it on the holdout sample,
+the results are likely to vary significantly. Data splitting requires
+a significantly larger sample size than resampling to work acceptably well
+
+Also see @steyerberg2018validation.
+
+To chose whether to do internal or external validation, see the *Biostatistics
+for Biomedical Research*
+[summary](https://hbiostat.org/bbr/reg.html#summary-choosing-internal-vs.-external-validation).
+
+:::
+
+```{r}
+set.seed(52)
+splits <- partition(tsk_pima, ratio = 0.8)
+splits
+```
+
+#### Training the model
+
+Now, I will train the classification tree on the training data.
+
+
+```{r}
+# loading the learners
+lrn_featureless <- lrn("classif.featureless", predict_type = "prob")
+lrn_rpart <- lrn("classif.rpart", predict_type = "prob") # 'prob' is the default prediction type
+lrn_rpart
+
+# training the learners
+lrn_featureless$train(tsk_pima, splits$train)
+lrn_rpart$train(tsk_pima, splits$train)
+```
+
+
+#### Evaluating the model {#sec-question-one-evaluating}
+
+Here, I'm evaluating the model on the test data (and comparing against the
+featureless learner).
+
+I will consider the Brier, log-loss and accuracy `measures`.
+The [Brier score](https://en.wikipedia.org/wiki/Brier_score) lies between $[0,
+1]$, where $0$ is best. The log-loss is the negative logarithm of the predicted
+probability for the true class, and the accuracy is the number of correct
+predictions divided by total number of predictions.
+
+```{r}
+# load accuracy measures
+measures = msrs(c("classif.mbrier", "classif.logloss", "classif.acc"))
+
+# predicting using the featureless learner
+prediction_featureless <- lrn_featureless$predict(tsk_pima, splits$test)
+prediction_featureless 
+```
+```{r}
+# obtaining score of featureless learner
+prediction_featureless$score(measures)
+```
+```{r}
+# predicting using the classification tree
+prediction_rpart <- lrn_rpart$predict(tsk_pima, splits$test)
+prediction_rpart 
+```
+```{r}
+# obtaining score of the classification tree
+prediction_rpart$score(measures) 
+```
+
+```{r}
+# confusion matrix
+prediction_rpart$confusion # <1>
+```
+1. All off-diagonal entries are incorrectly classified observations, and all diagonal entries are correctly classified.
+
+```{r}
+prediction_plot <- autoplot(prediction_rpart) + ggtitle("Default")
+prediction_plot
+```
+
+
+## Question 2
+Calculate the true positive, false positive, true negative, and false negative rates of the predictions made by the model in Exercise 1.
+
+  - Try to solve this in two ways:
+    1. Using `mlr3measures`-predefined measure objects.
+    2. Without using `mlr3` tools by directly working on the ground truth and prediction vectors.
+  - Compare the results.
+
+### Answer
+
+I've already started this in Question 1 (@sec-question-one-evaluating), but I will
+reiterate here. The confusion matrix gives the number of predictions that are
+correct (true positives or negatives) on the diagonal, and those that are incorrect (false
+positives and negatives) on the top right and bottom left, respectively
+
+```{r}
+# confusion matrix
+conf_matrix <- prediction_rpart$confusion
+conf_matrix
+```
+
+I want to obtain the *rates*, both using the
+[`mlr3measures`](https://mlr3.mlr-org.com/reference/mlr_measures.html) objects,
+and without.
+
+:::{.column-margin}
+
+Sensitivity
+: (true positive rate) is the probability of a positive test result, conditioned on the individual truly being positive.
+
+Specificity
+: (true negative rate) is the probability of a negative test result, conditioned on the individual truly being negative.
+
+:::
+
+#### Using `mlr3measures`
+
+First, let's figure out the measures we need...
+
+```{r}
+as.data.table(mlr_measures)[task_type == "classif" & predict_type == "response"]
+```
+
+OK, so we need to use the measures `classif.tpr` `classif.fpr` `classif.tnr`
+and `classif.fnr`, for the true positive, false positive, true negative and
+false negative rates, respectively.
+
+```{r}
+measures <- msrs(c("classif.tpr", "classif.fpr", "classif.tnr", "classif.fnr"))
+prediction_rpart$score(measures)
+```
+
+
+#### Without using `mlr3measures`
+
+I can obtain these rates directly from the confusion matrix.
+
+```{r}
+str(conf_matrix)
+
+# true positive rate / sensitivity
+tpr <- conf_matrix[1, 1]/ sum(conf_matrix[, 1])
+# false positive rate
+fpr <- conf_matrix[1, 2]/ sum(conf_matrix[, 2])
+
+# true negative rate / specificity
+tnr <- conf_matrix[2, 2]/ sum(conf_matrix[, 2])
+# false negative rate
+fnr <- conf_matrix[2, 1]/ sum(conf_matrix[, 1])
+
+data.table(
+  classif.tpr = tpr,
+  classif.fpr = fpr,
+  classif.tnr = tnr,
+  classif.fnr = fnr
+)
+```
+
+
+## Question 3
+Change the threshold of the model from Question 1 such that the false positive rate is lower than the false negative rate.
+
+- What is one reason you might do this in practice?
+
+### Answer
+
+One reason I might want a lower false positive rate than false negative rate is it the damage done by a false positive is higher than that done by a false negative. That if, if classifying the outcome as positive when it is actually negative is more damaging than the other way round. For example, if I am building a model to predict fraud for a bank, and a false positive would result in a customer transaction being wrongly declined. Lots of false positives could result in annoyed customers and a loss of trust.
+
+#### Inverse weights
+
+Let's first change the thresholds such that they account for the inbalanced data. I'm not considering false positives here.
+
+From @fig-pima-pairs, it's clear that the data is unbalanced (more people with
+negative diabetes than positive). I can account for this by changing the
+thresholds using inverse weightings.
+
+First, let's use the training data to obtain new thresholds.
+
+```{r}
+new_thresh = proportions(table(tsk_pima$truth(splits$train)))
+new_thresh
+```
+
+And then I'll use these thresholds to reweight the model.
+
+```{r}
+prediction_rpart$set_threshold(new_thresh)
+prediction_rpart$confusion
+prediction_plot_newt <- autoplot(prediction_rpart) +
+                                ggtitle("Inverse weighting thresholds")
+prediction_plot + prediction_plot_newt +
+        plot_layout(guides = "collect")
+```
+
+Oh, it doesn't make a difference!
+
+#### Reducing false positive rate
+
+This can be achieved by making it more difficult for the model to predict a positive result.
+
+So, let's create thresholds where the `pos` result is penalised.
+
+```{r}
+new_thresh <- c("pos" = 0.7, "neg" = 0.3)
+```
+
+```{r}
+prediction_rpart$set_threshold(new_thresh)
+prediction_rpart$confusion
+measures <- msrs(c("classif.tpr", "classif.fpr", "classif.tnr", "classif.fnr"))
+prediction_rpart$score(measures)
+prediction_plot_newt <- autoplot(prediction_rpart) +
+                                ggtitle("New thresholds")
+prediction_plot + prediction_plot_newt +
+        plot_layout(guides = "collect")
+```
+
+Here, the false positive rate has decreased, but the false negative has increased (as expected).
+
+
+# Fin

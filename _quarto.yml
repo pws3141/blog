@@ -18,6 +18,7 @@ format:
     df-print: paged
     toc: true
     toc-location: left
+    code-annotations: hover
 execute:
   echo: true
   freeze: auto
