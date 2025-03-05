@@ -186,7 +186,7 @@ window.Quarto = {
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <h1 class="title">Model Fitting and Validation</h1>
-            <p class="subtitle lead">Some critiques of data-splitting and stepwise</p>
+            <p class="subtitle lead">Some critiques of data-splitting and the stepwise procedure</p>
                                 <div class="quarto-categories">
                 <div class="quarto-category">code</div>
                 <div class="quarto-category">r</div>
@@ -257,10 +257,10 @@ window.Quarto = {
 <p>This short article collates some of the critiques in the way we currently do model building and validation.</p>
 <section id="current-practice" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="current-practice">Current practice</h2>
-<p>Currently, at work we use a stepwise procedure to chose explanatory variables in the model. This stepwise procedure is sometimes a mix of clinical judgement with some form of automated selection, and sometimes it is fully automated. This is often done on a <em>test</em> set which consists of around <span class="math inline">\(70\%\)</span> of the full data. For an example of a fully automated stepwise procedure on a <span class="math inline">\(70\%\)</span> test set, see <span class="citation" data-cites="collett2017factors">Collett, Friend, and Watson (<a href="#ref-collett2017factors" role="doc-biblioref">2017</a>)</span>.</p>
-<div class="no-row-height column-margin column-container"><div id="ref-collett2017factors" class="csl-entry" role="listitem">
+<p>Currently, at work we use a stepwise procedure to chose explanatory variables in the model. This stepwise procedure is sometimes a mix of clinical judgement with some form of automated selection, and sometimes it is fully automated. This is often done on a <em>test</em> set which consists of around <span class="math inline">\(70\%\)</span> of the full data. The remaining <span class="math inline">\(30\%\)</span> of the data is used for model validation.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;For an example of a fully automated stepwise procedure on a <span class="math inline">\(70\%\)</span> training set, with validation on the remaining <span class="math inline">\(30\%\)</span> test set, see <span class="citation" data-cites="collett2017factors">Collett, Friend, and Watson (<a href="#ref-collett2017factors" role="doc-biblioref">2017</a>)</span>.<br></p><div id="ref-collett2017factors" class="csl-entry" role="listitem">
 Collett, David, Peter J Friend, and Christopher JE Watson. 2017. <span>“Factors Associated with Short-and Long-Term Liver Graft Survival in the United Kingdom: Development of a UK Donor Liver Index.”</span> <em>Transplantation</em> 101 (4): 786–92.
-</div></div><p>There are lots of issues that result from this process: from the use of stepwise, and from not using all the data to fit the model (<em>data-splitting</em>).</p>
+</div></div></div><p>There are lots of issues that result from this process: from the use of the stepwise procedure, and from not using all the data to fit the model (<em>data-splitting</em>).</p>
 </section>
 </section>
 <section id="issues-with-the-stepwise-procedure" class="level1 page-columns page-full">
@@ -269,8 +269,8 @@ Collett, David, Peter J Friend, and Christopher JE Watson. 2017. <span>“Factor
 <div class="no-row-height column-margin column-container"></div><blockquote class="blockquote">
 <p>if [the stepwise] procedure had just been proposed as a statistical method, it would most likely be rejected because it violates every principle of statistical estimation and hypothesis testing.</p>
 </blockquote>
-<p>Some of the issues resulting from using a stepwise procedure are:<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
-<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;For a full list, see <span class="citation" data-cites="harrell2001regression">Harrell et al. (<a href="#ref-harrell2001regression" role="doc-biblioref">2001</a>)</span>.</p><div id="ref-harrell2001regression" class="csl-entry" role="listitem">
+<p>Some of the issues resulting from using a stepwise procedure are:<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;For a full list, see <span class="citation" data-cites="harrell2001regression">Harrell et al. (<a href="#ref-harrell2001regression" role="doc-biblioref">2001</a>)</span>.</p><div id="ref-harrell2001regression" class="csl-entry" role="listitem">
 Harrell, Frank E et al. 2001. <em>Regression Modeling Strategies: With Applications to Linear Models, Logistic Regression, and Survival Analysis</em>. Vol. 608. Springer.
 </div></div></div><ol type="1">
 <li>It yields <span class="math inline">\(R^2\)</span> values that are biased high.</li>
@@ -279,18 +279,18 @@ Harrell, Frank E et al. 2001. <em>Regression Modeling Strategies: With Applicati
 <li>It yields <span class="math inline">\(P\)</span>-values that are too small (due to severe multiple comparison problems).</li>
 <li>The regression coefficients are biased high in absolute value. That is, if <span class="math inline">\(\hat \beta &gt; 0\)</span>, <span class="math inline">\(E(\hat \beta | P &lt; 0.05, \hat \beta &gt; 0) &gt; \beta\)</span>.</li>
 </ol>
-<p>From <span class="citation" data-cites="copas1991estimating">Copas and Long (<a href="#ref-copas1991estimating" role="doc-biblioref">1991</a>)</span>,</p>
+<p><span class="citation" data-cites="copas1991estimating">Copas and Long (<a href="#ref-copas1991estimating" role="doc-biblioref">1991</a>)</span> explain how (5) occurs,</p>
 <div class="no-row-height column-margin column-container"><div id="ref-copas1991estimating" class="csl-entry" role="listitem">
 Copas, JB, and Tianyong Long. 1991. <span>“Estimating the Residual Variance in Orthogonal Regression with Variable Selection.”</span> <em>Journal of the Royal Statistical Society Series D: The Statistician</em> 40 (1): 51–59.
 </div></div><blockquote class="blockquote">
 <p>The choice of the variables to be included depends on estimated regression coefficients rather than their true values, and so <span class="math inline">\(X_j\)</span> is more likely to be included if its regression coefficient is over-estimated than if its regression coefficient is underestimated.</p>
 </blockquote>
-<p>To prevent regression coefficients being too large, Tibshirani’s<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> <em>lasso</em> procedure can be used <span class="citation" data-cites="tibshirani1996regression">(<a href="#ref-tibshirani1996regression" role="doc-biblioref">Tibshirani 1996</a>)</span>. This shrinks coefficient estimates towards zero by including a constraint that the sum of absolute values of the coefficient estimates must be less than some <span class="math inline">\(k\)</span>.</p>
-<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;of <em>An Introduction to Statistical Learning</em> fame.</p></div><div id="ref-tibshirani1996regression" class="csl-entry" role="listitem">
+<p>To prevent regression coefficients being too large, Tibshirani’s<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> <em>lasso</em> procedure can be used <span class="citation" data-cites="tibshirani1996regression">(<a href="#ref-tibshirani1996regression" role="doc-biblioref">Tibshirani 1996</a>)</span>. This shrinks coefficient estimates towards zero by including a constraint that the sum of absolute values of the coefficient estimates must be less than some <span class="math inline">\(k\)</span>.</p>
+<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;of <em>An Introduction to Statistical Learning</em> fame.</p></div><div id="ref-tibshirani1996regression" class="csl-entry" role="listitem">
 Tibshirani, Robert. 1996. <span>“Regression Shrinkage and Selection via the Lasso.”</span> <em>Journal of the Royal Statistical Society Series B: Statistical Methodology</em> 58 (1): 267–88.
 </div><div id="ref-derksen1992backward" class="csl-entry" role="listitem">
 Derksen, Shelley, and Harvey J Keselman. 1992. <span>“Backward, Forward and Stepwise Automated Subset Selection Algorithms: Frequency of Obtaining Authentic and Noise Variables.”</span> <em>British Journal of Mathematical and Statistical Psychology</em> 45 (2): 265–82.
-</div></div><p><span class="citation" data-cites="derksen1992backward">Derksen and Keselman (<a href="#ref-derksen1992backward" role="doc-biblioref">1992</a>)</span> found that when the stepwise procedure was used, the final model represented noise between <span class="math inline">\(20\%\)</span> and <span class="math inline">\(74\%\)</span> of the time, and the final model contained less than halve of the actual number of authentic predictors. To see this in action, Frank Harrell has some simulations on his ‘Regression Modelling Strategies’ <a href="https://hbiostat.org/rmsc/multivar#sec-multivar-variable-selection">course notes</a>.</p>
+</div></div><p><span class="citation" data-cites="derksen1992backward">Derksen and Keselman (<a href="#ref-derksen1992backward" role="doc-biblioref">1992</a>)</span> found that when the stepwise procedure was used, the final model represented noise between <span class="math inline">\(20\%\)</span> and <span class="math inline">\(74\%\)</span> of the time, and the final model contained less than half of the actual number of authentic predictors. To see this in action, Frank Harrell has some simulations as part of his ‘Regression Modelling Strategies’ <a href="https://hbiostat.org/rmsc/multivar#sec-multivar-variable-selection">course notes</a>.</p>
 </section>
 <section id="issues-with-data-splitting" class="level1 page-columns page-full">
 <h1>Issues with data-splitting</h1>
@@ -302,8 +302,8 @@ Derksen, Shelley, and Harvey J Keselman. 1992. <span>“Backward, Forward and St
 </ol>
 <p>Number (3) is discussed further <a href="https://www.fharrell.com/post/split-val/">here</a>, specifically:</p>
 <div class="page-columns page-full"><blockquote class="blockquote">
-<p>When feature selection is done, data splitting validates just one of a myriad of potential models. In effect it validates an example model. Resampling (repeated cross-validation or the bootstrap) validate the process that was used to develop the model. Resampling is honest in reporting the results because it depicts the uncertainty in feature selection, e.g., the disagreements in which variables are selected from one resample to the next.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
-</blockquote><div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;That is, for each bootstrap sample, some sort of variable selection is done (<em>e.g.</em> stepwise, or lasso). The proportion of bootstrap samples where each variable is chosen in the model can then be reported to give an idea of the uncertainty in variable selection.</p></div></div></div>
+<p>When feature selection is done, data splitting validates just one of a myriad of potential models. In effect it validates an example model. Resampling (repeated cross-validation or the bootstrap) validate the process that was used to develop the model. Resampling is honest in reporting the results because it depicts the uncertainty in feature selection, e.g., the disagreements in which variables are selected from one resample to the next.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
+</blockquote><div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;That is, for each bootstrap sample, some sort of variable selection is done (<em>e.g.</em> stepwise, or lasso). The proportion of bootstrap samples where each variable is chosen in the model can then be reported to give an idea of the uncertainty in variable selection.</p></div></div></div>
 <p>A good primer on the evaluation of clinical prediction models is given by <span class="citation" data-cites="collins2024evaluation">Collins et al. (<a href="#ref-collins2024evaluation" role="doc-biblioref">2024</a>)</span>. In this, the authors state,</p>
 <div class="no-row-height column-margin column-container"><div id="ref-collins2024evaluation" class="csl-entry" role="listitem">
 Collins, Gary S, Paula Dhiman, Jie Ma, Michael M Schlussel, Lucinda Archer, Ben Van Calster, Frank E Harrell, et al. 2024. <span>“Evaluation of Clinical Prediction Models (Part 1): From Development to External Validation.”</span> <em>Bmj</em> 384.
