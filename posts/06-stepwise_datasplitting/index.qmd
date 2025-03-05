@@ -1,0 +1,91 @@
+---
+title: "Model Fitting and Validation"
+subtitle: "Some critiques of data-splitting and stepwise"
+author:
+  - name: Paul Smith
+date: "2025-03-05"
+categories: [code, r, statistics, model fitting, model building]
+format:
+  html:
+    code-fold: false
+execute:
+  df-print: default
+---
+
+# Introduction
+
+This post is partly a expansion of a comment I made about training/test sets in a [previous post](../05-mlr3_basic_modelling/index.qmd).
+At work, we often need to fit a model and validate it (using internal validation), in the presence of missing data. This short article ignores the missing data issue (I will look at this later), but instead focuses on fitting and validating a model.
+
+There are two main areas that I am looking at here, to try and improve current practice:
+
+1. Fitting a model
+2. Validating the chosen model
+
+This short article collates some of the critiques in the way we currently do model building and validation. 
+
+## Current practice
+
+Currently, at work we use a stepwise procedure to chose explanatory variables in the model. This stepwise procedure is sometimes a mix of clinical judgement with some form of automated selection, and sometimes it is fully automated. This is often done on a *test* set which consists of around $70\%$ of the full data. For an example of a fully automated stepwise procedure on a $70\%$ test set, see @collett2017factors.
+
+There are lots of issues that result from this process: from the use of stepwise, and from not using all the data to fit the model (*data-splitting*).
+
+# Issues with the stepwise procedure
+
+There are lots of issues from using a stepwise procedure. Some of these are related to the procedure itself, and some related to the ability of the statistician to not have to think about the problem they are trying to solve. From @harrell2001regression [Section 4.3],
+
+>  if [the stepwise] procedure had just been proposed as a statistical method, it
+would most likely be rejected because it violates every principle of statistical
+estimation and hypothesis testing.
+
+Some of the issues resulting from using a stepwise procedure are:^[For a full list, see @harrell2001regression.]
+
+1. It yields $R^2$ values that are biased high.
+2. The $F$ and $\chi^2$ test statistics do not have the claimed distribution.
+3. The standard errors of regression coefficient estimates are biased low and confidence intervals for effects and predicted values are falsely narrow.
+4. It yields $P$-values that are too small (due to severe multiple comparison problems).
+5. The regression coefficients are biased high in absolute value. That is, if $\hat \beta > 0$, $E(\hat \beta | P < 0.05, \hat \beta > 0) > \beta$.
+
+From @copas1991estimating, 
+
+> The choice of the variables
+to be included depends on estimated regression coefficients rather than their
+true values, and so $X_j$ is more likely to be included if its regression coefficient
+is over-estimated than if its regression coefficient is underestimated.
+
+To prevent regression coefficients being too large, Tibshirani's^[of *An Introduction to Statistical Learning* fame.] *lasso* procedure can be used [@tibshirani1996regression]. This shrinks coefficient estimates towards zero by including a constraint that the sum of absolute values of the coefficient estimates must be less than some $k$.
+
+@derksen1992backward found that when the stepwise procedure was used, the final model represented noise between $20\%$ and $74\%$ of the time, and the final model contained less than halve of the actual number of authentic predictors. To see this in action, Frank Harrell has some simulations on his 'Regression Modelling Strategies' [course notes](https://hbiostat.org/rmsc/multivar#sec-multivar-variable-selection). 
+
+# Issues with data-splitting
+
+The issues with data-splitting are discussed in @harrell2001regression [Section 5.3.3]. These include
+
+1. Data-splitting greatly reduces the sample size for both model development and model testing. 
+2. Repeating the process with a different split can result in different assessments of predictive accuracy.
+3. It does not validate the final model, only a model developed on a subset of the data.
+
+Number (3) is discussed further [here](https://www.fharrell.com/post/split-val/), specifically:
+
+> When feature selection is done, data splitting validates just one of a myriad of potential models. In effect it validates an example model. Resampling (repeated cross-validation or the bootstrap) validate the process that was used to develop the model. Resampling is honest in reporting the results because it depicts the uncertainty in feature selection, e.g., the disagreements in which variables are selected from one resample to the next.[^note1]
+
+[^note1]: That is, for each bootstrap sample, some sort of variable selection is done (*e.g.* stepwise, or lasso). The proportion of bootstrap samples where each variable is chosen in the model can then be reported to give an idea of the uncertainty in variable selection.
+
+A good primer on the evaluation of clinical prediction models is given by @collins2024evaluation. In this, the authors state,
+
+> Randomly splitting obviously creates two smaller datasets, and often the full dataset is not even large enough to begin with. Having a dataset that is too small to develop the model increases the likelihood of overfitting and producing an unreliable model, and having a test set that is too small will not be able to reliably and precisely estimate model performance—this is a clear waste of precious information.
+
+Even more succinctly, @steyerberg2018validation states,
+
+> random data splitting should be abolished for validation of prediction models.
+
+Well, that's pretty clear!
+
+:::{.callout-note}
+# But what about external validation?
+
+There are not many situations where external validation is possible -- the main one in my mind being another research group has access to different data than you. For information on internal and external validation, see the 'Biostatistic for Biomedical Research' [course notes](https://hbiostat.org/bbr/reg.html#internal-vs.-external-model-validation).
+
+:::
+
+# Fin

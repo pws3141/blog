@@ -1,6 +1,6 @@
 ---
 title: "Getting Started with {mlr3}"
-subtitle: "Data and Basic Modeling"
+subtitle: "01 Data and Basic Modeling"
 author:
   - name: Paul Smith
 date: "2025-03-03"
