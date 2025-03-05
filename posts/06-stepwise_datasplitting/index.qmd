@@ -1,6 +1,6 @@
 ---
 title: "Model Fitting and Validation"
-subtitle: "Some critiques of data-splitting and stepwise"
+subtitle: "Some critiques of data-splitting and the stepwise procedure"
 author:
   - name: Paul Smith
 date: "2025-03-05"
@@ -26,9 +26,9 @@ This short article collates some of the critiques in the way we currently do mod
 
 ## Current practice
 
-Currently, at work we use a stepwise procedure to chose explanatory variables in the model. This stepwise procedure is sometimes a mix of clinical judgement with some form of automated selection, and sometimes it is fully automated. This is often done on a *test* set which consists of around $70\%$ of the full data. For an example of a fully automated stepwise procedure on a $70\%$ test set, see @collett2017factors.
+Currently, at work we use a stepwise procedure to chose explanatory variables in the model. This stepwise procedure is sometimes a mix of clinical judgement with some form of automated selection, and sometimes it is fully automated. This is often done on a *test* set which consists of around $70\%$ of the full data. The remaining $30\%$ of the data is used for model validation.^[For an example of a fully automated stepwise procedure on a $70\%$ training set, with validation on the remaining $30\%$ test set, see @collett2017factors.<br>]
 
-There are lots of issues that result from this process: from the use of stepwise, and from not using all the data to fit the model (*data-splitting*).
+There are lots of issues that result from this process: from the use of the stepwise procedure, and from not using all the data to fit the model (*data-splitting*).
 
 # Issues with the stepwise procedure
 
@@ -46,7 +46,7 @@ Some of the issues resulting from using a stepwise procedure are:^[For a full li
 4. It yields $P$-values that are too small (due to severe multiple comparison problems).
 5. The regression coefficients are biased high in absolute value. That is, if $\hat \beta > 0$, $E(\hat \beta | P < 0.05, \hat \beta > 0) > \beta$.
 
-From @copas1991estimating, 
+@copas1991estimating explain how (5) occurs, 
 
 > The choice of the variables
 to be included depends on estimated regression coefficients rather than their
@@ -55,7 +55,7 @@ is over-estimated than if its regression coefficient is underestimated.
 
 To prevent regression coefficients being too large, Tibshirani's^[of *An Introduction to Statistical Learning* fame.] *lasso* procedure can be used [@tibshirani1996regression]. This shrinks coefficient estimates towards zero by including a constraint that the sum of absolute values of the coefficient estimates must be less than some $k$.
 
-@derksen1992backward found that when the stepwise procedure was used, the final model represented noise between $20\%$ and $74\%$ of the time, and the final model contained less than halve of the actual number of authentic predictors. To see this in action, Frank Harrell has some simulations on his 'Regression Modelling Strategies' [course notes](https://hbiostat.org/rmsc/multivar#sec-multivar-variable-selection). 
+@derksen1992backward found that when the stepwise procedure was used, the final model represented noise between $20\%$ and $74\%$ of the time, and the final model contained less than half of the actual number of authentic predictors. To see this in action, Frank Harrell has some simulations as part of his 'Regression Modelling Strategies' [course notes](https://hbiostat.org/rmsc/multivar#sec-multivar-variable-selection). 
 
 # Issues with data-splitting
 
