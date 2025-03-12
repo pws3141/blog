@@ -154,6 +154,7 @@ lrn_rpart
 # training the learners
 lrn_featureless$train(tsk_pima, splits$train)
 lrn_rpart$train(tsk_pima, splits$train)
+lrn_rpart
 ```
 
 
