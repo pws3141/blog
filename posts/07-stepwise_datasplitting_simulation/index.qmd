@@ -1,0 +1,380 @@
+---
+title: "Model Fitting and Validation"
+subtitle: "Simulating the effect of data-splitting and stepwise selection on the `lung` dataset"
+author:
+  - name: Paul Smith
+date: "2025-03-05"
+categories: [code, r, statistics, model fitting, model validation]
+format:
+  html:
+    code-fold: false
+execute:
+  df-print: default
+---
+
+This is *Part Two* of an $N$^[where $N$ is TBC] part series on model fitting and validation. Part One can be found [here](../06-stepwise_datasplitting/index.qmd).
+
+# Introduction
+
+The aim of this article is to consider the effect of using data-splitting (to obtain a single training and test set) and stepwise selection (to obtain 'significant' factors) on the `lung` R dataset.
+
+In general -- assuming we have data $X \in \mathbb{R}^{n \times p}$ -- the process consists of the following steps:
+
+1. Randomly allocate the data to a *training* set, $X_\text{train} \in \mathbb{R}^{n_1 \times p}$, and a *test* set, $X_\text{test} \in \mathbb{R}^{n_2 \times p}$.
+    - Here, $n = n_1 + n_2$, where $n_1 \approx 0.7 n$ and $n_2 \approx 0.3 n$.
+2. Perform model building on the test set, using stepwise selection starting with a model that includes all factors, to obtain model $\mathcal{M}$.
+    - Stepwise is performed by adding and removing a single factor at each step such that AIC is minimised. Here, $\text{AIC} = 2k - 2 \log(\hat L)$, and $\hat L$ is the maximised (partial) likelihood.
+3. Perform model validation on the test set, to obtain [Harrell’s C-index](https://statisticaloddsandends.wordpress.com/2019/10/26/what-is-harrells-c-index/), assessing the predictive performance of the model over all observed times.
+    - We are answering the question: *Among all pairs of individuals, what fraction had predicted risks that were correctly ranked in the same order as their actual observed outcomes (event times)?*
+
+```{r}
+#| echo: false
+
+n_sim <- 100
+```
+
+There are many issues with this procedure, which I have discussed in
+a [previous post](../06-stepwise_datasplitting/index.qmd). In this article
+I will perform the above steps `r n_sim` times and obtain the following:
+
+1. The amount of variability in the factors chosen in the model selection stage.
+    - In addition, the variability in the coefficients estimated for each factor.
+2. The amount of variability in the c-statistic obtained from validation on the test set.
+
+## Prerequisites and data cleaning
+
+The `lung` dataset is from the `{survival}` package [@therneau2024survival], and I will use `{data.table}` [@barrett2024datatable] as I like the syntax and it's fast.
+
+```{r}
+library(survival)
+library(broom) # for 'tidy'
+library(data.table)
+options(datatable.print.nrows = 20) # set max # rows before truncating (default = 100)
+library(ggplot2)
+lung <- as.data.table(lung)
+lung
+```
+
+The `lung` dataset has status encoded in a non-standard way (as `1` for censored and `2` for dead). I will change this to `0` and `1` respectively. I will also ensure the data contains no missingness by using `na.omit()`.
+
+```{r}
+#recode 'status' as 1 if event and 0 if censored
+lung_recode <- copy(lung)[, status := as.integer(status == 2)]
+
+# remove NA's (st 'ampute' works)
+lung_complete <- na.omit(lung_recode)
+
+lung_complete[, `:=`(sex = as.factor(sex), ph.ecog = as.factor(ph.ecog))]
+
+lung_complete
+```
+
+# The code
+
+Here, I'll do the following:
+
+- Randomly allocate $\approx 70\%$ of the data to the training set, and the remainder to the test set.
+- Use stepwise selection to choose 'significant' factors and estimate coefficients.
+- Obtain the C-index on the test set.
+
+For reproducibility, I'll create a `data.table` where the rows consist of an
+`.id` variable -- relating to the simulation number -- and the row indices
+which will be chosen from `lung_complete` to make a training set for that
+simulation. This is shown in @lst-training-set-indices.
+
+```{r}
+#| lst-cap: "Generating training set indices for data-splitting simulations"
+#| lst-label: lst-training-set-indices
+
+set.seed(1000)
+
+n_x <- nrow(lung_complete)
+n1 <- 0.7 # size of training set
+
+training_idx <- rbindlist(
+                  lapply(seq_len(n_sim), function(i) {
+                                idx <- sample(1:n_x, floor(n1 * n_x))
+                                data.frame(.id = i, as.list(idx))
+                                }
+                        ),
+                          use.names = FALSE
+                  )
+
+# change column names except '.id'
+old_names <- names(training_idx)
+new_names <- c(".id", paste0("idx_", seq_len(ncol(training_idx) - 1))) 
+setnames(training_idx, old = old_names, new = new_names)
+
+training_idx[1:5, 1:12]
+```
+
+Now, I'll build `r n_sim` Cox proportional hazard models, using a stepwise
+procedure, on each training sample, and obtain the C-index on the respective test sample.
+
+
+```{r}
+#| lst-cap: "Fitting Cox PH models on the training samples, and obtaining the C-index on the respective test samples"
+#| lst-label: lst-model-building-validation
+
+# split data into training and test sets
+# and obtain cox coefs
+models <- training_idx[, {
+        tmp_train <- lung_complete[unlist(.SD)]
+        tmp_test <- lung_complete[-unlist(.SD)]
+        # fit the full model to the training data
+        cox_full_tmp <- coxph(Surv(time, status) ~ .,
+                              data = tmp_train)
+        # use stepwise selection on training data
+        cox_step_tmp <- step(cox_full_tmp,
+                             direction = "both",
+                             trace = 0)
+        # get linear predictor on test data
+        lp_tmp <- predict(cox_step_tmp, 
+                          newdata = tmp_test, type = "lp")
+        # obtain c-statistic using linear predictor
+        c_stat <- concordance(Surv(tmp_test$time, tmp_test$status) ~ lp_tmp)
+        data.table(as.data.table(tidy(cox_step_tmp)),
+                         c = c_stat$concordance)
+        }, by = .id] 
+
+models 
+```
+The `models` output from @lst-model-building-validation has `r ncol(models)` columns. The
+`.id` variable refers back to the training sample obtained from `training_idx`
+in @lst-training-set-indices, and the `term` variable gives the factors that
+have been selected in the model relating to the `.id`.^[The `term` estimates
+can contain `NA`'s if there is complete separation or zero events in the
+split.]
+The `c` variable is the C-index obtained from using the `.id`$^{\text{th}}$
+model to predict the test set events, so is identical for rows with the same
+`.id`'s.
+
+:::{.callout-note collapse = true}
+# Using the linear predictor to access predictive ability
+
+Fitting a Cox proportional hazards model:
+
+$$
+\lambda(t \mid X) = \lambda_0(t) \exp(\beta_1 X_1 + \beta_2 X_2 + \dots + \beta_p X_p),
+$$
+
+- $\beta_1, \beta_2, \dots, \beta_p$ are the estimated coefficients.  
+- Linear Predictor:
+  $$
+  \text{LP}(X) = \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_p X_p.
+  $$
+- The hazard ratio between two individuals is determined by the difference
+  in their linear predictors. A higher linear predictor implies a higher hazard
+  (i.e., worse prognosis, or shorter survival on average).
+
+Why the LP Is Enough to Rank Subjects
+
+- Harrell’s c-index is fundamentally about whether the model places the higher risk on the patient who actually experiences the event earlier.  
+- In a Cox model, risk is monotonic in $\exp(\text{LP})$. That is, if $\text{LP}_A > \text{LP}_B$, then $\exp(\text{LP}_A) > \exp(\text{LP}_B)$.  
+- So for pairwise comparisons, we only need to compare the linear predictor $\text{LP}_A\) vs. \(\text{LP}_B$.  
+- If $\text{LP}_A > \text{LP}_B$ but patient A actually survived longer, that pair is discordant. If A also died sooner, that pair is concordant.
+
+:::
+
+# Analysing the results
+
+Using the models and coefficient estimates obtained in `models` (from @lst-model-building-validation), I'll look at a few things:
+
+1. How often each factor is chosen -- using the stepwise procedure -- to be in the `r n_sim` models.
+2. How many different models are chosen from the `r n_sim` stepwise selection procedures, and the proportion of times each model is selected.
+3. The variability in the estimated factor coefficients (if there are chosen in the model).
+4. The variability in the C-index obtained on the test set.
+
+## The model factors 
+
+First, let's look at the proportion that each factor has been chosen to be in the `r n_sim` models.
+
+```{r}
+#| lst-label: lst-factor-proportion
+#| lst-cap: Obtaining the proportion that each factor is chosen to be in the models.
+
+which_variables <- models[, unique(term)]
+
+proportion_variables <- rbindlist(
+      lapply(1:length(which_variables), 
+             function(i) {
+              prop_tmp <- nrow(models[term == which_variables[i]]) / n_sim
+              data.table(which_variables[i], prop_tmp)
+                    }
+             )
+      )
+
+# categorical factors in each model are present in the `models` dataset multiple times
+# e.g. 'ph.ecog1', 'ph.ecog2', etc.
+# create a "expl_factor" group by removing trailing digits
+proportion_variables[
+  , expl_factor := sub("[0-9]+$", "", V1)
+]
+
+# collapse by the explanatory factor
+grouped_proportions <- proportion_variables[
+  , .(prop = unique(prop_tmp)),
+  by = expl_factor
+]
+
+grouped_proportions[order(prop, decreasing = TRUE)]
+```
+
+Now I'll consider each model and the factors obtained using the stepwise
+procedure. First -- in @lst-model-terms -- I'll create a `terms_string`
+variable that gives a string containing all the terms in each of the `r n_sim`
+models.
+Then -- in @lst-model-terms-groups -- I'll group these models together to see
+how many different combination of factors have been chosen from the `r n_sim`
+stepwise selection procedures.
+
+```{r}
+#| lst-cap: Creating string of all the factors in each of the models.
+#| lst-label: lst-model-terms
+
+model_variables <- models[, .(
+  terms_string = paste(
+    unique(sub("[0-9]+$", "", term)),
+    collapse = ", "
+  )
+), by = .id]
+
+model_variables
+```
+
+Grouping these models together gives the follow:
+
+```{r}
+#| lst-cap: Grouping models together to show the number of different models obtained from using stepwise selection.
+#| lst-label: lst-model-terms-groups
+#| df_print: paged
+
+proportion_model_variables <- model_variables[
+      , .(prop = nrow(.SD) / nrow(model_variables))
+      , by = terms_string]
+
+#proportion_model_variables
+proportion_model_variables[order(prop, decreasing = TRUE)]
+```
+
+That is, from `r n_sim` simulations of splitting the data into a training and
+test set, I've obtained `r nrow(proportion_model_variables)` different models!
+
+### The factor coefficients
+
+OK -- let's look at the variability of the coefficient estimates for each
+factor. First, I'll get summary statistics for each factor coefficient.
+A box-plot showing this variability is given in @fig-coef-box, and the kernel
+densities of the estimates are shown in @fig-coef-density.
+
+```{r}
+# Remove any rows that have NA in the estimate
+models_clean <- subset(models, !is.na(estimate))
+
+models_clean[, as.list(summary(estimate)), by = term]
+```
+
+```{r}
+#| fig-asp: 1
+#| label: fig-coef-box
+#| fig-cap: Box plots showing the variability in the factor coefficient estimates.
+
+ggplot(models_clean, aes(x=term, y=estimate)) +
+  geom_boxplot() +
+  theme_minimal() +
+  theme(
+     axis.title = element_blank(),
+     # remove the grid lines
+     panel.grid.major = element_blank() ,
+     panel.grid.minor = element_blank() ,
+     # explicitly set the horizontal lines 
+     panel.grid.major.y = element_line(linewidth = .1, color = "grey" )
+        )
+```
+
+We can see from @fig-coef-box (and by referring back to @lst-factor-proportion)
+that the factors that are chosen the most times have the largest varibility in
+their coefficient estimates.
+
+
+```{r}
+#| fig-asp: 1
+#| fig-width: 8
+#| label: fig-coef-density
+#| fig-cap: Density plots of the estimates for each factor coefficient.
+
+ggplot(models_clean, aes(x = estimate)) +
+  geom_density(fill = "grey", alpha = 0.4) +
+  facet_wrap(~ term, scales = "free") +
+  labs(
+    title = "Density Plot of Factor Coefficients",
+    x = "Coefficient Estimate",
+    y = "Density"
+  ) +
+  theme_minimal() +
+  theme(
+     axis.text.y = element_blank(),
+     axis.title.y=element_blank(),
+     # remove the grid lines
+     panel.grid.major = element_blank() ,
+     panel.grid.minor = element_blank() ,
+     # explicitly set the horizontal lines 
+     panel.grid.major.y = element_line(linewidth = .1, color = "grey" )
+  )
+```
+
+## The C-Index on the test sets
+
+Finally, let's look at how the C-index varies for each training/test split and
+respective model. The code in @lst-model-c gives the C-index values obtained
+from the `r n_sim` models, and the histogram is given in @fig-hist-c.
+
+```{r}
+#| lst-label: lst-model-c
+#| lst-cap: Code to output the C-index, in descending order.
+
+c_stats <- models[, .(c_stats = unique(c)), by = .id]
+c_stats[order(c_stats, decreasing = TRUE)]
+```
+
+```{r}
+#| fig-cap: Histogram of the C-index values obtained on the test sets of the models.
+#| label: fig-hist-c
+
+ggplot(c_stats, aes(x = c_stats)) +
+        stat_bin(bins = 30) +
+        xlab("C-Index") + ylab("") +
+        theme_minimal() +
+        theme(
+           # remove the grid lines
+           panel.grid.major = element_blank() ,
+           panel.grid.minor = element_blank() ,
+           # explicitly set the horizontal lines 
+           panel.grid.major.y = element_line(linewidth = .1, color = "grey" )
+        )
+```
+
+These C-statistics seem to be very low (most under $0.5$). There are some
+reasons why this might be the case (that I should probably have a look at at some point):
+
+1.	Stepwise selection is likely overfitting to noise in the training set.
+2.	The predictors in `lung` may not be strongly associated with survival.
+3.	Some predictors might violate proportional hazards, hurting model performance.
+4.	Small test set size reduces the reliability of C-index estimates.
+
+# Conclusion
+
+To sum up, I have shown by simulation some not-that-surprising results. These are:
+
+- Building a model on a single training-test split and then performing stepwise
+  selection creates a huge amount of variability, both in the model factors and
+  in their coefficient estimates.
+- The model validation step (performed on the test set) is not stable, and
+  results in very different results depending on the data-split, the model and
+  the coefficient estimates.
+
+**Next steps:** I will examine better methods for model building and validation in some future
+posts, but as a spoiler, they will include the use of the lasso, bootstrapping
+and cross-validation.  
+
+# Fin

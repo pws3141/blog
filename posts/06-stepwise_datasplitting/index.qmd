@@ -4,7 +4,7 @@ subtitle: "Some critiques of data-splitting and the stepwise procedure"
 author:
   - name: Paul Smith
 date: "2025-03-05"
-categories: [code, r, statistics, model fitting, model building]
+categories: [code, r, statistics, model fitting, model validation]
 format:
   html:
     code-fold: false
