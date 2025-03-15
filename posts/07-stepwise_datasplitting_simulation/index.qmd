@@ -3,7 +3,7 @@ title: "Model Fitting and Validation"
 subtitle: "Simulating the effect of data-splitting and stepwise selection on the `lung` dataset"
 author:
   - name: Paul Smith
-date: "2025-03-05"
+date: "2025-03-15"
 categories: [code, r, statistics, model fitting, model validation]
 format:
   html:
