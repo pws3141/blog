@@ -377,4 +377,5 @@ To sum up, I have shown by simulation some not-that-surprising results. These ar
 posts, but as a spoiler, they will include the use of the lasso, bootstrapping
 and cross-validation.  
 
+
 # Fin
