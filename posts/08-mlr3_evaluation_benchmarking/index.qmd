@@ -1,0 +1,404 @@
+---
+title: "Getting Started with {mlr3}"
+subtitle: "02 Evaluation and Benchmarking"
+author:
+  - name: Paul Smith
+date: "2025-03-21"
+categories: [code, r, machine learning, mlr3]
+image: "./fig/mlr3_logo.svg"
+format:
+  html:
+    code-fold: false
+execute:
+  df-print: default
+---
+
+# Introduction
+
+I am attempting to learn how to use `{mlr3}` [@lang2019mlr3], by reading through the book
+[Applied Machine Learning Using mlr3 in R](https://mlr3book.mlr-org.com/)
+[@bischl2024usingmlr3].
+
+My previous posts include:
+- [Part one](../05-mlr3_basic_modelling/index.qmd):
+    - Create a classification tree model to predict diabetes.
+    - Look at the confusion matrix and create measures without using {mlr3measures}.
+    - Change the thresholds in the model.
+
+In this second blog post, I am going through the exercises
+given in Section 3 [@casalicchio2024evaluation].
+This involves using repeated cross-validation resampling, using a custom
+resampling strategy, and creating a function that produces a ROC.
+
+
+## Prerequisites
+
+```{r}
+library(mlr3)
+library(mlr3viz)
+library(mlr3learners)
+library(mlr3data)
+library(ggplot2)
+library(patchwork)
+library(data.table)
+options(datatable.print.nrows = 20)
+```
+
+# Exercises
+
+1. Apply a repeated cross-validation resampling strategy on `tsk("mtcars")` and evaluate the performance of `lrn("regr.rpart")`.
+   - Use five repeats of three folds each.
+   - Calculate the MSE for each iteration and visualize the result.
+   - Finally, calculate the aggregated performance score.
+
+2. Use `tsk("spam")` and five-fold CV to benchmark `lrn("classif.ranger")`, `lrn("classif.log_reg")`, and `lrn("classif.xgboost", nrounds = 100)` with respect to AUC.
+   - Which learner appears to perform best?
+   - How confident are you in your conclusion?
+   - Think about the stability of results and investigate this by re-running the experiment with different seeds.
+   - What can be done to improve this?
+
+3. A colleague reports a 93.1% classification accuracy using `lrn("classif.rpart")` on `tsk("penguins_simple")`.
+   - You want to reproduce their results and ask them about their resampling strategy.
+   - They said they used a custom three-fold CV with folds assigned as `factor(task$row_ids %% 3)`.
+   - See if you can reproduce their results.
+
+4. (\*) Program your own ROC plotting function **without** using `mlr3`'s `autoplot()` function.
+   - The signature of your function should be `my_roc_plot(task, learner, train_indices, test_indices)`.
+   - Your function should use the `$set_threshold()` method of `Prediction`, as well as `mlr3measures`.
+
+First, let's suppress all messaging unless it's a warning:^[See [Section 10.3](https://mlr3book.mlr-org.com/chapters/chapter10/advanced_technical_aspects_of_mlr3.html#sec-logging) of the tutorial for more information about mlr3 logging output)]
+
+```{r}
+lgr::get_logger("mlr3")$set_threshold("warn")
+```
+
+
+## Question 1
+
+Apply a repeated cross-validation resampling strategy on `tsk("mtcars")` and evaluate the performance of `lrn("regr.rpart")`.
+
+- Use five repeats of three folds each.
+- Calculate the MSE for each iteration and visualize the result.
+- Finally, calculate the aggregated performance score.
+
+### Answer
+
+First, I'll load the `Task`, `Learner`, and create the `rsmp()` object.
+```{r}
+tsk_mtcars <- tsk("mtcars")
+tsk_mtcars
+# load learner
+lrn_rpart <- lrn("regr.rpart")
+lrn_rpart
+# load resampling method: 5 lots of three-fold CV
+rcv53 = rsmp("repeated_cv", repeats = 5, folds = 3)
+rcv53
+```
+
+Now, I'll use the `resample()` function to run the resampling strategy.
+
+```{r}
+rr <- resample(tsk_mtcars, lrn_rpart, rcv53)
+rr
+```
+
+Calculating the MSE for each iteration requires running `$score()`.
+
+```{r}
+rr_mse <- rr$score(msr("regr.mse"))
+rr_mse
+```
+
+Let's plot this.
+
+```{r}
+#| fig-asp: 0.5
+#| fig-width: 8
+autoplot(rr, measure = msr("regr.mse"), type = "boxplot") +
+autoplot(rr, measure = msr("regr.mse"), type = "histogram")
+```
+
+Aggregating the MSE scores (using *macro* aggregation) gives:
+
+```{r}
+rr$aggregate(msr("regr.mse"))
+```
+
+## Question 2
+
+Use `tsk("spam")` and five-fold CV to benchmark `lrn("classif.ranger")`, `lrn("classif.log_reg")`, and `lrn("classif.xgboost", nrounds = 100)` with respect to AUC.
+
+- Which learner appears to perform best?
+- How confident are you in your conclusion?
+- Think about the stability of results and investigate this by re-running the experiment with different seeds.
+- What can be done to improve this?
+
+### Answer
+
+Let's load the task, learners and resampling method.
+
+```{r}
+tsk_spam <- tsk("spam")
+tsk_spam
+# set up leaners
+# first set up the 'lrns()' then modify the xgboost 'nrounds' argument
+learners <- lrns(c("classif.ranger", "classif.log_reg", "classif.xgboost"), 
+                 predict_type = "prob")
+# adjust 'nrounds' argument for xgboost
+learners$classif.xgboost$param_set$values$nrounds <- 100
+learners
+# set up resampling
+cv5 <- rsmp("cv", folds = 5)
+cv5
+```
+
+Now we can set up the benchmark grid.
+
+```{r}
+set.seed(1)
+
+design <- benchmark_grid(tsk_spam, learners, cv5)
+design
+```
+
+Now, see how well these perform in terms of AUC.^[**Recall:** AUC can be interpreted as the probability that a randomly chosen positive instance has a higher predicted probability of belonging to the positive class than a randomly chosen negative instance]
+
+```{r}
+bmr <- benchmark(design)
+bmr$score(msr("classif.auc"))[, .(learner_id, iteration, classif.auc)]
+```
+
+And let's aggregate by `Learner`.
+
+```{r}
+bmr$aggregate(msr("classif.auc"))
+```
+
+```{r}
+autoplot(bmr, measure = msr("classif.auc"))
+```
+
+
+So, from a naive look at this, it appears that the XGBoost model performs the best (highest AUC). However, the results from all three of these models appear very similar, and I would maybe prefer "simpler" models over more flexible ones in this case (here, the logistic regression model).
+
+If we run this 5 times with different seeds, let's see how the AUC varies.
+
+```{r}
+#| cache: true
+#| warning: false
+
+bmr_auc <- rbindlist(lapply(seq_len(5), function(i) {
+                         tmp_seed <- i * 100
+                         set.seed(tmp_seed)
+                         design <- benchmark_grid(tsk_spam, learners, cv5)
+                         bmr <- benchmark(design)
+                         data.table(
+                                       seed = tmp_seed,
+                                       auc = bmr$aggregate(msr("classif.auc"))
+                                       )
+                    })
+                )
+
+
+bmr_auc[, .(seed, auc.learner_id, auc.classif.auc)]
+
+# some summary stats
+bmr_auc[, as.list(summary(auc.classif.auc)), by = auc.learner_id]
+```
+
+From this, it does appear that the logistic regression model is consistently worse, but there is not much difference in the other two models (although XGBoost always very slighly outperforms the random forest model, after aggregation). The choice of model will depend on how important that small difference is in the AUC compared to model complexity.
+
+## Question 3
+
+A colleague reports a $93.1\%$ classification accuracy using `lrn("classif.rpart")` on `tsk("penguins_simple")`.
+
+- You want to reproduce their results and ask them about their resampling strategy.
+- They said they used a custom three-fold CV with folds assigned as `factor(task$row_ids %% 3)`.
+- See if you can reproduce their results.
+
+### Answer
+
+Let's have a look at the `Task`. This task doesn't seem to be in included in the default {mlr3} package, but is referenced in the {mlr3data} [@becker2024mlr3data] [docs](https://mlr3data.mlr-org.com/reference/penguins_simple.html).
+
+```{r}
+tsk_penguins <- tsk("penguins_simple")
+tsk_penguins
+```
+
+OK, so this is a multi-class classification task, using 10 features to predict the species of the penguin.
+
+They said they used a custom three-fold CV, so let's try and reproduce this. By looking at `factor(tsk_penguins$row_ids %% 3)`, we can see that the CV is putting every third observation into the same fold. This feels weird and wrong, but fine.
+
+```{r}
+# load learner
+lrn_rpart <- lrn("classif.rpart")
+lrn_rpart
+# create custom resampling strategy
+rsmp_custom = rsmp("custom_cv")
+folds <- factor(tsk_penguins$row_ids %% 3)
+rsmp_custom$instantiate(tsk_penguins, f = folds)
+rr <- resample(tsk_penguins, lrn_rpart, rsmp_custom)
+rr$predictions()
+rr$score(msr("classif.acc"))
+rr$aggregate(msr("classif.acc"))
+```
+
+So, we get a model with $93.1\%$ accuracy, as required.
+
+## Question 4
+
+(\*) Program your own ROC plotting function **without** using `mlr3`'s `autoplot()` function.
+
+- The signature of your function should be `my_roc_plot(task, learner, train_indices, test_indices)`.
+- Your function should use the `$set_threshold()` method of `Prediction`, as well as `mlr3measures`.
+
+### Answer
+
+Let's first have a look at the output from using `autoplot()`. I'll use the `german_credit` task.
+
+```{r}
+tsk_german = tsk("german_credit")
+tsk_german
+lrn_ranger = lrn("classif.ranger", predict_type = "prob")
+splits = partition(tsk_german, ratio = 0.8)
+
+lrn_ranger$train(tsk_german, splits$train)
+prediction = lrn_ranger$predict(tsk_german, splits$test)
+```
+
+```{r}
+autoplot(prediction, type = "roc")
+```
+
+First, I'll do all the steps to create the ROC, then I'll wrap this in a function, `my_roc_plot()`.
+
+#### Creating the ROC
+
+OK -- so I need to use [`$set_threshold()`](https://mlr3.mlr-org.com/reference/PredictionClassif.html#method-PredictionClassif-set_threshold) to obtain predictions over the range of thresholds. Then, I need to use {mlr3measures} [@lang2024mlr3measures] to compute the TPR (Sensitivity) and FPR ($1 -$ Specificity) and plot these all on a lovely graph.
+
+:::{.column-margin}
+
+Sensitivity
+: (true positive rate) is the probability of a positive test result, conditioned on the individual truly being positive.
+
+Specificity
+: (true negative rate) is the probability of a negative test result, conditioned on the individual truly being negative.
+
+:::
+
+I'll first check to see which is the `positive` outcome in the `Task`.
+
+```{r}
+tsk_german$positive
+# also, by looking at the help file 'prediction$help()'
+# can see that the positive class is the first level of '$truth', i.e.
+levels(prediction$truth)[1]
+```
+
+So having `good` credit is the positive outcome here.
+
+Now, I'll create a vector of thresholds^[Thresholds were discussed in [Section
+2.5.4](https://mlr3book.mlr-org.com/chapters/chapter2/data_and_basic_modeling.html#sec-classif-prediction)
+of the mlr3 tutorial, and I looked at them in Question 3 of my [previous
+post](../05-mlr3_basic_modelling/index.qmd)] and then obtain predictions and
+calculate the measures. 
+
+```{r}
+positive_class <- levels(prediction$truth)[1]
+thresholds <- seq(0, 1, length = 101)
+tsk_german_measures <- rbindlist(
+         lapply(thresholds, function(j) {
+                prediction$set_threshold(j)
+                tpr_tmp <- mlr3measures::tpr(truth = prediction$truth,
+                                             response = prediction$response,
+                                             positive = positive_class)
+                fpr_tmp <- mlr3measures::fpr(truth = prediction$truth,
+                                             response = prediction$response,
+                                             positive = positive_class)
+                data.table(threshold = j,
+                           tpr = tpr_tmp,
+                           fpr = fpr_tmp)
+                    }
+                 )
+         )
+
+# order by increasing fpr, and tpr
+# s.t. the step function avoids spikes
+# spikes are happening as seed not set in $set_threshold(),
+# so possible to get non-monotonic tpr/ fpr
+# also put them in descending threshold order, just to make the data look nicer.
+tsk_german_measures <- tsk_german_measures[order(fpr, tpr, -threshold)]
+tsk_german_measures
+```
+
+OK, I think I've got everything required to plot the ROC.
+
+```{r}
+ggplot(tsk_german_measures, aes(x = fpr, y = tpr)) +
+        geom_step() +
+        geom_abline(intercept = 0, slope = 1,
+                    linetype = "dotted", colour = "grey") +
+        labs(x = "1 - Specificity",
+             y = "Sensitivity") +
+        theme_minimal()
+```
+
+#### Making the function `my_roc_plot()`
+
+```{r}
+my_roc_plot <- function(task, learner, train_indices, test_indices) {
+        # task: a 'Task' object
+        # learner: a 'Learner' object
+
+        # train the learner on the task
+        learner$train(task, row_ids = train_indices)
+        # create the prediction object
+        prediction <- learner$predict(task, row_ids = test_indices)
+
+        # find TPR and FPR over a seq of thresholds
+        positive_class <- levels(prediction$truth)[1]
+        thresholds <- seq(0, 1, length = 101)
+        tpr_fpr_thresholds <- rbindlist(
+                 lapply(thresholds, function(j) {
+                        prediction$set_threshold(j)
+                        tpr_tmp <- mlr3measures::tpr(truth = prediction$truth,
+                                                     response = prediction$response,
+                                                     positive = positive_class)
+                        fpr_tmp <- mlr3measures::fpr(truth = prediction$truth,
+                                                     response = prediction$response,
+                                                     positive = positive_class)
+                        data.table(threshold = j,
+                                   tpr = tpr_tmp,
+                                   fpr = fpr_tmp)
+                            }
+                         )
+                 )
+
+        tpr_fpr_thresholds <- tpr_fpr_thresholds[order(fpr, tpr, -threshold)]
+
+        # and plot
+        ggplot(tpr_fpr_thresholds, aes(x = fpr, y = tpr)) +
+                geom_step() +
+                geom_abline(intercept = 0, slope = 1,
+                            linetype = "dotted", colour = "grey") +
+                labs(x = "1 - Specificity",
+                     y = "Sensitivity") +
+                theme_minimal()
+
+}
+
+```
+
+Let's test it:
+
+```{r}
+my_roc_plot(task = tsk_german,
+            learner = lrn("classif.ranger", predict_type = "prob"),
+            train_indices = splits$train,
+            test_indices = splits$test)
+```
+
+
+Cool, looks good!
+
+# Fin
