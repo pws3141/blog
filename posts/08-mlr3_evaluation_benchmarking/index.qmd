@@ -180,7 +180,10 @@ autoplot(bmr, measure = msr("classif.auc"))
 ```
 
 
-So, from a naive look at this, it appears that the XGBoost model performs the best (highest AUC). However, the results from all three of these models appear very similar, and I would maybe prefer "simpler" models over more flexible ones in this case (here, the logistic regression model).
+So, from a naive look at this, it appears that the XGBoost model performs the
+best (highest AUC). However, the results from all three of these models appear
+very similar, and I would maybe prefer "simpler" models over more flexible ones
+in this case (here, the logistic regression model).
 
 If we run this 5 times with different seeds, let's see how the AUC varies.
 
@@ -207,7 +210,12 @@ bmr_auc[, .(seed, auc.learner_id, auc.classif.auc)]
 bmr_auc[, as.list(summary(auc.classif.auc)), by = auc.learner_id]
 ```
 
-From this, it does appear that the logistic regression model is consistently worse, but there is not much difference in the other two models (although XGBoost always very slighly outperforms the random forest model, after aggregation). The choice of model will depend on how important that small difference is in the AUC compared to model complexity.
+Although XGBoost achieved the highest AUC on average, the difference compared
+to ranger was minimal across repeated runs (although XGBoost always very
+slighly outperforms the random forest model, after aggregation). Confidence
+intervals or additional repeats could provide better insight into whether the
+observed difference is meaningful. The choice of model will depend on how
+important that small difference is in the AUC compared to model complexity.
 
 ## Question 3
 
@@ -228,7 +236,12 @@ tsk_penguins
 
 OK, so this is a multi-class classification task, using 10 features to predict the species of the penguin.
 
-They said they used a custom three-fold CV, so let's try and reproduce this. By looking at `factor(tsk_penguins$row_ids %% 3)`, we can see that the CV is putting every third observation into the same fold. This feels weird and wrong, but fine.
+They said they used a custom three-fold CV, so let's try and reproduce this. By
+looking at `factor(tsk_penguins$row_ids %% 3)`, we can see that the CV is
+putting every third observation into the same fold. This feels weird and wrong,
+but fine.^[ This folding strategy does not ensure class balance within each
+fold and may lead to biased performance estimates, particularly in smaller
+datasets.]
 
 ```{r}
 # load learner
@@ -244,7 +257,10 @@ rr$score(msr("classif.acc"))
 rr$aggregate(msr("classif.acc"))
 ```
 
-So, we get a model with $93.1\%$ accuracy, as required.
+So, we get a model with $93.1\%$ accuracy, as required.^[Would the results
+change much with, for example, [grouped
+resampling](https://mlr3book.mlr-org.com/chapters/chapter3/evaluation_and_benchmarking.html#sec-strat-group)?
+I should look at this at some point.]
 
 ## Question 4
 
