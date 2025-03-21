@@ -308,7 +308,15 @@ window.Quarto = {
 Lang, Michel, Martin Binder, Jakob Richter, Patrick Schratz, Florian Pfisterer, Stefan Coors, Quay Au, Giuseppe Casalicchio, Lars Kotthoff, and Bernd Bischl. 2019. <span>“<span class="nocase">mlr3</span>: A Modern Object-Oriented Machine Learning Framework in <span>R</span>.”</span> <em>Journal of Open Source Software</em>, December. <a href="https://doi.org/10.21105/joss.01903">https://doi.org/10.21105/joss.01903</a>.
 </div><div id="ref-bischl2024usingmlr3" class="csl-entry" role="listitem">
 Bischl, Bernd, Raphael Sonabend, Lars Kotthoff, and Michel Lang, eds. 2024. <em>Applied Machine Learning Using <span class="nocase">m</span>lr3 in <span>R</span></em>. CRC Press. <a href="https://mlr3book.mlr-org.com">https://mlr3book.mlr-org.com</a>.
-</div></div><p>My previous posts include: - <a href="../../posts/05-mlr3_basic_modelling/index.html">Part one</a>: - Create a classification tree model to predict diabetes. - Look at the confusion matrix and create measures without using {mlr3measures}. - Change the thresholds in the model.</p>
+</div></div><p>My previous posts include:</p>
+<ul>
+<li><a href="../../posts/05-mlr3_basic_modelling/index.html">Part one</a>:
+<ul>
+<li>Create a classification tree model to predict diabetes.</li>
+<li>Look at the confusion matrix and create measures without using {mlr3measures}.</li>
+<li>Change the thresholds in the model.</li>
+</ul></li>
+</ul>
 <p>In this second blog post, I am going through the exercises given in Section 3 <span class="citation" data-cites="casalicchio2024evaluation">(<a href="#ref-casalicchio2024evaluation" role="doc-biblioref">Casalicchio and Burk 2024</a>)</span>. This involves using repeated cross-validation resampling, using a custom resampling strategy, and creating a function that produces a ROC.</p>
 <div class="no-row-height column-margin column-container"><div id="ref-casalicchio2024evaluation" class="csl-entry" role="listitem">
 Casalicchio, Giuseppe, and Lukas Burk. 2024. <span>“Evaluation and Benchmarking.”</span> In <em>Applied Machine Learning Using <span class="nocase">m</span>lr3 in <span>R</span></em>, edited by Bernd Bischl, Raphael Sonabend, Lars Kotthoff, and Michel Lang. CRC Press. <a href="https://mlr3book.mlr-org.com/evaluation_and_benchmarking.html">https://mlr3book.mlr-org.com/evaluation_and_benchmarking.html</a>.
@@ -432,21 +440,21 @@ Casalicchio, Giuseppe, and Lukas Burk. 2024. <span>“Evaluation and Benchmarkin
 <div class="cell-output cell-output-stdout">
 <pre><code>    task_id learner_id resampling_id iteration regr.mse
      &lt;char&gt;     &lt;char&gt;        &lt;char&gt;     &lt;int&gt;    &lt;num&gt;
- 1:  mtcars regr.rpart   repeated_cv         1 24.22522
- 2:  mtcars regr.rpart   repeated_cv         2 14.59758
- 3:  mtcars regr.rpart   repeated_cv         3 33.43807
- 4:  mtcars regr.rpart   repeated_cv         4 21.23417
- 5:  mtcars regr.rpart   repeated_cv         5 18.63858
- 6:  mtcars regr.rpart   repeated_cv         6 26.52406
- 7:  mtcars regr.rpart   repeated_cv         7 16.28326
- 8:  mtcars regr.rpart   repeated_cv         8 27.10835
- 9:  mtcars regr.rpart   repeated_cv         9 21.77850
-10:  mtcars regr.rpart   repeated_cv        10 27.13531
-11:  mtcars regr.rpart   repeated_cv        11 16.76295
-12:  mtcars regr.rpart   repeated_cv        12 22.63867
-13:  mtcars regr.rpart   repeated_cv        13 22.08690
-14:  mtcars regr.rpart   repeated_cv        14 12.84575
-15:  mtcars regr.rpart   repeated_cv        15 11.03230
+ 1:  mtcars regr.rpart   repeated_cv         1 18.86200
+ 2:  mtcars regr.rpart   repeated_cv         2 14.62213
+ 3:  mtcars regr.rpart   repeated_cv         3 27.20238
+ 4:  mtcars regr.rpart   repeated_cv         4 18.19663
+ 5:  mtcars regr.rpart   repeated_cv         5 24.31141
+ 6:  mtcars regr.rpart   repeated_cv         6 28.51660
+ 7:  mtcars regr.rpart   repeated_cv         7 13.74869
+ 8:  mtcars regr.rpart   repeated_cv         8 18.09771
+ 9:  mtcars regr.rpart   repeated_cv         9 30.01980
+10:  mtcars regr.rpart   repeated_cv        10 18.83330
+11:  mtcars regr.rpart   repeated_cv        11 13.55929
+12:  mtcars regr.rpart   repeated_cv        12 35.88914
+13:  mtcars regr.rpart   repeated_cv        13 21.05378
+14:  mtcars regr.rpart   repeated_cv        14 17.44531
+15:  mtcars regr.rpart   repeated_cv        15 21.01809
 Hidden columns: task, learner, resampling, prediction_test</code></pre>
 </div>
 </div>
@@ -470,7 +478,7 @@ Hidden columns: task, learner, resampling, prediction_test</code></pre>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>rr<span class="sc">$</span><span class="fu">aggregate</span>(<span class="fu">msr</span>(<span class="st">"regr.mse"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>regr.mse 
-21.08864 </code></pre>
+21.42509 </code></pre>
 </div>
 </div>
 </section>
