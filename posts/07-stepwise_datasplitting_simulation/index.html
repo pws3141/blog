@@ -447,7 +447,7 @@ Listing&nbsp;1: Generating training set indices for data-splitting simulations
 <div id="lst-model-building-validation" class="r cell-code listing quarto-float quarto-figure quarto-figure-left anchored page-columns page-full">
 <figure class="quarto-float quarto-float-lst figure page-columns page-full">
 <div aria-describedby="lst-model-building-validation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="sourceCode cell-code" id="lst-model-building-validation"><pre class="sourceCode code-annotation-code r code-with-copy"><code class="sourceCode r"><span id="lst-model-building-validation-1"><a href="#lst-model-building-validation-1" aria-hidden="true" tabindex="-1"></a><span class="co"># split data into training and test sets</span></span>
+<div class="sourceCode cell-code" id="lst-model-building-validation"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="lst-model-building-validation-1"><a href="#lst-model-building-validation-1" aria-hidden="true" tabindex="-1"></a><span class="co"># split data into training and test sets</span></span>
 <span id="lst-model-building-validation-2"><a href="#lst-model-building-validation-2" aria-hidden="true" tabindex="-1"></a><span class="co"># and obtain cox coefs</span></span>
 <span id="lst-model-building-validation-3"><a href="#lst-model-building-validation-3" aria-hidden="true" tabindex="-1"></a>models <span class="ot">&lt;-</span> training_idx[, {</span>
 <span id="lst-model-building-validation-4"><a href="#lst-model-building-validation-4" aria-hidden="true" tabindex="-1"></a>        tmp_train <span class="ot">&lt;-</span> lung_complete[<span class="fu">unlist</span>(.SD)]</span>
@@ -463,12 +463,12 @@ Listing&nbsp;1: Generating training set indices for data-splitting simulations
 <span id="lst-model-building-validation-14"><a href="#lst-model-building-validation-14" aria-hidden="true" tabindex="-1"></a>        lp_tmp <span class="ot">&lt;-</span> <span class="fu">predict</span>(cox_step_tmp, </span>
 <span id="lst-model-building-validation-15"><a href="#lst-model-building-validation-15" aria-hidden="true" tabindex="-1"></a>                          <span class="at">newdata =</span> tmp_test, <span class="at">type =</span> <span class="st">"lp"</span>)</span>
 <span id="lst-model-building-validation-16"><a href="#lst-model-building-validation-16" aria-hidden="true" tabindex="-1"></a>        <span class="co"># obtain c-statistic using linear predictor</span></span>
-<span id="lst-model-building-validation-17"><a href="#lst-model-building-validation-17" aria-hidden="true" tabindex="-1"></a>        c_stat <span class="ot">&lt;-</span> <span class="fu">concordance</span>(<span class="fu">Surv</span>(tmp_test<span class="sc">$</span>time, tmp_test<span class="sc">$</span>status) <span class="sc">~</span> lp_tmp,</span>
-<span id="lst-model-building-validation-18"><a href="#lst-model-building-validation-18" aria-hidden="true" tabindex="-1"></a>                              <span class="at">reverse =</span> <span class="cn">TRUE</span>)</span>
-<span id="lst-model-building-validation-19"><a href="#lst-model-building-validation-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">data.table</span>(<span class="fu">as.data.table</span>(<span class="fu">tidy</span>(cox_step_tmp)),</span>
-<span id="lst-model-building-validation-20"><a href="#lst-model-building-validation-20" aria-hidden="true" tabindex="-1"></a>                         <span class="at">c =</span> c_stat<span class="sc">$</span>concordance)</span>
-<span id="lst-model-building-validation-21"><a href="#lst-model-building-validation-21" aria-hidden="true" tabindex="-1"></a>        }, by <span class="ot">=</span> .id] </span>
-<span id="lst-model-building-validation-22"><a href="#lst-model-building-validation-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="lst-model-building-validation-17"><a href="#lst-model-building-validation-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># see callout note below for why `reverse = TRUE` is required</span></span>
+<span id="lst-model-building-validation-18"><a href="#lst-model-building-validation-18" aria-hidden="true" tabindex="-1"></a>        c_stat <span class="ot">&lt;-</span> <span class="fu">concordance</span>(<span class="fu">Surv</span>(tmp_test<span class="sc">$</span>time, tmp_test<span class="sc">$</span>status) <span class="sc">~</span> lp_tmp, </span>
+<span id="lst-model-building-validation-19"><a href="#lst-model-building-validation-19" aria-hidden="true" tabindex="-1"></a>                              <span class="at">reverse =</span> <span class="cn">TRUE</span>) </span>
+<span id="lst-model-building-validation-20"><a href="#lst-model-building-validation-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">data.table</span>(<span class="fu">as.data.table</span>(<span class="fu">tidy</span>(cox_step_tmp)),</span>
+<span id="lst-model-building-validation-21"><a href="#lst-model-building-validation-21" aria-hidden="true" tabindex="-1"></a>                         <span class="at">c =</span> c_stat<span class="sc">$</span>concordance)</span>
+<span id="lst-model-building-validation-22"><a href="#lst-model-building-validation-22" aria-hidden="true" tabindex="-1"></a>        }, by <span class="ot">=</span> .id] </span>
 <span id="lst-model-building-validation-23"><a href="#lst-model-building-validation-23" aria-hidden="true" tabindex="-1"></a>models </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-lst margin-caption" id="lst-model-building-validation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -492,10 +492,44 @@ Listing&nbsp;2: Fitting Cox PH models on the training samples, and obtaining the
 633:   100 ph.karno  0.04106388 0.01400488  2.932112 3.366650e-03 0.5729730</code></pre>
 </div>
 </div>
-<p>1.The <code>reverse = TRUE</code> argument is important here: if <code>TRUE</code> then assume that larger x values predict smaller response values y; a proportional hazards model is the common example of this, larger hazard = shorter survival.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Calculating the C-statistic using <code>concordance()</code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <code>reverse = TRUE</code> argument in <code>concordance()</code> is important in <a href="#lst-model-building-validation" class="quarto-xref">Listing&nbsp;2</a>: if TRUE then assume that larger x values predict smaller response values y; a proportional hazards model is the common example of this, larger hazard = shorter survival.</p>
+</div>
+</div>
 <p>The <code>models</code> output from <a href="#lst-model-building-validation" class="quarto-xref">Listing&nbsp;2</a> has 7 columns. The <code>.id</code> variable refers back to the training sample obtained from <code>training_idx</code> in <a href="#lst-training-set-indices" class="quarto-xref">Listing&nbsp;1</a>, and the <code>term</code> variable gives the factors that have been selected in the model relating to the <code>.id</code>.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> The <code>c</code> variable is the C-index obtained from using the <code>.id</code><span class="math inline">\(^{\text{th}}\)</span> model to predict the test set events, so is identical for rows with the same <code>.id</code>’s.</p>
-<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;The <code>term</code> estimates can contain <code>NA</code>’s if there is complete separation or zero events in the split.</p></div></div><div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;The <code>term</code> estimates can contain <code>NA</code>’s if there is complete separation or zero events in the split.</p></div><div class="">
+<p>Annoyingly, it appears to not be possible to both label / caption listings (using <code>#| lst-label</code> and <code>#| lst-cap</code>) and use code annotations (via <code># &lt;1&gt;</code>). I’m not sure why, but worth remember for the future.</p>
+<p>For example, if the code block contains the lines,</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| lst-cap: "An example of when the hover annotation doesn't work"</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| lst-label: lst-no-hover</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>then the output looks like this:</p>
+<div class="cell">
+<div id="lst-no-hover" class="r cell-code listing quarto-float quarto-figure quarto-figure-left anchored">
+<figure class="quarto-float quarto-float-lst figure">
+<div aria-describedby="lst-no-hover-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="sourceCode cell-code" id="lst-no-hover"><pre class="sourceCode code-annotation-code r code-with-copy"><code class="sourceCode r"><span id="lst-no-hover-1"><a href="#lst-no-hover-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-lst" id="lst-no-hover-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Listing&nbsp;3: An example of when the hover annotation doesn’t work
+</figcaption>
+</figure>
+</div>
+</div>
+<ol type="1">
+<li>This hovering code annotation doesn’t work</li>
+</ol>
+</div></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -504,7 +538,7 @@ Using the linear predictor to access predictive ability
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Fitting a Cox proportional hazards model:</p>
 <p><span class="math display">\[
@@ -575,7 +609,7 @@ Using the linear predictor to access predictive ability
 <span id="lst-factor-proportion-25"><a href="#lst-factor-proportion-25" aria-hidden="true" tabindex="-1"></a>grouped_proportions[<span class="fu">order</span>(prop, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-lst margin-caption" id="lst-factor-proportion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Listing&nbsp;3: Obtaining the proportion that each factor is chosen to be in the models.
+Listing&nbsp;4: Obtaining the proportion that each factor is chosen to be in the models.
 </figcaption>
 </figure>
 </div>
@@ -592,7 +626,7 @@ Listing&nbsp;3: Obtaining the proportion that each factor is chosen to be in the
 8:    meal.cal  0.04</code></pre>
 </div>
 </div>
-<p>Now I’ll consider each model and the factors obtained using the stepwise procedure. First – in <a href="#lst-model-terms" class="quarto-xref">Listing&nbsp;4</a> – I’ll create a <code>terms_string</code> variable that gives a string containing all the terms in each of the 100 models. Then – in <a href="#lst-model-terms-groups" class="quarto-xref">Listing&nbsp;5</a> – I’ll group these models together to see how many different combination of factors have been chosen from the 100 stepwise selection procedures.</p>
+<p>Now I’ll consider each model and the factors obtained using the stepwise procedure. First – in <a href="#lst-model-terms" class="quarto-xref">Listing&nbsp;5</a> – I’ll create a <code>terms_string</code> variable that gives a string containing all the terms in each of the 100 models. Then – in <a href="#lst-model-terms-groups" class="quarto-xref">Listing&nbsp;6</a> – I’ll group these models together to see how many different combination of factors have been chosen from the 100 stepwise selection procedures.</p>
 <div class="cell page-columns page-full">
 <div id="lst-model-terms" class="r cell-code listing quarto-float quarto-figure quarto-figure-left anchored page-columns page-full">
 <figure class="quarto-float quarto-float-lst figure page-columns page-full">
@@ -607,7 +641,7 @@ Listing&nbsp;3: Obtaining the proportion that each factor is chosen to be in the
 <span id="lst-model-terms-8"><a href="#lst-model-terms-8" aria-hidden="true" tabindex="-1"></a>model_variables</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-lst margin-caption" id="lst-model-terms-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Listing&nbsp;4: Creating string of all the factors in each of the models.
+Listing&nbsp;5: Creating string of all the factors in each of the models.
 </figcaption>
 </figure>
 </div>
@@ -640,7 +674,7 @@ Listing&nbsp;4: Creating string of all the factors in each of the models.
 <span id="lst-model-terms-groups-6"><a href="#lst-model-terms-groups-6" aria-hidden="true" tabindex="-1"></a>proportion_model_variables[<span class="fu">order</span>(prop, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-lst margin-caption" id="lst-model-terms-groups-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Listing&nbsp;5: Grouping models together to show the number of different models obtained from using stepwise selection.
+Listing&nbsp;6: Grouping models together to show the number of different models obtained from using stepwise selection.
 </figcaption>
 </figure>
 </div>
@@ -665,10 +699,10 @@ Listing&nbsp;5: Grouping models together to show the number of different models 
 <h3 class="anchored" data-anchor-id="the-factor-coefficients">The factor coefficients</h3>
 <p>OK – let’s look at the variability of the coefficient estimates for each factor. First, I’ll get summary statistics for each factor coefficient. A box-plot showing this variability is given in <a href="#fig-coef-box" class="quarto-xref">Figure&nbsp;1</a>, and the kernel densities of the estimates are shown in <a href="#fig-coef-density" class="quarto-xref">Figure&nbsp;2</a>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove any rows that have NA in the estimate</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>models_clean <span class="ot">&lt;-</span> <span class="fu">subset</span>(models, <span class="sc">!</span><span class="fu">is.na</span>(estimate))</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>models_clean[, <span class="fu">as.list</span>(<span class="fu">summary</span>(estimate)), by <span class="ot">=</span> term]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove any rows that have NA in the estimate</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>models_clean <span class="ot">&lt;-</span> <span class="fu">subset</span>(models, <span class="sc">!</span><span class="fu">is.na</span>(estimate))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>models_clean[, <span class="fu">as.list</span>(<span class="fu">summary</span>(estimate)), by <span class="ot">=</span> term]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>         term          Min.       1st Qu.        Median          Mean
        &lt;char&gt;         &lt;num&gt;         &lt;num&gt;         &lt;num&gt;         &lt;num&gt;
@@ -697,17 +731,17 @@ Listing&nbsp;5: Grouping models together to show the number of different models 
 </div>
 </div>
 <div class="cell page-columns page-full">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(models_clean, <span class="fu">aes</span>(<span class="at">x=</span>term, <span class="at">y=</span>estimate)) <span class="sc">+</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">axis.title =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>     <span class="co"># remove the grid lines</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">panel.grid.major =</span> <span class="fu">element_blank</span>() ,</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>() ,</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>     <span class="co"># explicitly set the horizontal lines </span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">panel.grid.major.y =</span> <span class="fu">element_line</span>(<span class="at">linewidth =</span> .<span class="dv">1</span>, <span class="at">color =</span> <span class="st">"grey"</span> )</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(models_clean, <span class="fu">aes</span>(<span class="at">x=</span>term, <span class="at">y=</span>estimate)) <span class="sc">+</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">axis.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>     <span class="co"># remove the grid lines</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">panel.grid.major =</span> <span class="fu">element_blank</span>() ,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>() ,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>     <span class="co"># explicitly set the horizontal lines </span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">panel.grid.major.y =</span> <span class="fu">element_line</span>(<span class="at">linewidth =</span> .<span class="dv">1</span>, <span class="at">color =</span> <span class="st">"grey"</span> )</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>        )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display page-columns page-full">
 <div id="fig-coef-box" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="quarto-float quarto-float-fig figure page-columns page-full">
@@ -721,26 +755,26 @@ Figure&nbsp;1: Box plots showing the variability in the factor coefficient estim
 </div>
 </div>
 </div>
-<p>We can see from <a href="#fig-coef-box" class="quarto-xref">Figure&nbsp;1</a> (and by referring back to <a href="#lst-factor-proportion" class="quarto-xref">Listing&nbsp;3</a>) that the factors that are chosen the most times have the largest varibility in their coefficient estimates.</p>
+<p>We can see from <a href="#fig-coef-box" class="quarto-xref">Figure&nbsp;1</a> (and by referring back to <a href="#lst-factor-proportion" class="quarto-xref">Listing&nbsp;4</a>) that the factors that are chosen the most times have the largest varibility in their coefficient estimates.</p>
 <div class="cell page-columns page-full">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(models_clean, <span class="fu">aes</span>(<span class="at">x =</span> estimate)) <span class="sc">+</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill =</span> <span class="st">"grey"</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> term, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Density Plot of Factor Coefficients"</span>,</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Coefficient Estimate"</span>,</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Density"</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>     <span class="at">axis.title.y=</span><span class="fu">element_blank</span>(),</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>     <span class="co"># remove the grid lines</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">panel.grid.major =</span> <span class="fu">element_blank</span>() ,</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>() ,</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>     <span class="co"># explicitly set the horizontal lines </span></span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>     <span class="at">panel.grid.major.y =</span> <span class="fu">element_line</span>(<span class="at">linewidth =</span> .<span class="dv">1</span>, <span class="at">color =</span> <span class="st">"grey"</span> )</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(models_clean, <span class="fu">aes</span>(<span class="at">x =</span> estimate)) <span class="sc">+</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill =</span> <span class="st">"grey"</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> term, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Density Plot of Factor Coefficients"</span>,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Coefficient Estimate"</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Density"</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>     <span class="at">axis.title.y=</span><span class="fu">element_blank</span>(),</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>     <span class="co"># remove the grid lines</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">panel.grid.major =</span> <span class="fu">element_blank</span>() ,</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>() ,</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>     <span class="co"># explicitly set the horizontal lines </span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>     <span class="at">panel.grid.major.y =</span> <span class="fu">element_line</span>(<span class="at">linewidth =</span> .<span class="dv">1</span>, <span class="at">color =</span> <span class="st">"grey"</span> )</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display page-columns page-full">
 <div id="fig-coef-density" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="quarto-float quarto-float-fig figure page-columns page-full">
@@ -758,7 +792,7 @@ Figure&nbsp;2: Density plots of the estimates for each factor coefficient.
 </section>
 <section id="the-c-index-on-the-test-sets" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="the-c-index-on-the-test-sets">The C-Index on the test sets</h2>
-<p>Finally, let’s look at how the C-index varies for each training/test split and respective model. The code in <a href="#lst-model-c" class="quarto-xref">Listing&nbsp;6</a> gives the C-index values obtained from the 100 models, and the histogram is given in <a href="#fig-hist-c" class="quarto-xref">Figure&nbsp;3</a>.</p>
+<p>Finally, let’s look at how the C-index varies for each training/test split and respective model. The code in <a href="#lst-model-c" class="quarto-xref">Listing&nbsp;7</a> gives the C-index values obtained from the 100 models, and the histogram is given in <a href="#fig-hist-c" class="quarto-xref">Figure&nbsp;3</a>.</p>
 <div class="cell page-columns page-full">
 <div id="lst-model-c" class="r cell-code listing quarto-float quarto-figure quarto-figure-left anchored page-columns page-full">
 <figure class="quarto-float quarto-float-lst figure page-columns page-full">
@@ -767,7 +801,7 @@ Figure&nbsp;2: Density plots of the estimates for each factor coefficient.
 <span id="lst-model-c-2"><a href="#lst-model-c-2" aria-hidden="true" tabindex="-1"></a>c_stats[<span class="fu">order</span>(c_stats, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-lst margin-caption" id="lst-model-c-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Listing&nbsp;6: Code to output the C-index, in descending order.
+Listing&nbsp;7: Code to output the C-index, in descending order.
 </figcaption>
 </figure>
 </div>
@@ -788,17 +822,17 @@ Listing&nbsp;6: Code to output the C-index, in descending order.
 </div>
 </div>
 <div class="cell page-columns page-full">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(c_stats, <span class="fu">aes</span>(<span class="at">x =</span> c_stats)) <span class="sc">+</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>        <span class="fu">stat_bin</span>(<span class="at">bins =</span> <span class="dv">30</span>) <span class="sc">+</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">xlab</span>(<span class="st">"C-Index"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">""</span>) <span class="sc">+</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme</span>(</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>           <span class="co"># remove the grid lines</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">panel.grid.major =</span> <span class="fu">element_blank</span>() ,</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>() ,</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>           <span class="co"># explicitly set the horizontal lines </span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">panel.grid.major.y =</span> <span class="fu">element_line</span>(<span class="at">linewidth =</span> .<span class="dv">1</span>, <span class="at">color =</span> <span class="st">"grey"</span> )</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>        )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(c_stats, <span class="fu">aes</span>(<span class="at">x =</span> c_stats)) <span class="sc">+</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>        <span class="fu">stat_bin</span>(<span class="at">bins =</span> <span class="dv">30</span>) <span class="sc">+</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">xlab</span>(<span class="st">"C-Index"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme</span>(</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>           <span class="co"># remove the grid lines</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">panel.grid.major =</span> <span class="fu">element_blank</span>() ,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>() ,</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>           <span class="co"># explicitly set the horizontal lines </span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">panel.grid.major.y =</span> <span class="fu">element_line</span>(<span class="at">linewidth =</span> .<span class="dv">1</span>, <span class="at">color =</span> <span class="st">"grey"</span> )</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>        )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display page-columns page-full">
 <div id="fig-hist-c" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="quarto-float quarto-float-fig figure page-columns page-full">
