@@ -132,13 +132,16 @@ models <- training_idx[, {
         lp_tmp <- predict(cox_step_tmp, 
                           newdata = tmp_test, type = "lp")
         # obtain c-statistic using linear predictor
-        c_stat <- concordance(Surv(tmp_test$time, tmp_test$status) ~ lp_tmp)
+        c_stat <- concordance(Surv(tmp_test$time, tmp_test$status) ~ lp_tmp,
+                              reverse = TRUE) # <1>
         data.table(as.data.table(tidy(cox_step_tmp)),
                          c = c_stat$concordance)
         }, by = .id] 
 
 models 
 ```
+1.The `reverse = TRUE` argument is important here: if `TRUE` then assume that larger x values predict smaller response values y; a proportional hazards model is the common example of this, larger hazard = shorter survival.
+
 The `models` output from @lst-model-building-validation has `r ncol(models)` columns. The
 `.id` variable refers back to the training sample obtained from `training_idx`
 in @lst-training-set-indices, and the `term` variable gives the factors that
@@ -354,13 +357,10 @@ ggplot(c_stats, aes(x = c_stats)) +
         )
 ```
 
-These C-statistics seem to be very low (most under $0.5$). There are some
-reasons why this might be the case (that I should probably have a look at at some point):
+These C-statistics varies quite a bit, from worse-than-random (a minimum of `r round(min(c_stats$c_stats), 2)`) to *OK* (a maximum of `r round(max(c_stats$c_stats), 2)`). Some of this variability could be accounted for by:
 
-1.	Stepwise selection is likely overfitting to noise in the training set.
-2.	The predictors in `lung` may not be strongly associated with survival.
-3.	Some predictors might violate proportional hazards, hurting model performance.
-4.	Small test set size reduces the reliability of C-index estimates.
+1.	Some predictors might violate proportional hazards, hurting model performance.
+2.	Small test set size reduces the reliability of C-index estimates.
 
 # Conclusion
 
