@@ -357,7 +357,9 @@ ggplot(c_stats, aes(x = c_stats)) +
         )
 ```
 
-These C-statistics varies quite a bit, from worse-than-random (a minimum of `r round(min(c_stats$c_stats), 2)`) to *OK* (a maximum of `r round(max(c_stats$c_stats), 2)`). Some of this variability could be accounted for by:
+These C-statistics varies quite a bit, from worse-than-random (a minimum of
+`r round(min(c_stats$c_stats), 2)`) to *OK* (a maximum of `r round(max(c_stats$c_stats), 2)`). Some
+of this variability could be accounted for by:
 
 1.	Some predictors might violate proportional hazards, hurting model performance.
 2.	Small test set size reduces the reliability of C-index estimates.
