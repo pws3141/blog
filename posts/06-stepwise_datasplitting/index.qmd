@@ -65,7 +65,13 @@ to be included depends on estimated regression coefficients rather than their
 true values, and so $X_j$ is more likely to be included if its regression coefficient
 is over-estimated than if its regression coefficient is underestimated.
 
-To prevent regression coefficients being too large, Tibshirani's^[of *An Introduction to Statistical Learning* fame.] *lasso* procedure can be used [@tibshirani1996regression]. This shrinks coefficient estimates towards zero by including a constraint that the sum of absolute values of the coefficient estimates must be less than some $k$.
+To prevent regression coefficients being too large, Tibshirani's^[of *An
+Introduction to Statistical Learning* fame.] *lasso* procedure can be used
+[@tibshirani1996regression]. This shrinks coefficient estimates towards zero by
+including a constraint that the sum of absolute values of the coefficient
+estimates must be less than some $k$. Note that the lasso procedure shares many
+of stepwise's deficiencies, namely that there is a "low probability of
+selecting the 'correct' variables".
 
 @derksen1992backward found that when the stepwise procedure was used, the final model represented noise between $20\%$ and $74\%$ of the time, and the final model contained less than half of the actual number of authentic predictors. To see this in action, Frank Harrell has some simulations as part of his 'Regression Modelling Strategies' [course notes](https://hbiostat.org/rmsc/multivar#sec-multivar-variable-selection). 
 
