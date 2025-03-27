@@ -132,15 +132,24 @@ models <- training_idx[, {
         lp_tmp <- predict(cox_step_tmp, 
                           newdata = tmp_test, type = "lp")
         # obtain c-statistic using linear predictor
-        c_stat <- concordance(Surv(tmp_test$time, tmp_test$status) ~ lp_tmp,
-                              reverse = TRUE) # <1>
+        # see callout note below for why `reverse = TRUE` is required
+        c_stat <- concordance(Surv(tmp_test$time, tmp_test$status) ~ lp_tmp, 
+                              reverse = TRUE) 
         data.table(as.data.table(tidy(cox_step_tmp)),
                          c = c_stat$concordance)
         }, by = .id] 
-
 models 
 ```
-1.The `reverse = TRUE` argument is important here: if `TRUE` then assume that larger x values predict smaller response values y; a proportional hazards model is the common example of this, larger hazard = shorter survival.
+
+:::{.callout-tip}
+# Calculating the C-statistic using `concordance()`
+
+The `reverse = TRUE` argument in `concordance()` is important in
+@lst-model-building-validation: if TRUE then assume that larger x values
+predict smaller response values y; a proportional hazards model is the
+common example of this, larger hazard = shorter survival.
+
+:::
 
 The `models` output from @lst-model-building-validation has `r ncol(models)` columns. The
 `.id` variable refers back to the training sample obtained from `training_idx`
@@ -151,6 +160,30 @@ split.]
 The `c` variable is the C-index obtained from using the `.id`$^{\text{th}}$
 model to predict the test set events, so is identical for rows with the same
 `.id`'s.
+
+:::{.column-margin}
+Annoyingly, it appears to not be possible to both label / caption listings
+(using `#| lst-label` and `#| lst-cap`) and use code annotations (via `# <1>`).
+I'm not sure why, but worth remember for the future.
+
+For example, if the code block contains the lines,
+
+```r
+#| lst-cap: "An example of when the hover annotation doesn't work"
+#| lst-label: lst-no-hover
+```
+
+then the output looks like this:
+
+```{r}
+#| lst-cap: "An example of when the hover annotation doesn't work"
+#| lst-label: lst-no-hover
+
+x <- rnorm(100) # <1>
+```
+1. This hovering code annotation doesn't work
+
+:::
 
 :::{.callout-note collapse = true}
 # Using the linear predictor to access predictive ability
@@ -222,7 +255,6 @@ grouped_proportions <- proportion_variables[
 
 grouped_proportions[order(prop, decreasing = TRUE)]
 ```
-
 Now I'll consider each model and the factors obtained using the stepwise
 procedure. First -- in @lst-model-terms -- I'll create a `terms_string`
 variable that gives a string containing all the terms in each of the `r n_sim`
