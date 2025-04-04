@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Paul Smith">
+<meta name="dcterms.date" content="2025-03-21">
+
+<title>Getting Started with {mlr3} – pblog</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-96f1539d32e037de96a9a8424bc20d60.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+<meta name="citation_title" content="Getting Started with {mlr3}">
+<meta name="citation_author" content="Paul Smith">
+<meta name="citation_publication_date" content="2025-03-21">
+<meta name="citation_cover_date" content="2025-03-21">
+<meta name="citation_year" content="2025">
+<meta name="citation_online_date" content="2025-03-21">
+<meta name="citation_fulltext_html_url" content="https://pws3141.github.io/blog/posts/09-mlr3_hyperparameter/">
+<meta name="citation_language" content="en">
+<meta name="citation_reference" content="citation_title=Clmnis: An r package for downloading data from the parliamentary members names information service;,citation_author=Noel Dempsey;,citation_publication_date=2025;,citation_cover_date=2025;,citation_year=2025;,citation_fulltext_html_url=https://github.com/houseofcommonslibrary/clmnis;">
+<meta name="citation_reference" content="citation_title=Highcharter: A wrapper for the ’highcharts’ library;,citation_author=Joshua Kunst;,citation_publication_date=2022;,citation_cover_date=2022;,citation_year=2022;,citation_fulltext_html_url=https://CRAN.R-project.org/package=highcharter;">
+<meta name="citation_reference" content="citation_title=Palmerpenguins: Palmer archipelago (antarctica) penguin data;,citation_author=Allison Marie Horst;,citation_author=Alison Presmanes Hill;,citation_author=Kristen B Gorman;,citation_publication_date=2020;,citation_cover_date=2020;,citation_year=2020;,citation_fulltext_html_url=https://allisonhorst.github.io/palmerpenguins/;,citation_doi=10.5281/zenodo.3960218;">
+<meta name="citation_reference" content="citation_title=Medicaldata: Data package for medical datasets;,citation_author=Peter Higgins;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_fulltext_html_url=https://CRAN.R-project.org/package=medicaldata;">
+<meta name="citation_reference" content="citation_title=Fontawesome: Easily work with ’font awesome’ icons;,citation_author=Richard Iannone;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_fulltext_html_url=https://github.com/rstudio/fontawesome;">
+<meta name="citation_reference" content="citation_title=Welcome to the tidyverse;,citation_author=Hadley Wickham;,citation_author=Mara Averick;,citation_author=Jennifer Bryan;,citation_author=Winston Chang;,citation_author=Lucy D’Agostino McGowan;,citation_author=Romain François;,citation_author=Garrett Grolemund;,citation_author=Alex Hayes;,citation_author=Lionel Henry;,citation_author=Jim Hester;,citation_author=Max Kuhn;,citation_author=Thomas Lin Pedersen;,citation_author=Evan Miller;,citation_author=Stephan Milton Bache;,citation_author=Kirill Müller;,citation_author=Jeroen Ooms;,citation_author=David Robinson;,citation_author=Dana Paige Seidel;,citation_author=Vitalie Spinu;,citation_author=Kohske Takahashi;,citation_author=Davis Vaughan;,citation_author=Claus Wilke;,citation_author=Kara Woo;,citation_author=Hiroaki Yutani;,citation_publication_date=2019;,citation_cover_date=2019;,citation_year=2019;,citation_issue=43;,citation_doi=10.21105/joss.01686;,citation_volume=4;,citation_journal_title=Journal of Open Source Software;">
+<meta name="citation_reference" content="citation_title=Paletteer: Comprehensive collection of color palettes;,citation_author=Emil Hvitfeldt;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_fulltext_html_url=https://github.com/EmilHvitfeldt/paletteer;">
+<meta name="citation_reference" content="citation_title=Gapminder: Data from gapminder;,citation_author=Jennifer Bryan;,citation_publication_date=2023;,citation_cover_date=2023;,citation_year=2023;,citation_fulltext_html_url=https://CRAN.R-project.org/package=gapminder;">
+<meta name="citation_reference" content="citation_title=mlr3: A modern object-oriented machine learning framework in R;,citation_author=Michel Lang;,citation_author=Martin Binder;,citation_author=Jakob Richter;,citation_author=Patrick Schratz;,citation_author=Florian Pfisterer;,citation_author=Stefan Coors;,citation_author=Quay Au;,citation_author=Giuseppe Casalicchio;,citation_author=Lars Kotthoff;,citation_author=Bernd Bischl;,citation_publication_date=2019-12;,citation_cover_date=2019-12;,citation_year=2019;,citation_fulltext_html_url=https://joss.theoj.org/papers/10.21105/joss.01903;,citation_doi=10.21105/joss.01903;,citation_journal_title=Journal of Open Source Software;">
+<meta name="citation_reference" content="citation_title=Applied machine learning using mlr3 in R;,citation_editor=Bernd Bischl;,citation_editor=Raphael Sonabend;,citation_editor=Lars Kotthoff;,citation_editor=Michel Lang;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_fulltext_html_url=https://mlr3book.mlr-org.com;,citation_isbn=9781032507545;">
+<meta name="citation_reference" content="citation_title=Data and basic modeling;,citation_author=Natalie Foss;,citation_author=Lars Kotthoff;,citation_editor=Bernd Bischl;,citation_editor=Raphael Sonabend;,citation_editor=Lars Kotthoff;,citation_editor=Michel Lang;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_fulltext_html_url=https://mlr3book.mlr-org.com/data_and_basic_modeling.html;,citation_inbook_title=Applied machine learning using mlr3 in R;">
+<meta name="citation_reference" content="citation_title=Factors associated with short-and long-term liver graft survival in the united kingdom: Development of a UK donor liver index;,citation_author=David Collett;,citation_author=Peter J Friend;,citation_author=Christopher JE Watson;,citation_publication_date=2017;,citation_cover_date=2017;,citation_year=2017;,citation_issue=4;,citation_volume=101;,citation_journal_title=Transplantation;,citation_publisher=LWW;">
+<meta name="citation_reference" content="citation_title=Regression modeling strategies: With applications to linear models, logistic regression, and survival analysis;,citation_author=Frank E Harrell;,citation_author=others;,citation_publication_date=2001;,citation_cover_date=2001;,citation_year=2001;,citation_volume=608;">
+<meta name="citation_reference" content="citation_title=Estimating the residual variance in orthogonal regression with variable selection;,citation_author=JB Copas;,citation_author=Tianyong Long;,citation_publication_date=1991;,citation_cover_date=1991;,citation_year=1991;,citation_issue=1;,citation_volume=40;,citation_journal_title=Journal of the Royal Statistical Society Series D: The Statistician;,citation_publisher=Oxford University Press;">
+<meta name="citation_reference" content="citation_title=Backward, forward and stepwise automated subset selection algorithms: Frequency of obtaining authentic and noise variables;,citation_author=Shelley Derksen;,citation_author=Harvey J Keselman;,citation_publication_date=1992;,citation_cover_date=1992;,citation_year=1992;,citation_issue=2;,citation_volume=45;,citation_journal_title=British Journal of Mathematical and Statistical Psychology;,citation_publisher=Wiley Online Library;">
+<meta name="citation_reference" content="citation_title=Evaluation of clinical prediction models (part 1): From development to external validation;,citation_author=Gary S Collins;,citation_author=Paula Dhiman;,citation_author=Jie Ma;,citation_author=Michael M Schlussel;,citation_author=Lucinda Archer;,citation_author=Ben Van Calster;,citation_author=Frank E Harrell;,citation_author=Glen P Martin;,citation_author=Karel GM Moons;,citation_author=Maarten Van Smeden;,citation_author=others;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_volume=384;,citation_journal_title=Bmj;,citation_publisher=British Medical Journal Publishing Group;">
+<meta name="citation_reference" content="citation_title=Validation in prediction research: The waste by data splitting;,citation_author=Ewout W Steyerberg;,citation_publication_date=2018;,citation_cover_date=2018;,citation_year=2018;,citation_volume=103;,citation_journal_title=Journal of clinical epidemiology;,citation_publisher=Elsevier;">
+<meta name="citation_reference" content="citation_title=Regression shrinkage and selection via the lasso;,citation_author=Robert Tibshirani;,citation_publication_date=1996;,citation_cover_date=1996;,citation_year=1996;,citation_issue=1;,citation_volume=58;,citation_journal_title=Journal of the Royal Statistical Society Series B: Statistical Methodology;,citation_publisher=Oxford University Press;">
+<meta name="citation_reference" content="citation_title=A package for survival analysis in r;,citation_author=Terry M Therneau;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_fulltext_html_url=https://CRAN.R-project.org/package=survival;">
+<meta name="citation_reference" content="citation_title=Data.table: Extension of ‘data.frame‘;,citation_author=Tyson Barrett;,citation_author=Matt Dowle;,citation_author=Arun Srinivasan;,citation_author=Jan Gorecki;,citation_author=Michael Chirico;,citation_author=Toby Hocking;,citation_author=Benjamin Schwendinger;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_fulltext_html_url=https://CRAN.R-project.org/package=data.table;">
+<meta name="citation_reference" content="citation_title=Evaluation and benchmarking;,citation_author=Giuseppe Casalicchio;,citation_author=Lukas Burk;,citation_editor=Bernd Bischl;,citation_editor=Raphael Sonabend;,citation_editor=Lars Kotthoff;,citation_editor=Michel Lang;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_fulltext_html_url=https://mlr3book.mlr-org.com/evaluation_and_benchmarking.html;,citation_inbook_title=Applied machine learning using mlr3 in R;">
+<meta name="citation_reference" content="citation_title=mlr3data: Collection of machine learning data sets for ’mlr3’;,citation_author=Marc Becker;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_fulltext_html_url=https://github.com/mlr-org/mlr3data;">
+<meta name="citation_reference" content="citation_title=mlr3measures: Performance measures for ’mlr3’;,citation_author=Michel Lang;,citation_author=Marc Becker;,citation_author=Lona Koers;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_fulltext_html_url=https://CRAN.R-project.org/package=mlr3measures;">
+</head>
+
+<body class="floating nav-fixed slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">pblog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pws3141/blog"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Getting Started with {mlr3}</h1>
+            <p class="subtitle lead">03 Hyperparameter Optimisation</p>
+                                <div class="quarto-categories">
+                <div class="quarto-category">code</div>
+                <div class="quarto-category">r</div>
+                <div class="quarto-category">machine learning</div>
+                <div class="quarto-category">mlr3</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Paul Smith </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">March 21, 2025</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+  <li><a href="#prerequisites" id="toc-prerequisites" class="nav-link" data-scroll-target="#prerequisites">Prerequisites</a></li>
+  </ul></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a>
+  <ul class="collapse">
+  <li><a href="#question-1" id="toc-question-1" class="nav-link" data-scroll-target="#question-1">Question 1</a>
+  <ul class="collapse">
+  <li><a href="#answer" id="toc-answer" class="nav-link" data-scroll-target="#answer">Answer</a></li>
+  </ul></li>
+  <li><a href="#question-2" id="toc-question-2" class="nav-link" data-scroll-target="#question-2">Question 2</a>
+  <ul class="collapse">
+  <li><a href="#answer-1" id="toc-answer-1" class="nav-link" data-scroll-target="#answer-1">Answer</a></li>
+  </ul></li>
+  <li><a href="#question-3" id="toc-question-3" class="nav-link" data-scroll-target="#question-3">Question 3</a>
+  <ul class="collapse">
+  <li><a href="#answer-2" id="toc-answer-2" class="nav-link" data-scroll-target="#answer-2">Answer</a></li>
+  </ul></li>
+  <li><a href="#question4" id="toc-question4" class="nav-link" data-scroll-target="#question4">Question4</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
+
+
+
+
+
+<section id="introduction" class="level1 page-columns page-full">
+<h1>Introduction</h1>
+<section id="prerequisites" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="prerequisites">Prerequisites</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mlr3)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mlr3viz)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mlr3learners)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mlr3tuning)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: paradox</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mlr3tuningspaces)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">datatable.print.nrows =</span> <span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Suppress all messaging unless it’s a warning:<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;The packages in <code>{mlr3}</code> that make use of optimization, i.e., <code>{mlr3tuning}</code> or <code>{mlr3select}</code>, use the logger of their base package <code>{bbotk}</code>.</p></div></div><div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>lgr<span class="sc">::</span><span class="fu">get_logger</span>(<span class="st">"mlr3"</span>)<span class="sc">$</span><span class="fu">set_threshold</span>(<span class="st">"warn"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>lgr<span class="sc">::</span><span class="fu">get_logger</span>(<span class="st">"bbotk"</span>)<span class="sc">$</span><span class="fu">set_threshold</span>(<span class="st">"warn"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="exercises" class="level1 page-columns page-full">
+<h1>Exercises</h1>
+<ol type="1">
+<li><p>Tune the <code>mtry</code>, <code>sample.fraction</code>, and <code>num.trees</code> hyperparameters of <code>lrn("regr.ranger")</code> on <code>tsk("mtcars")</code>. Use a simple random search with 50 evaluations. Evaluate with a three-fold CV and the root mean squared error. Visualize the effects that each hyperparameter has on the performance via simple marginal plots, which plot a single hyperparameter versus the cross-validated MSE.</p></li>
+<li><p>Evaluate the performance of the model created in Exercise 1 with nested resampling. Use a holdout validation for the inner resampling and a three-fold CV for the outer resampling.</p></li>
+<li><p>Tune and benchmark an XGBoost model against a logistic regression (without tuning the latter) and determine which has the best Brier score. Use <code>mlr3tuningspaces</code> and nested resampling, try to pick appropriate inner and outer resampling strategies that balance computational efficiency vs.&nbsp;stability of the results.</p></li>
+<li><p>(*) Write a function that implements an iterated random search procedure that drills down on the optimal configuration by applying random search to iteratively smaller search spaces. Your function should have seven inputs: <code>task</code>, <code>learner</code>, <code>search_space</code>, <code>resampling</code>, <code>measure</code>, <code>random_search_stages</code>, and <code>random_search_size</code>. You should only worry about programming this for fully numeric and bounded search spaces that have no dependencies. In pseudo-code:</p>
+<pre><code> a. Create a random design of size `random_search_size` from the given search space and evaluate the learner on it.
+ b. Identify the best configuration.
+ c. Create a smaller search space around this best config, where you define the new range for each parameter as: `new_range[i] = (best_conf[i] - 0.25 * current_range[i], best_conf[i] + 0.25*current_range[i])`. Ensure that this `new_range` respects the initial bound of the original `search_space` by taking the `max()` of the new and old lower bound, and the `min()` of the new and the old upper bound (“clipping”).
+ d. Iterate the previous steps `random_search_stages` times and at the end return the best configuration you have ever evaluated. As a stretch goal, look into `mlr3tuning`’s internal source code and turn your function into an R6 class inheriting from the `TunerBatch` class – test it out on a learner of your choice.</code></pre></li>
+</ol>
+<section id="question-1" class="level2">
+<h2 class="anchored" data-anchor-id="question-1">Question 1</h2>
+<p>Tune the <code>mtry</code>, <code>sample.fraction</code>, and <code>num.trees</code> hyperparameters of <code>lrn("regr.ranger")</code> on <code>tsk("mtcars")</code>. Use a simple random search with 50 evaluations. Evaluate with a three-fold CV and the root mean squared error. Visualize the effects that each hyperparameter has on the performance via simple marginal plots, which plot a single hyperparameter versus the cross-validated MSE.</p>
+<section id="answer" class="level3">
+<h3 class="anchored" data-anchor-id="answer">Answer</h3>
+<p>Let’s load the task and look at the properties of the <code>mtry</code>, <code>sample.fraction</code>, and <code>num.trees</code> parameters.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>tsk_mtcars <span class="ot">&lt;-</span> <span class="fu">tsk</span>(<span class="st">"mtcars"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">lrn</span>(<span class="st">"regr.ranger"</span>)<span class="sc">$</span>param_set<span class="sc">$</span>data[id <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"mtry"</span>, <span class="st">"sample.fraction"</span>, <span class="st">"num.trees"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                id    class lower upper levels nlevels is_bounded special_vals
+            &lt;char&gt;   &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;list&gt;   &lt;num&gt;     &lt;lgcl&gt;       &lt;list&gt;
+1:            mtry ParamInt     1   Inf [NULL]     Inf      FALSE    &lt;list[1]&gt;
+2:       num.trees ParamInt     1   Inf [NULL]     Inf      FALSE    &lt;list[0]&gt;
+3: sample.fraction ParamDbl     0     1 [NULL]     Inf       TRUE    &lt;list[0]&gt;
+          default storage_type                   tags
+           &lt;list&gt;       &lt;char&gt;                 &lt;list&gt;
+1: &lt;NoDefault[0]&gt;      integer                  train
+2:            500      integer train,predict,hotstart
+3: &lt;NoDefault[0]&gt;      numeric                  train</code></pre>
+</div>
+</div>
+<p>The hyperparameters I’m looking at are:</p>
+<ul>
+<li><code>mtry</code>: number of variables considered at each tree split.</li>
+<li><code>num.trees</code>: number of trees in the forest.</li>
+<li><code>sample.fraction</code>: fraction of observations used to train each tree.</li>
+</ul>
+<p>Now I will set up the tuning of the <code>mtry</code>, <code>sample.fraction</code>, and <code>num.trees</code> hyperparameters.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>learner <span class="ot">&lt;-</span> <span class="fu">lrn</span>(<span class="st">"regr.ranger"</span>,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">mtry =</span> <span class="fu">to_tune</span>(<span class="dv">1</span>, <span class="fl">1e1</span>),</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">num.trees =</span> <span class="fu">to_tune</span>(<span class="dv">1</span>, <span class="fl">1e5</span>),</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">sample.fraction =</span> <span class="fu">to_tune</span>(<span class="fl">0.1</span>, <span class="dv">1</span>))</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>learner</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;LearnerRegrRanger:regr.ranger&gt;: Random Forest
+* Model: -
+* Parameters: mtry=&lt;RangeTuneToken&gt;, num.threads=1,
+  num.trees=&lt;RangeTuneToken&gt;, sample.fraction=&lt;RangeTuneToken&gt;
+* Packages: mlr3, mlr3learners, ranger
+* Predict Types:  [response], se, quantiles
+* Feature Types: logical, integer, numeric, character, factor, ordered
+* Properties: hotstart_backward, importance, missings, oob_error,
+  selected_features, weights</code></pre>
+</div>
+</div>
+<p>Setting up an instance to terminate the tuner after 50 evaluations, and to use three-fold CV.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>instance <span class="ot">&lt;-</span> <span class="fu">ti</span>(<span class="at">task =</span> tsk_mtcars,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">learner =</span> learner,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">resampling =</span> <span class="fu">rsmp</span>(<span class="st">"cv"</span>, <span class="at">folds =</span> <span class="dv">3</span>),</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">measures =</span> <span class="fu">msr</span>(<span class="st">"regr.mse"</span>),</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">terminator =</span> <span class="fu">trm</span>(<span class="st">"evals"</span>, <span class="at">n_evals =</span> <span class="dv">50</span>))</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>instance</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;TuningInstanceBatchSingleCrit&gt;
+* State:  Not optimized
+* Objective: &lt;ObjectiveTuningBatch:regr.ranger_on_mtcars&gt;
+* Search Space:
+                id    class lower upper nlevels
+            &lt;char&gt;   &lt;char&gt; &lt;num&gt; &lt;num&gt;   &lt;num&gt;
+1:            mtry ParamInt   1.0 1e+01   1e+01
+2:       num.trees ParamInt   1.0 1e+05   1e+05
+3: sample.fraction ParamDbl   0.1 1e+00     Inf
+* Terminator: &lt;TerminatorEvals&gt;</code></pre>
+</div>
+</div>
+<p>The tuning step uses 3-fold cross-validation:</p>
+<ul>
+<li>In each evaluation, two-thirds of the data is used for training,</li>
+<li>One-third is used for validation (i.e.&nbsp;to compute the MSE).</li>
+<li>This is repeated for 50 random configurations (as specified by the terminator).</li>
+</ul>
+<p>Now I can set up the tuning process (random search).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>tuner <span class="ot">&lt;-</span> <span class="fu">tnr</span>(<span class="st">"random_search"</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">#tuner$param_set</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>tuner</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;TunerBatchRandomSearch&gt;: Random Search
+* Parameters: batch_size=1
+* Parameter classes: ParamLgl, ParamInt, ParamDbl, ParamFct
+* Properties: dependencies, single-crit, multi-crit
+* Packages: mlr3tuning, bbotk</code></pre>
+</div>
+</div>
+<p>And trigger the tuning process.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">333</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>tuner<span class="sc">$</span><span class="fu">optimize</span>(instance)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    mtry num.trees sample.fraction learner_param_vals  x_domain regr.mse
+   &lt;int&gt;     &lt;int&gt;           &lt;num&gt;             &lt;list&gt;    &lt;list&gt;    &lt;num&gt;
+1:     5      8460       0.9761367          &lt;list[4]&gt; &lt;list[3]&gt; 6.663052</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>instance<span class="sc">$</span>result<span class="sc">$</span>learner_param_vals</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1]]
+[[1]]$num.threads
+[1] 1
+
+[[1]]$mtry
+[1] 5
+
+[[1]]$num.trees
+[1] 8460
+
+[[1]]$sample.fraction
+[1] 0.9761367</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>instance<span class="sc">$</span>archive</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;ArchiveBatchTuning&gt; with 50 evaluations
+     mtry num.trees sample.fraction regr.mse warnings errors batch_nr
+    &lt;int&gt;     &lt;int&gt;           &lt;num&gt;    &lt;num&gt;    &lt;int&gt;  &lt;int&gt;    &lt;int&gt;
+ 1:     5      8460            0.98      6.7        0      0        1
+ 2:     8     60940            0.38     11.6        0      0        2
+ 3:     4     47422            0.90      6.9        0      0        3
+ 4:    10     63785            0.88      6.9        0      0        4
+ 5:     2      7150            0.27     35.2        0      0        5
+---                                                                  
+46:     9     35348            0.20     35.2        0      0       46
+47:     7       782            0.61      8.1        0      0       47
+48:     4     74059            0.14     35.2        0      0       48
+49:     6     81636            0.71      7.5        0      0       49
+50:     3     14265            0.16     35.2        0      0       50
+     mtry num.trees sample.fraction regr.mse x_domain_mtry x_domain_num.trees
+    &lt;int&gt;     &lt;int&gt;           &lt;num&gt;    &lt;num&gt;         &lt;int&gt;              &lt;int&gt;
+ 1:     5      8460            0.98      6.7             5               8460
+ 2:     8     60940            0.38     11.6             8              60940
+ 3:     4     47422            0.90      6.9             4              47422
+ 4:    10     63785            0.88      6.9            10              63785
+ 5:     2      7150            0.27     35.2             2               7150
+---                                                                          
+46:     9     35348            0.20     35.2             9              35348
+47:     7       782            0.61      8.1             7                782
+48:     4     74059            0.14     35.2             4              74059
+49:     6     81636            0.71      7.5             6              81636
+50:     3     14265            0.16     35.2             3              14265
+    x_domain_sample.fraction warnings errors batch_nr
+                       &lt;num&gt;    &lt;int&gt;  &lt;int&gt;    &lt;int&gt;
+ 1:                     0.98        0      0        1
+ 2:                     0.38        0      0        2
+ 3:                     0.90        0      0        3
+ 4:                     0.88        0      0        4
+ 5:                     0.27        0      0        5
+---                                                  
+46:                     0.20        0      0       46
+47:                     0.61        0      0       47
+48:                     0.14        0      0       48
+49:                     0.71        0      0       49
+50:                     0.16        0      0       50</code></pre>
+</div>
+</div>
+<p>Now let’s visualise the effect of each hyperparameter using marginal plots.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(instance, <span class="at">type =</span> <span class="st">"marginal"</span>, <span class="at">cols_x =</span> <span class="fu">c</span>(<span class="st">"mtry"</span>, <span class="st">"sample.fraction"</span>, <span class="st">"num.trees"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As during the HPO stage, I used three-fold CV, the model has not seen the full data all at once. So, now I’ll train the model using the optimised hyperparameters.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>lrn_ranger_tuned <span class="ot">&lt;-</span> <span class="fu">lrn</span>(<span class="st">"regr.ranger"</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>lrn_ranger_tuned<span class="sc">$</span>param_set<span class="sc">$</span>values <span class="ot">=</span> instance<span class="sc">$</span>result_learner_param_vals</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>lrn_ranger_tuned<span class="sc">$</span><span class="fu">train</span>(tsk_mtcars)<span class="sc">$</span>model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Ranger result
+
+Call:
+ ranger::ranger(dependent.variable.name = task$target_names, data = task$data(),      case.weights = task$weights$weight, mtry = 5L, num.threads = 1L,      num.trees = 8460L, sample.fraction = 0.976136745349504) 
+
+Type:                             Regression 
+Number of trees:                  8460 
+Sample size:                      32 
+Number of independent variables:  10 
+Mtry:                             5 
+Target node size:                 5 
+Variable importance mode:         none 
+Splitrule:                        variance 
+OOB prediction error (MSE):       5.567214 
+R squared (OOB):                  0.846735 </code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Summary of question 1 (hyperparameter tuning with random search)
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I tuned the <code>regr.ranger</code> learner on the <code>mtcars</code> dataset, focusing on three hyperparameters:</p>
+<ul>
+<li><code>mtry</code>: number of variables considered at each split,</li>
+<li><code>num.trees</code>: number of trees in the forest,</li>
+<li><code>sample.fraction</code>: fraction of the dataset used for each tree.</li>
+</ul>
+<p><strong>Steps I took:</strong></p>
+<ol type="1">
+<li><p><strong>Exploration</strong> I inspected the available parameters for the learner using <code>$param_set</code>.</p></li>
+<li><p><strong>Learner setup</strong> I defined the tuning ranges with <code>to_tune()</code>:</p>
+<ul>
+<li><code>mtry</code> from 1 to 10,</li>
+<li><code>num.trees</code> from 1 to 100,000,</li>
+<li><code>sample.fraction</code> from 0.1 to 1.</li>
+</ul></li>
+<li><p><strong>Tuning instance</strong> I created a <code>TuningInstanceSingleCrit</code> using:</p>
+<ul>
+<li>the <code>mtcars</code> task,</li>
+<li>3-fold cross-validation for resampling,</li>
+<li>mean squared error (MSE) as the evaluation metric,</li>
+<li>a limit of 50 evaluations using a random search strategy.</li>
+</ul></li>
+<li><p><strong>Running the tuner</strong> I used <code>tnr("random_search")</code> and called <code>$optimize()</code> to run the search. I then extracted the best hyperparameter combination and the archive of evaluated configurations.</p></li>
+<li><p><strong>Visualising results</strong> I used marginal plots to visualise the effect of each hyperparameter on the cross-validated MSE.</p></li>
+<li><p><strong>Training the final model</strong> I retrained the <code>regr.ranger</code> model on the full dataset using the best parameters found.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="question-2" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="question-2">Question 2</h2>
+<p>Evaluate the performance of the model created in Exercise 1 with nested resampling. Use a holdout validation for the inner resampling and a three-fold CV for the outer resampling.</p>
+<section id="answer-1" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="answer-1">Answer</h3>
+<p>OK, so here we need an outer and inner resampling strategy. The outer resampling strategy will be a three-fold CV, and the inner resampling strategy will be a holdout validation.</p>
+<div id="fig-nested-resampling-example" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
+<figure class="quarto-float quarto-float-fig figure page-columns page-full">
+<div aria-describedby="fig-nested-resampling-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./fig/nested_resampling.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-nested-resampling-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: An illustration of nested resampling. The large blocks represent three-fold CV for the outer resampling for model evaluation and the small blocks represent four-fold CV for the inner resampling for HPO. The light blue blocks are the training sets and the dark blue blocks are the test sets.
+</figcaption>
+</figure>
+</div>
+<p><a href="#fig-nested-resampling-example" class="quarto-xref">Figure&nbsp;1</a> shows an example of a nest resampling strategy (with three-fold CV on the outer and four-fold CV on the inner nest). Here, we need to do something slightly different as we are using the holdout resampling strategy on the inner nest.</p>
+<ol type="1">
+<li>Outer resampling start
+<ul>
+<li>Perform 3-fold cross-validation on the full dataset.</li>
+<li>For each outer fold, split the data into:
+<ul>
+<li>Training set (light blue blocks)</li>
+<li>Test set (dark blue block)</li>
+</ul></li>
+</ul></li>
+<li>Inner resampling
+<ul>
+<li>Within each outer training set, perform holdout validation (assuming 70/30 training-test split).</li>
+<li>This inner split is used for tuning hyperparameters (not evaluation).</li>
+</ul></li>
+<li>HPO – Hyperparameter tuning
+<ul>
+<li>Evaluate different hyperparameter combinations by fitting models on the inner training set and evaluating performance on the inner validation (holdout) set.</li>
+<li>Select the best hyperparameter configuration based on performance on the inner holdout set.</li>
+</ul></li>
+<li>Training
+<ul>
+<li>Fit the model on the entire outer training set using the tuned hyperparameters.</li>
+</ul></li>
+<li>Evaluation
+<ul>
+<li>Evaluate the trained model on the outer test set (unseen during tuning).</li>
+</ul></li>
+<li>Outer resampling repeats
+<ul>
+<li>Repeat steps 2–5 for each of the 3 outer folds.</li>
+</ul></li>
+<li>Aggregation
+<ul>
+<li>Average the 3 outer test performance scores.</li>
+<li>This gives an unbiased estimate of the model’s generalisation performance with tuning.</li>
+</ul></li>
+</ol>
+<p>I will use <code>AutoTuner</code> to do nested resampling, as that is what is done in <a href="https://mlr3book.mlr-org.com/chapters/chapter4/hyperparameter_optimization.html#sec-nested-resampling">Section 4.3.1</a> of the mlr3 tutorial.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="annotated-cell-13"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-13-1"><a href="#annotated-cell-13-1" aria-hidden="true" tabindex="-1"></a><span class="do">## create auto_tuner to resample a random forest </span></span>
+<span id="annotated-cell-13-2"><a href="#annotated-cell-13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># with 3-fold CV in outer resampling and </span></span>
+<span id="annotated-cell-13-3"><a href="#annotated-cell-13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># holdout validation in inner resampling</span></span>
+<span id="annotated-cell-13-4"><a href="#annotated-cell-13-4" aria-hidden="true" tabindex="-1"></a>at <span class="ot">&lt;-</span> <span class="fu">auto_tuner</span>(</span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-13" data-target-annotation="1">1</button><span id="annotated-cell-13-5" class="code-annotation-target"><a href="#annotated-cell-13-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">tuner =</span> <span class="fu">tnr</span>(<span class="st">"random_search"</span>),</span>
+<span id="annotated-cell-13-6"><a href="#annotated-cell-13-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">learner =</span> <span class="fu">lrn</span>(<span class="st">"regr.ranger"</span>,</span>
+<span id="annotated-cell-13-7"><a href="#annotated-cell-13-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">mtry =</span> <span class="fu">to_tune</span>(<span class="dv">1</span>, <span class="fl">1e1</span>),</span>
+<span id="annotated-cell-13-8"><a href="#annotated-cell-13-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">num.trees =</span> <span class="fu">to_tune</span>(<span class="dv">1</span>, <span class="fl">1e5</span>),</span>
+<span id="annotated-cell-13-9"><a href="#annotated-cell-13-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">sample.fraction =</span> <span class="fu">to_tune</span>(<span class="fl">0.1</span>, <span class="dv">1</span>)),</span>
+<span id="annotated-cell-13-10"><a href="#annotated-cell-13-10" aria-hidden="true" tabindex="-1"></a>         <span class="co"># inner resampling</span></span>
+<span id="annotated-cell-13-11"><a href="#annotated-cell-13-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">resampling =</span> <span class="fu">rsmp</span>(<span class="st">"holdout"</span>, <span class="at">ratio =</span> <span class="fl">0.7</span>),</span>
+<span id="annotated-cell-13-12"><a href="#annotated-cell-13-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">measure =</span> <span class="fu">msr</span>(<span class="st">"regr.mse"</span>),</span>
+<span id="annotated-cell-13-13"><a href="#annotated-cell-13-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">terminator =</span> <span class="fu">trm</span>(<span class="st">"evals"</span>, <span class="at">n_evals =</span> <span class="dv">50</span>)</span>
+<span id="annotated-cell-13-14"><a href="#annotated-cell-13-14" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="annotated-cell-13-15"><a href="#annotated-cell-13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-13-16"><a href="#annotated-cell-13-16" aria-hidden="true" tabindex="-1"></a><span class="co"># resampling step</span></span>
+<span id="annotated-cell-13-17"><a href="#annotated-cell-13-17" aria-hidden="true" tabindex="-1"></a>rr <span class="ot">&lt;-</span> <span class="fu">resample</span>(tsk_mtcars, at, </span>
+<span id="annotated-cell-13-18"><a href="#annotated-cell-13-18" aria-hidden="true" tabindex="-1"></a>               <span class="co"># outer resampling</span></span>
+<span id="annotated-cell-13-19"><a href="#annotated-cell-13-19" aria-hidden="true" tabindex="-1"></a>               <span class="fu">rsmp</span>(<span class="st">"cv"</span>, <span class="at">folds =</span> <span class="dv">3</span>), </span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-13" data-target-annotation="2">2</button><span id="annotated-cell-13-20" class="code-annotation-target"><a href="#annotated-cell-13-20" aria-hidden="true" tabindex="-1"></a>               <span class="at">store_models =</span> <span class="cn">TRUE</span>)</span>
+<span id="annotated-cell-13-21"><a href="#annotated-cell-13-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-13-22"><a href="#annotated-cell-13-22" aria-hidden="true" tabindex="-1"></a>rr</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-hidden code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-13" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-13" data-code-lines="5" data-code-annotation="1">The tuners and learners are the same as in the previous exercise, I’m just definining them again here for clarity.</span>
+</dd>
+<dt data-target-cell="annotated-cell-13" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-13" data-code-lines="20" data-code-annotation="2">Set <code>store_models = TRUE</code> so that the <code>AutoTuner</code> models (fitted on the outer training data) are stored,</span>
+</dd>
+</dl>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;ResampleResult&gt; with 3 resampling iterations
+ task_id        learner_id resampling_id iteration  prediction_test warnings
+  mtcars regr.ranger.tuned            cv         1 &lt;PredictionRegr&gt;        0
+  mtcars regr.ranger.tuned            cv         2 &lt;PredictionRegr&gt;        0
+  mtcars regr.ranger.tuned            cv         3 &lt;PredictionRegr&gt;        0
+ errors
+      0
+      0
+      0</code></pre>
+</div>
+</div>
+<p>Now I aggregate across the three outer folds to get the final perforance.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>rr<span class="sc">$</span><span class="fu">aggregate</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>regr.mse 
+13.13362 </code></pre>
+</div>
+</div>
+<p>The inner tuning results can also be accessed, returning the optimal configurations (across all outer folds) and the full tuning archives.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># optimal configurations</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_inner_tuning_results</span>(rr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   iteration  mtry num.trees sample.fraction regr.mse learner_param_vals
+       &lt;int&gt; &lt;int&gt;     &lt;int&gt;           &lt;num&gt;    &lt;num&gt;             &lt;list&gt;
+1:         1     1     81784       0.6769030 8.322982          &lt;list[4]&gt;
+2:         2     5     73924       0.9194928 4.264315          &lt;list[4]&gt;
+3:         3     3     15719       0.7797092 3.268233          &lt;list[4]&gt;
+    x_domain task_id        learner_id resampling_id
+      &lt;list&gt;  &lt;char&gt;            &lt;char&gt;        &lt;char&gt;
+1: &lt;list[3]&gt;  mtcars regr.ranger.tuned            cv
+2: &lt;list[3]&gt;  mtcars regr.ranger.tuned            cv
+3: &lt;list[3]&gt;  mtcars regr.ranger.tuned            cv</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># full tuning archives</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_inner_tuning_archives</span>(rr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     iteration  mtry num.trees sample.fraction  regr.mse x_domain_mtry
+         &lt;int&gt; &lt;int&gt;     &lt;int&gt;           &lt;num&gt;     &lt;num&gt;         &lt;int&gt;
+  1:         1     2     15547       0.3219244 26.171505             2
+  2:         1     8     23468       0.3020848 26.147901             8
+  3:         1     5     47564       0.3500007 26.169833             5
+  4:         1     9     14922       0.8105999 10.639386             9
+  5:         1     2     81447       0.1308460 26.265523             2
+ ---                                                                  
+146:         3     5     20556       0.5608060  4.334576             5
+147:         3     2      9179       0.8461799  3.487326             2
+148:         3     4     93847       0.1486419 13.940234             4
+149:         3     3     15719       0.7797092  3.268233             3
+150:         3     1     31967       0.2513883 13.982543             1
+     x_domain_num.trees x_domain_sample.fraction runtime_learners
+                  &lt;int&gt;                    &lt;num&gt;            &lt;num&gt;
+  1:              15547                0.3219244            0.055
+  2:              23468                0.3020848            0.090
+  3:              47564                0.3500007            0.193
+  4:              14922                0.8105999            0.116
+  5:              81447                0.1308460            0.356
+ ---                                                             
+146:              20556                0.5608060            0.126
+147:               9179                0.8461799            0.056
+148:              93847                0.1486419            0.403
+149:              15719                0.7797092            0.100
+150:              31967                0.2513883            0.124
+               timestamp warnings errors batch_nr  resample_result task_id
+                  &lt;POSc&gt;    &lt;int&gt;  &lt;int&gt;    &lt;int&gt;           &lt;list&gt;  &lt;char&gt;
+  1: 2025-04-04 12:53:35        0      0        1 &lt;ResampleResult&gt;  mtcars
+  2: 2025-04-04 12:53:35        0      0        2 &lt;ResampleResult&gt;  mtcars
+  3: 2025-04-04 12:53:35        0      0        3 &lt;ResampleResult&gt;  mtcars
+  4: 2025-04-04 12:53:35        0      0        4 &lt;ResampleResult&gt;  mtcars
+  5: 2025-04-04 12:53:35        0      0        5 &lt;ResampleResult&gt;  mtcars
+ ---                                                                      
+146: 2025-04-04 12:54:17        0      0       46 &lt;ResampleResult&gt;  mtcars
+147: 2025-04-04 12:54:17        0      0       47 &lt;ResampleResult&gt;  mtcars
+148: 2025-04-04 12:54:18        0      0       48 &lt;ResampleResult&gt;  mtcars
+149: 2025-04-04 12:54:18        0      0       49 &lt;ResampleResult&gt;  mtcars
+150: 2025-04-04 12:54:18        0      0       50 &lt;ResampleResult&gt;  mtcars
+            learner_id resampling_id
+                &lt;char&gt;        &lt;char&gt;
+  1: regr.ranger.tuned            cv
+  2: regr.ranger.tuned            cv
+  3: regr.ranger.tuned            cv
+  4: regr.ranger.tuned            cv
+  5: regr.ranger.tuned            cv
+ ---                                
+146: regr.ranger.tuned            cv
+147: regr.ranger.tuned            cv
+148: regr.ranger.tuned            cv
+149: regr.ranger.tuned            cv
+150: regr.ranger.tuned            cv</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Summary of question 2 (nested resampling)
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I evaluated the performance of the tuned model using nested resampling to obtain an unbiased estimate.</p>
+<p><strong>Steps I took:</strong></p>
+<ol type="1">
+<li><p><strong>Resampling strategy</strong> I used:</p>
+<ul>
+<li>outer resampling: 3-fold cross-validation,</li>
+<li>inner resampling: holdout validation with a 70/30 split.</li>
+</ul></li>
+<li><p><strong>AutoTuner setup</strong> I reused the same <code>regr.ranger</code> learner and parameter ranges as in Question 1, wrapped in an <code>AutoTuner</code>. The tuning again used 50 evaluations of random search and MSE as the measure.</p></li>
+<li><p><strong>Resample execution</strong> I called <code>resample()</code> with the outer CV and the <code>AutoTuner</code>, setting <code>store_models = TRUE</code> to keep the fitted models from each outer fold.</p></li>
+<li><p><strong>Aggregating performance</strong> I used <code>$aggregate()</code> to average the MSE across the outer test folds.</p></li>
+<li><p><strong>Inspecting inner results</strong> I extracted the best configurations and full tuning logs from each inner loop using <code>extract_inner_tuning_results()</code> and <code>extract_inner_tuning_archives()</code>.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="question-3" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="question-3">Question 3</h2>
+<p>Tune and benchmark an XGBoost model against a logistic regression (without tuning the latter) and determine which has the best Brier score. Use <code>mlr3tuningspaces</code> and nested resampling, try to pick appropriate inner and outer resampling strategies that balance computational efficiency vs.&nbsp;stability of the results.</p>
+<section id="answer-2" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="answer-2">Answer</h3>
+<p>Since the outcome is categorical, this is a classification task, and I’ll use the built-in <code>spam</code> task.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>tsk_spam <span class="ot">&lt;-</span> <span class="fu">tsk</span>(<span class="st">"spam"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>First I’ll set up the logistic regression model (with no tuning).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># requires probs to compute the brier score</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>lrn_logreg <span class="ot">&lt;-</span> <span class="fu">lrn</span>(<span class="st">"classif.log_reg"</span>, <span class="at">predict_type =</span> <span class="st">"prob"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p>The XGBoost model has lots of hyperparameters:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lrn</span>(<span class="st">"classif.xgboost"</span>)<span class="sc">$</span>param_set<span class="sc">$</span><span class="fu">ids</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "alpha"                       "approxcontrib"              
+ [3] "base_score"                  "booster"                    
+ [5] "callbacks"                   "colsample_bylevel"          
+ [7] "colsample_bynode"            "colsample_bytree"           
+ [9] "device"                      "disable_default_eval_metric"
+[11] "early_stopping_rounds"       "eta"                        
+[13] "eval_metric"                 "feature_selector"           
+[15] "gamma"                       "grow_policy"                
+[17] "interaction_constraints"     "iterationrange"             
+[19] "lambda"                      "lambda_bias"                
+[21] "max_bin"                     "max_delta_step"             
+[23] "max_depth"                   "max_leaves"                 
+[25] "maximize"                    "min_child_weight"           
+[27] "missing"                     "monotone_constraints"       
+[29] "nrounds"                     "normalize_type"             
+[31] "nthread"                     "ntreelimit"                 
+[33] "num_parallel_tree"           "objective"                  
+[35] "one_drop"                    "outputmargin"               
+[37] "predcontrib"                 "predinteraction"            
+[39] "predleaf"                    "print_every_n"              
+[41] "process_type"                "rate_drop"                  
+[43] "refresh_leaf"                "reshape"                    
+[45] "seed_per_iteration"          "sampling_method"            
+[47] "sample_type"                 "save_name"                  
+[49] "save_period"                 "scale_pos_weight"           
+[51] "skip_drop"                   "strict_shape"               
+[53] "subsample"                   "top_k"                      
+[55] "training"                    "tree_method"                
+[57] "tweedie_variance_power"      "updater"                    
+[59] "verbose"                     "watchlist"                  
+[61] "xgb_model"                  </code></pre>
+</div>
+</div>
+<p>The main ones are:</p>
+<table class="table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 63%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Hyperparameter</th>
+<th>Description</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>eta</code></td>
+<td>Learning rate (shrinkage)</td>
+<td>numeric</td>
+</tr>
+<tr class="even">
+<td><code>max_depth</code></td>
+<td>Maximum depth of trees</td>
+<td>integer</td>
+</tr>
+<tr class="odd">
+<td><code>nrounds</code></td>
+<td>Number of boosting rounds (trees)</td>
+<td>integer</td>
+</tr>
+<tr class="even">
+<td><code>colsample_bytree</code></td>
+<td>Fraction of features randomly sampled per tree</td>
+<td>numeric</td>
+</tr>
+<tr class="odd">
+<td><code>subsample</code></td>
+<td>Fraction of rows sampled per tree</td>
+<td>numeric</td>
+</tr>
+<tr class="even">
+<td><code>min_child_weight</code></td>
+<td>Minimum sum of instance weights in a child node</td>
+<td>numeric</td>
+</tr>
+<tr class="odd">
+<td><code>gamma</code></td>
+<td>Minimum loss reduction to make a split</td>
+<td>numeric</td>
+</tr>
+<tr class="even">
+<td><code>lambda</code></td>
+<td>L2 regularisation term on weights</td>
+<td>numeric</td>
+</tr>
+<tr class="odd">
+<td><code>alpha</code></td>
+<td>L1 regularisation term on weights</td>
+<td>numeric</td>
+</tr>
+</tbody>
+</table>
+<p>A typical tuning strategy for XGBoost might involve:</p>
+<ol type="1">
+<li>Starting with basic tree shape and learning rate:
+<ul>
+<li><code>max_depth</code></li>
+<li><code>eta</code></li>
+<li><code>nrounds</code></li>
+</ul></li>
+<li>Adding sampling and regularisation to control overfitting:
+<ul>
+<li><code>subsample</code></li>
+<li><code>colsample_bytree</code></li>
+<li><code>min_child_weight</code></li>
+<li><code>gamma</code></li>
+</ul></li>
+<li>Fine-tuning regularisation terms if needed:
+<ul>
+<li><code>lambda</code> (L2)</li>
+<li><code>alpha</code> (L1)</li>
+</ul></li>
+</ol>
+</div></div><p>For the XGBoost learner, I’m going to use a predefined search space from <code>{mlr3tuningspaces}</code>. First, I’ll give a list of these predefined spaces.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>mlr_tuning_spaces<span class="sc">$</span><span class="fu">keys</span>()[<span class="fu">grepl</span>(<span class="st">"xgboost"</span>, mlr_tuning_spaces<span class="sc">$</span><span class="fu">keys</span>())]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "classif.xgboost.default" "classif.xgboost.rbv1"   
+[3] "classif.xgboost.rbv2"    "regr.xgboost.default"   
+[5] "regr.xgboost.rbv1"       "regr.xgboost.rbv2"      </code></pre>
+</div>
+</div>
+<p>I will use the <code>classif.xgboost.default</code> space.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>space <span class="ot">=</span> <span class="fu">lts</span>(<span class="st">"classif.xgboost.default"</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>space</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;TuningSpace:classif.xgboost.default&gt;: Classification XGBoost with Default
+                  id lower upper levels logscale
+              &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;list&gt;   &lt;lgcl&gt;
+1:               eta 1e-04     1 [NULL]     TRUE
+2:           nrounds 1e+00  5000 [NULL]    FALSE
+3:         max_depth 1e+00    20 [NULL]    FALSE
+4:  colsample_bytree 1e-01     1 [NULL]    FALSE
+5: colsample_bylevel 1e-01     1 [NULL]    FALSE
+6:            lambda 1e-03  1000 [NULL]     TRUE
+7:             alpha 1e-03  1000 [NULL]     TRUE
+8:         subsample 1e-01     1 [NULL]    FALSE</code></pre>
+</div>
+</div>
+<p>Plugging this into <code>auto_tuner()</code> creates an <code>AutoTuner</code> object. I’m going to use 5-fold CV in the inner resampling and a terminator based on run time (of 60 seconds).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create terminator with time budget of 60 secs</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>trm_rt <span class="ot">=</span> <span class="fu">trm</span>(<span class="st">"run_time"</span>)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>trm_rt<span class="sc">$</span>param_set<span class="sc">$</span>values<span class="sc">$</span>secs <span class="ot">=</span> <span class="dv">60</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="co"># create xgboost learner with prob predict_type</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 'prob' required for brier score</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>lrn_xgb <span class="ot">=</span> <span class="fu">lrn</span>(<span class="st">"classif.xgboost"</span>, <span class="at">predict_type =</span> <span class="st">"prob"</span>)</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>at_xgb <span class="ot">&lt;-</span> <span class="fu">auto_tuner</span>(<span class="at">learner =</span> lrn_xgb,</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>                    <span class="at">resampling =</span> <span class="fu">rsmp</span>(<span class="st">"cv"</span>, <span class="at">folds =</span> <span class="dv">5</span>),</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>                    <span class="at">measure =</span> <span class="fu">msr</span>(<span class="st">"classif.bbrier"</span>),</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>                    <span class="at">terminator =</span> trm_rt,</span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>                    <span class="at">tuner =</span> <span class="fu">tnr</span>(<span class="st">"random_search"</span>),</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>                    <span class="at">search_space =</span> space)</span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>at_xgb</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;AutoTuner:classif.xgboost.tuned&gt;
+* Model: list
+* Parameters: list()
+* Packages: mlr3, mlr3tuning, mlr3learners, xgboost
+* Predict Types:  response, [prob]
+* Feature Types: logical, integer, numeric
+* Properties: hotstart_forward, importance, missings, multiclass,
+  offset, twoclass, weights
+* Search Space:
+                  id    class     lower       upper nlevels
+              &lt;char&gt;   &lt;char&gt;     &lt;num&gt;       &lt;num&gt;   &lt;num&gt;
+1:             alpha ParamDbl -6.907755    6.907755     Inf
+2: colsample_bylevel ParamDbl  0.100000    1.000000     Inf
+3:  colsample_bytree ParamDbl  0.100000    1.000000     Inf
+4:               eta ParamDbl -9.210340    0.000000     Inf
+5:            lambda ParamDbl -6.907755    6.907755     Inf
+6:         max_depth ParamInt  1.000000   20.000000      20
+7:           nrounds ParamInt  1.000000 5000.000000    5000
+8:         subsample ParamDbl  0.100000    1.000000     Inf</code></pre>
+</div>
+</div>
+<p>Now I can set up the outer resampling strategy (4-fold CV).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>outer_rsmp <span class="ot">&lt;-</span> <span class="fu">rsmp</span>(<span class="st">"cv"</span>, <span class="at">folds =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>I can create a benchmark grid and run it for the task to compare the two learners.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Benchmark both learners</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>design <span class="ot">=</span> <span class="fu">benchmark_grid</span>(</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">tasks =</span> tsk_spam,</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">learners =</span> <span class="fu">list</span>(lrn_logreg, at_xgb),</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamplings =</span> outer_rsmp</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a><span class="co"># run the benchmark design</span></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">101</span>)</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>bmr <span class="ot">=</span> <span class="fu">benchmark</span>(design)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># the score for each of the 4-fold CV outer folds</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>bmr<span class="sc">$</span><span class="fu">score</span>(<span class="fu">msr</span>(<span class="st">"classif.bbrier"</span>))[, </span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>         .(learner_id, resampling_id, iteration, classif.bbrier)</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>         ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              learner_id resampling_id iteration classif.bbrier
+                  &lt;char&gt;        &lt;char&gt;     &lt;int&gt;          &lt;num&gt;
+1:       classif.log_reg            cv         1     0.06236199
+2:       classif.log_reg            cv         2     0.05802780
+3:       classif.log_reg            cv         3     0.05744753
+4:       classif.log_reg            cv         4     0.05651042
+5: classif.xgboost.tuned            cv         1     0.05362083
+6: classif.xgboost.tuned            cv         2     0.02618333
+7: classif.xgboost.tuned            cv         3     0.04326268
+8: classif.xgboost.tuned            cv         4     0.03606656</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># the aggregate score for each learner</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>bmr<span class="sc">$</span><span class="fu">aggregate</span>(<span class="fu">msr</span>(<span class="st">"classif.bbrier"</span>))[,</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>         .(learner_id, resampling_id, classif.bbrier)</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>         ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              learner_id resampling_id classif.bbrier
+                  &lt;char&gt;        &lt;char&gt;          &lt;num&gt;
+1:       classif.log_reg            cv     0.05858693
+2: classif.xgboost.tuned            cv     0.03978335</code></pre>
+</div>
+</div>
+<p>I can use <code>autoplot</code> to plot these results.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(bmr, <span class="at">measure =</span> <span class="fu">msr</span>(<span class="st">"classif.bbrier"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Summary of question 3 (XGBoost vs.&nbsp;logistic regression)
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I benchmarked a tuned XGBoost model against an untuned logistic regression model on the <code>spam</code> classification task using the Brier score.</p>
+<p><strong>Steps I took:</strong></p>
+<ol type="1">
+<li><p><strong>Loading the task</strong><br>
+I used the built-in <code>tsk("spam")</code>.</p></li>
+<li><p><strong>Logistic regression setup</strong><br>
+I defined a <code>classif.log_reg</code> learner with <code>predict_type = "prob"</code> to enable Brier score calculation.</p></li>
+<li><p><strong>XGBoost setup with tuning</strong><br>
+I used <code>classif.xgboost</code> with <code>predict_type = "prob"</code> and the predefined tuning space <code>lts("classif.xgboost.default")</code> from <code>{mlr3tuningspaces}</code>.</p></li>
+<li><p><strong>AutoTuner for XGBoost</strong><br>
+I created an <code>AutoTuner</code> with:</p>
+<ul>
+<li>5-fold CV for inner resampling,<br>
+</li>
+<li>60-second time budget via <code>trm("run_time")</code>,<br>
+</li>
+<li>random search tuner,<br>
+</li>
+<li>Brier score as the measure.</li>
+</ul></li>
+<li><p><strong>Outer resampling</strong><br>
+I used 4-fold CV for the outer loop.</p></li>
+<li><p><strong>Benchmark setup and execution</strong><br>
+I created a benchmark grid comparing both learners on the task, ran the benchmark, and scored the results using the Brier score.</p></li>
+<li><p><strong>Results</strong><br>
+I looked at individual fold scores using <code>bmr$score()</code> and aggregate performance using <code>bmr$aggregate()</code>. I also visualised the comparison with <code>autoplot()</code>.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="question4" class="level2">
+<h2 class="anchored" data-anchor-id="question4">Question4</h2>
+<p>Write a function that implements an iterated random search procedure that drills down on the optimal configuration by applying random search to iteratively smaller search spaces. Your function should have seven inputs: <code>task</code>, <code>learner</code>, <code>search_space</code>, <code>resampling</code>, <code>measure</code>, <code>random_search_stages</code>, and <code>random_search_size</code>. You should only worry about programming this for fully numeric and bounded search spaces that have no dependencies. In pseudo-code:</p>
+<pre><code>    a. Create a random design of size `random_search_size` from the given search space and evaluate the learner on it.
+    b. Identify the best configuration.
+    c. Create a smaller search space around this best config, where you define the new range for each parameter as: `new_range[i] = (best_conf[i] - 0.25 * current_range[i], best_conf[i] + 0.25*current_range[i])`. Ensure that this `new_range` respects the initial bound of the original `search_space` by taking the `max()` of the new and old lower bound, and the `min()` of the new and the old upper bound (“clipping”).
+    d. Iterate the previous steps `random_search_stages` times and at the end return the best configuration you have ever evaluated. As a stretch goal, look into `mlr3tuning`’s internal source code and turn your function into an R6 class inheriting from the `TunerBatch` class – test it out on a learner of your choice.</code></pre>
+
+
+</section>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{smith2025,
+  author = {Smith, Paul},
+  title = {Getting {Started} with \{Mlr3\}},
+  date = {2025-03-21},
+  url = {https://pws3141.github.io/blog/posts/09-mlr3_hyperparameter/},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-smith2025" class="csl-entry quarto-appendix-citeas" role="listitem">
+Smith, Paul. 2025. <span>“Getting Started with {Mlr3}.”</span> March 21,
+2025. <a href="https://pws3141.github.io/blog/posts/09-mlr3_hyperparameter/">https://pws3141.github.io/blog/posts/09-mlr3_hyperparameter/</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/pws3141\.github\.io\/blog\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
+      for (let i=0; i<annoteTargets.length; i++) {
+        const annoteTarget = annoteTargets[i];
+        const targetCell = annoteTarget.getAttribute("data-target-cell");
+        const targetAnnotation = annoteTarget.getAttribute("data-target-annotation");
+        const contentFn = () => {
+          const content = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          if (content) {
+            const tipContent = content.cloneNode(true);
+            tipContent.classList.add("code-annotation-tip-content");
+            return tipContent.outerHTML;
+          }
+        }
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          onShow: (instance) => {
+            selectCodeLines(instance.reference);
+            instance.reference.classList.add('code-annotation-active');
+            window.tippy.hideAll();
+          },
+          onHide: (instance) => {
+            unselectCodeLines();
+            instance.reference.classList.remove('code-annotation-active');
+          },
+          maxWidth: 300,
+          delay: [50, 0],
+          duration: [200, 0],
+          offset: [5, 10],
+          arrow: true,
+          appendTo: function(el) {
+            return el.parentElement.parentElement.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto',
+          placement: 'right',
+          popperOptions: {
+            modifiers: [
+            {
+              name: 'flip',
+              options: {
+                flipVariations: false, // true by default
+                allowedAutoPlacements: ['right'],
+                fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
+              },
+            },
+            {
+              name: 'preventOverflow',
+              options: {
+                mainAxis: false,
+                altAxis: false
+              }
+            }
+            ]        
+          }      
+        };
+        window.tippy(annoteTarget, config); 
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

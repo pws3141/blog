@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/09-mlr3_hyperparameter/index.html",
       "/posts/08-mlr3_evaluation_benchmarking/index.html",
       "/posts/07-stepwise_datasplitting_simulation/index.html",
       "/posts/06-stepwise_datasplitting/index.html",
