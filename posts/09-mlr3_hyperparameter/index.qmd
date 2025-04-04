@@ -71,8 +71,8 @@ lgr::get_logger("bbotk")$set_threshold("warn")
 
 # Exercises
 
-1. Tune the `mtry`, `sample.fraction`, and `num.trees` hyperparameters of `lrn("regr.ranger")` on `tsk("mtcars")`. Use a simple random search with 50 evaluations. Evaluate with a three-fold CV and the root mean squared error. Visualize the effects that each hyperparameter has on the performance via simple marginal plots, which plot a single hyperparameter versus the cross-validated MSE.
-2. Evaluate the performance of the model created in Exercise 1 with nested resampling. Use a holdout validation for the inner resampling and a three-fold CV for the outer resampling.
+1. Tune the `mtry`, `sample.fraction`, and `num.trees` hyperparameters of `lrn("regr.ranger")` on `tsk("mtcars")`. Use a simple random search with 50 evaluations. Evaluate with a 3-fold CV and the root mean squared error. Visualize the effects that each hyperparameter has on the performance via simple marginal plots, which plot a single hyperparameter versus the cross-validated MSE.
+2. Evaluate the performance of the model created in Exercise 1 with nested resampling. Use a holdout validation for the inner resampling and a 3-fold CV for the outer resampling.
 3. Tune and benchmark an XGBoost model against a logistic regression (without tuning the latter) and determine which has the best Brier score. Use `mlr3tuningspaces` and nested resampling, try to pick appropriate inner and outer resampling strategies that balance computational efficiency vs. stability of the results.
 4. (\*) Write a function that implements an iterated random search procedure that drills down on the optimal configuration by applying random search to iteratively smaller search spaces. Your function should have seven inputs: `task`, `learner`, `search_space`, `resampling`, `measure`, `random_search_stages`, and `random_search_size`. You should only worry about programming this for fully numeric and bounded search spaces that have no dependencies. In pseudo-code:
 
@@ -85,7 +85,7 @@ lgr::get_logger("bbotk")$set_threshold("warn")
 
 Tune the `mtry`, `sample.fraction`, and `num.trees` hyperparameters of
 `lrn("regr.ranger")` on `tsk("mtcars")`. Use a simple random search with 50
-evaluations. Evaluate with a three-fold CV and the root mean squared error.
+evaluations. Evaluate with a 3-fold CV and the root mean squared error.
 Visualize the effects that each hyperparameter has on the performance via
 simple marginal plots, which plot a single hyperparameter versus the
 cross-validated MSE.
@@ -110,13 +110,13 @@ Now I will set up the tuning of the `mtry`, `sample.fraction`, and `num.trees` h
 
 ```{r}
 learner <- lrn("regr.ranger",
-               mtry = to_tune(1, 1e1),
-               num.trees = to_tune(1, 1000),
+               mtry = to_tune(p_int(1, 10)),
+               num.trees = to_tune(20, 2000),
                sample.fraction = to_tune(0.1, 1))
 learner
 ```
 
-Setting up an instance to terminate the tuner after 50 evaluations, and to use three-fold CV.
+Setting up an instance to terminate the tuner after 50 evaluations, and to use 3-fold CV.
 
 ```{r}
 instance <- ti(task = tsk_mtcars,
@@ -131,7 +131,7 @@ instance
 The tuning step uses 3-fold cross-validation:
 
 - In each evaluation, two-thirds of the data is used for training,
-- One-third is used for validation (i.e. to compute the MSE).
+- One-third is used for validation (i.e. to compute the RMSE).
 - This is repeated for 50 random configurations (as specified by the terminator).
 
 
@@ -166,7 +166,7 @@ Now let's visualise the effect of each hyperparameter using marginal plots.
 autoplot(instance, type = "marginal", cols_x = c("mtry", "sample.fraction", "num.trees"))
 ```
 
-As during the HPO stage, I used three-fold CV, the model has not seen the full
+As during the HPO stage, I used 3-fold CV, the model has not seen the full
 data all at once. So, now I'll train the model using the optimised
 hyperparameters.
 
@@ -200,14 +200,14 @@ I tuned the `regr.ranger` learner on the `mtcars` dataset, focusing on three hyp
    I created a `TuningInstanceSingleCrit` using:
    - the `mtcars` task,
    - 3-fold cross-validation for resampling,
-   - mean squared error (MSE) as the evaluation metric,
+   - root mean squared error (RMSE) as the evaluation metric,
    - a limit of 50 evaluations using a random search strategy.
 
 4. **Running the tuner**
    I used `tnr("random_search")` and called `$optimize()` to run the search. I then extracted the best hyperparameter combination and the archive of evaluated configurations.
 
 5. **Visualising results**
-   I used marginal plots to visualise the effect of each hyperparameter on the cross-validated MSE.
+   I used marginal plots to visualise the effect of each hyperparameter on the cross-validated RMSE.
 
 6. **Training the final model**
    I retrained the `regr.ranger` model on the full dataset using the best parameters found.
@@ -217,19 +217,19 @@ I tuned the `regr.ranger` learner on the `mtcars` dataset, focusing on three hyp
 ## Question 2
 
 Evaluate the performance of the model created in Exercise 1 with nested
-resampling. Use a holdout validation for the inner resampling and a three-fold
+resampling. Use a holdout validation for the inner resampling and a 3-fold
 CV for the outer resampling.
 
 ### Answer
 
 OK, so here we need an outer and inner resampling strategy.
-The outer resampling strategy will be a three-fold CV, and the inner resampling
+The outer resampling strategy will be a 3-fold CV, and the inner resampling
 strategy will be a holdout validation.
 
-![An illustration of nested resampling. The large blocks represent three-fold CV for the outer resampling for model evaluation and the small blocks represent four-fold CV for the inner resampling for HPO. The light blue blocks are the training sets and the dark blue blocks are the test sets.](./fig/nested_resampling.svg){#fig-nested-resampling-example}
+![An illustration of nested resampling. The large blocks represent 3-fold CV for the outer resampling for model evaluation and the small blocks represent 4-fold CV for the inner resampling for HPO. The light blue blocks are the training sets and the dark blue blocks are the test sets.](./fig/nested_resampling.svg){#fig-nested-resampling-example}
 
 @fig-nested-resampling-example shows an example of a nest resampling strategy
-(with three-fold CV on the outer and four-fold CV on the inner nest). Here, we
+(with 3-fold CV on the outer and 4-fold CV on the inner nest). Here, we
 need to do something slightly different as we are using the holdout resampling
 strategy on the inner nest.
 
@@ -277,7 +277,7 @@ at <- auto_tuner(
                        sample.fraction = to_tune(0.1, 1)),
          # inner resampling
          resampling = rsmp("holdout", ratio = 0.7),
-         measure = msr("regr.mse"),
+         measure = msr("regr.rmse"),
          terminator = trm("evals", n_evals = 50)
         )
 
@@ -291,11 +291,11 @@ rr <- resample(tsk("mtcars"),
 rr
 ```
 1. The tuners and learners are the same as in the previous exercise, I'm just
-   definining them again here for clarity.
+   defining them again here for clarity.
 2. Set `store_models = TRUE` so that the `AutoTuner` models (fitted on the
    outer training data) are stored,
 
-Now I aggregate across the three outer folds to get the final perforance.
+Now I aggregate across the three outer folds to get the final performance.
 ```{r}
 rr$aggregate()
 ```
@@ -341,7 +341,7 @@ Tune and benchmark an XGBoost model against a logistic regression (without tunin
 
 ### Answer
 
-Since the outcome is categorical, this is a classification task, and I’ll use the built-in `spam` task.
+I’ll use the built-in `spam` task -- since the outcome is categorical, this is a classification task.
 
 ```{r}
 tsk_spam <- tsk("spam")
@@ -444,6 +444,7 @@ design = benchmark_grid(
   learners = list(lrn_logreg, at_xgb),
   resamplings = outer_rsmp
 )
+design
 
 # run the benchmark design
 set.seed(101)
@@ -462,6 +463,11 @@ I can use `autoplot` to plot these results.
 ```{r}
 autoplot(bmr, measure = msr("classif.bbrier"))
 ```
+
+So, XGBoost performs better than the logistic regression model on the `spam`
+task. But, the XGBoost model is much more computationally expensive, takes
+longer to train, and is less interpretable. So, the choice of model is a trade
+off between performance and interpretability.
 
 :::{.callout-note collapse="true"}
 # Summary of question 3 (XGBoost vs. logistic regression)
