@@ -73,7 +73,12 @@ estimates must be less than some $k$. Note that the lasso procedure shares many
 of stepwise's deficiencies, namely that there is a "low probability of
 selecting the 'correct' variables".
 
-@derksen1992backward found that when the stepwise procedure was used, the final model represented noise between $20\%$ and $74\%$ of the time, and the final model contained less than half of the actual number of authentic predictors. To see this in action, Frank Harrell has some simulations as part of his 'Regression Modelling Strategies' [course notes](https://hbiostat.org/rmsc/multivar#sec-multivar-variable-selection). 
+@derksen1992backward found that when the stepwise procedure was used, the final
+model represented noise between $20\%$ and $74\%$ of the time, and the final
+model contained less than half of the actual number of authentic predictors. To
+see this in action, Frank Harrell has some simulations as part of his
+'Regression Modelling Strategies' [course
+notes](https://hbiostat.org/rmsc/multivar#sec-multivar-variable-selection). 
 
 # Issues with data-splitting
 

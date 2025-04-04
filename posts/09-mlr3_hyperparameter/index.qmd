@@ -1,0 +1,481 @@
+---
+title: "Getting Started with {mlr3}"
+subtitle: "03 Hyperparameter Optimisation"
+author:
+  - name: Paul Smith
+date: "2025-03-21"
+categories: [code, r, machine learning, mlr3]
+image: "./fig/mlr3_logo.svg"
+format:
+  html:
+    code-fold: false
+execute:
+  df-print: default
+  cache: true
+---
+
+# Introduction
+
+## Prerequisites
+
+```{r}
+#| cache: false
+
+library(mlr3)
+library(mlr3viz)
+library(mlr3learners)
+library(mlr3tuning)
+library(mlr3tuningspaces)
+library(ggplot2)
+library(patchwork)
+library(data.table)
+options(datatable.print.nrows = 20)
+```
+
+Suppress all messaging unless it's a warning:^[The packages in `{mlr3}` that
+make use of optimization, i.e., `{mlr3tuning}` or `{mlr3select}`, use the
+logger of their base package `{bbotk}`.]
+
+```{r}
+#| cache: false
+
+lgr::get_logger("mlr3")$set_threshold("warn")
+lgr::get_logger("bbotk")$set_threshold("warn")
+```
+
+# Exercises
+
+1. Tune the `mtry`, `sample.fraction`, and `num.trees` hyperparameters of `lrn("regr.ranger")` on `tsk("mtcars")`. Use a simple random search with 50 evaluations. Evaluate with a three-fold CV and the root mean squared error. Visualize the effects that each hyperparameter has on the performance via simple marginal plots, which plot a single hyperparameter versus the cross-validated MSE.
+2. Evaluate the performance of the model created in Exercise 1 with nested resampling. Use a holdout validation for the inner resampling and a three-fold CV for the outer resampling.
+3. Tune and benchmark an XGBoost model against a logistic regression (without tuning the latter) and determine which has the best Brier score. Use `mlr3tuningspaces` and nested resampling, try to pick appropriate inner and outer resampling strategies that balance computational efficiency vs. stability of the results.
+4. (\*) Write a function that implements an iterated random search procedure that drills down on the optimal configuration by applying random search to iteratively smaller search spaces. Your function should have seven inputs: `task`, `learner`, `search_space`, `resampling`, `measure`, `random_search_stages`, and `random_search_size`. You should only worry about programming this for fully numeric and bounded search spaces that have no dependencies. In pseudo-code:
+
+        a. Create a random design of size `random_search_size` from the given search space and evaluate the learner on it.
+        b. Identify the best configuration.
+        c. Create a smaller search space around this best config, where you define the new range for each parameter as: `new_range[i] = (best_conf[i] - 0.25 * current_range[i], best_conf[i] + 0.25*current_range[i])`. Ensure that this `new_range` respects the initial bound of the original `search_space` by taking the `max()` of the new and old lower bound, and the `min()` of the new and the old upper bound (“clipping”).
+        d. Iterate the previous steps `random_search_stages` times and at the end return the best configuration you have ever evaluated. As a stretch goal, look into `mlr3tuning`’s internal source code and turn your function into an R6 class inheriting from the `TunerBatch` class – test it out on a learner of your choice.
+
+## Question 1
+
+Tune the `mtry`, `sample.fraction`, and `num.trees` hyperparameters of
+`lrn("regr.ranger")` on `tsk("mtcars")`. Use a simple random search with 50
+evaluations. Evaluate with a three-fold CV and the root mean squared error.
+Visualize the effects that each hyperparameter has on the performance via
+simple marginal plots, which plot a single hyperparameter versus the
+cross-validated MSE.
+
+### Answer
+
+Let's load the task and look at the properties of the `mtry`,
+`sample.fraction`, and `num.trees` parameters.
+
+```{r}
+tsk_mtcars <- tsk("mtcars")
+lrn("regr.ranger")$param_set$data[id %in% c("mtry", "sample.fraction", "num.trees")]
+```
+
+The hyperparameters I'm looking at are:
+
+- `mtry`: number of variables considered at each tree split.
+- `num.trees`: number of trees in the forest.
+- `sample.fraction`: fraction of observations used to train each tree.
+
+Now I will set up the tuning of the `mtry`, `sample.fraction`, and `num.trees` hyperparameters.
+
+```{r}
+learner <- lrn("regr.ranger",
+               mtry = to_tune(1, 1e1),
+               num.trees = to_tune(1, 1000),
+               sample.fraction = to_tune(0.1, 1))
+learner
+```
+
+Setting up an instance to terminate the tuner after 50 evaluations, and to use three-fold CV.
+
+```{r}
+instance <- ti(task = tsk_mtcars,
+               learner = learner,
+               resampling = rsmp("cv", folds = 3),
+               # rmse gives interpretability in the original units (MPG) rather than squared units
+               measures = msr("regr.rmse"), 
+               terminator = trm("evals", n_evals = 50))
+instance
+```
+
+The tuning step uses 3-fold cross-validation:
+
+- In each evaluation, two-thirds of the data is used for training,
+- One-third is used for validation (i.e. to compute the MSE).
+- This is repeated for 50 random configurations (as specified by the terminator).
+
+
+Now I can set up the tuning process (random search).
+
+```{r}
+tuner <- tnr("random_search")
+#tuner$param_set
+tuner
+```
+
+And trigger the tuning process.
+
+```{r}
+set.seed(333)
+tuner$optimize(instance)
+instance$result
+instance$result$learner_param_vals
+```
+
+All 50 of the random search evaluations are stored in the `archive` slot of the
+`instance` object.
+```{r}
+instance$archive[, .(mtry, sample.fraction, num.trees, regr.rmse)]
+```
+
+Now let's visualise the effect of each hyperparameter using marginal plots.
+
+```{r}
+#| fig-width: 8
+
+autoplot(instance, type = "marginal", cols_x = c("mtry", "sample.fraction", "num.trees"))
+```
+
+As during the HPO stage, I used three-fold CV, the model has not seen the full
+data all at once. So, now I'll train the model using the optimised
+hyperparameters.
+
+```{r}
+lrn_ranger_tuned <- lrn("regr.ranger")
+lrn_ranger_tuned$param_set$values = instance$result_learner_param_vals
+lrn_ranger_tuned$train(tsk_mtcars)$model
+```
+
+:::{.callout-note collapse="true"}
+# Summary of question 1 (hyperparameter tuning with random search)
+
+I tuned the `regr.ranger` learner on the `mtcars` dataset, focusing on three hyperparameters:
+
+- `mtry`: number of variables considered at each split,
+- `num.trees`: number of trees in the forest,
+- `sample.fraction`: fraction of the dataset used for each tree.
+
+**Steps I took:**
+
+1. **Exploration**
+   I inspected the available parameters for the learner using `$param_set`.
+
+2. **Learner setup**
+   I defined the tuning ranges with `to_tune()`:
+   - `mtry` from 1 to 10,
+   - `num.trees` from 1 to 100,000,
+   - `sample.fraction` from 0.1 to 1.
+
+3. **Tuning instance**
+   I created a `TuningInstanceSingleCrit` using:
+   - the `mtcars` task,
+   - 3-fold cross-validation for resampling,
+   - mean squared error (MSE) as the evaluation metric,
+   - a limit of 50 evaluations using a random search strategy.
+
+4. **Running the tuner**
+   I used `tnr("random_search")` and called `$optimize()` to run the search. I then extracted the best hyperparameter combination and the archive of evaluated configurations.
+
+5. **Visualising results**
+   I used marginal plots to visualise the effect of each hyperparameter on the cross-validated MSE.
+
+6. **Training the final model**
+   I retrained the `regr.ranger` model on the full dataset using the best parameters found.
+
+:::
+
+## Question 2
+
+Evaluate the performance of the model created in Exercise 1 with nested
+resampling. Use a holdout validation for the inner resampling and a three-fold
+CV for the outer resampling.
+
+### Answer
+
+OK, so here we need an outer and inner resampling strategy.
+The outer resampling strategy will be a three-fold CV, and the inner resampling
+strategy will be a holdout validation.
+
+![An illustration of nested resampling. The large blocks represent three-fold CV for the outer resampling for model evaluation and the small blocks represent four-fold CV for the inner resampling for HPO. The light blue blocks are the training sets and the dark blue blocks are the test sets.](./fig/nested_resampling.svg){#fig-nested-resampling-example}
+
+@fig-nested-resampling-example shows an example of a nest resampling strategy
+(with three-fold CV on the outer and four-fold CV on the inner nest). Here, we
+need to do something slightly different as we are using the holdout resampling
+strategy on the inner nest.
+
+1. Outer resampling start
+   - Perform 3-fold cross-validation on the full dataset.
+   - For each outer fold, split the data into:
+     - Training set (light blue blocks)
+     - Test set (dark blue block)
+
+2. Inner resampling
+   - Within each outer training set, perform holdout validation (assuming 70/30 training-test split).
+   - This inner split is used for tuning hyperparameters (not evaluation).
+
+3. HPO – Hyperparameter tuning
+   - Evaluate different hyperparameter combinations by fitting models on the inner training set and evaluating performance on the inner validation (holdout) set.
+   - Select the best hyperparameter configuration based on performance on the inner holdout set. 
+
+4. Training
+   - Fit the model on the entire outer training set using the tuned hyperparameters.
+
+5. Evaluation
+   - Evaluate the trained model on the outer test set (unseen during tuning).
+
+6. Outer resampling repeats
+   - Repeat steps 2–5 for each of the 3 outer folds.
+
+7. Aggregation
+   - Average the 3 outer test performance scores.
+   - This gives an unbiased estimate of the model’s generalisation performance with tuning.
+
+I will use `AutoTuner` to do nested resampling, as that is what is done in
+[Section
+4.3.1](https://mlr3book.mlr-org.com/chapters/chapter4/hyperparameter_optimization.html#sec-nested-resampling)
+of the mlr3 tutorial.
+
+```{r}
+## create auto_tuner to resample a random forest 
+# with 3-fold CV in outer resampling and 
+# holdout validation in inner resampling
+at <- auto_tuner(
+         tuner = tnr("random_search"), #<1>
+         learner = lrn("regr.ranger",
+                       mtry = to_tune(1, 1e1),
+                       num.trees = to_tune(1, 1e5),
+                       sample.fraction = to_tune(0.1, 1)),
+         # inner resampling
+         resampling = rsmp("holdout", ratio = 0.7),
+         measure = msr("regr.mse"),
+         terminator = trm("evals", n_evals = 50)
+        )
+
+# resampling step
+rr <- resample(tsk("mtcars"),
+               at, 
+               # outer resampling
+               rsmp("cv", folds = 3), 
+               store_models = TRUE) #<2>
+
+rr
+```
+1. The tuners and learners are the same as in the previous exercise, I'm just
+   definining them again here for clarity.
+2. Set `store_models = TRUE` so that the `AutoTuner` models (fitted on the
+   outer training data) are stored,
+
+Now I aggregate across the three outer folds to get the final perforance.
+```{r}
+rr$aggregate()
+```
+
+The inner tuning results can also be accessed, returning the optimal configurations (across all outer folds) and the full tuning archives.
+
+```{r}
+# optimal configurations
+extract_inner_tuning_results(rr)
+# full tuning archives
+extract_inner_tuning_archives(rr)
+```
+
+:::{.callout-note collapse="true"}
+# Summary of question 2 (nested resampling)
+
+I evaluated the performance of the tuned model using nested resampling to obtain an unbiased estimate.
+
+**Steps I took:**
+
+1. **Resampling strategy**
+   I used:
+   - outer resampling: 3-fold cross-validation,
+   - inner resampling: holdout validation with a 70/30 split.
+
+2. **AutoTuner setup**
+   I reused the same `regr.ranger` learner and parameter ranges as in Question 1, wrapped in an `AutoTuner`. The tuning again used 50 evaluations of random search and MSE as the measure.
+
+3. **Resample execution**
+   I called `resample()` with the outer CV and the `AutoTuner`, setting `store_models = TRUE` to keep the fitted models from each outer fold.
+
+4. **Aggregating performance**
+   I used `$aggregate()` to average the MSE across the outer test folds.
+
+5. **Inspecting inner results**
+   I extracted the best configurations and full tuning logs from each inner loop using `extract_inner_tuning_results()` and `extract_inner_tuning_archives()`.
+
+:::
+
+## Question 3
+
+Tune and benchmark an XGBoost model against a logistic regression (without tuning the latter) and determine which has the best Brier score. Use `mlr3tuningspaces` and nested resampling, try to pick appropriate inner and outer resampling strategies that balance computational efficiency vs. stability of the results.
+
+### Answer
+
+Since the outcome is categorical, this is a classification task, and I’ll use the built-in `spam` task.
+
+```{r}
+tsk_spam <- tsk("spam")
+```
+
+First I'll set up the logistic regression model (with no tuning).
+
+```{r}
+# requires probs to compute the brier score
+lrn_logreg <- lrn("classif.log_reg", predict_type = "prob")
+```
+
+:::{.column-margin}
+
+The XGBoost model has lots of hyperparameters:
+```{r}
+lrn("classif.xgboost")$param_set$ids()
+```
+
+The main ones are:
+
+| Hyperparameter         | Description                                               | Type     |
+|------------------------|-----------------------------------------------------------|----------|
+| `eta`                  | Learning rate (shrinkage)                                 | numeric  |
+| `max_depth`            | Maximum depth of trees                                    | integer  |
+| `nrounds`              | Number of boosting rounds (trees)                         | integer  |
+| `colsample_bytree`     | Fraction of features randomly sampled per tree            | numeric  |
+| `subsample`            | Fraction of rows sampled per tree                         | numeric  |
+| `min_child_weight`     | Minimum sum of instance weights in a child node           | numeric  |
+| `gamma`                | Minimum loss reduction to make a split                    | numeric  |
+| `lambda`               | L2 regularisation term on weights                         | numeric  |
+| `alpha`                | L1 regularisation term on weights                         | numeric  |
+
+A typical tuning strategy for XGBoost might involve:
+
+1. Starting with basic tree shape and learning rate:
+   - `max_depth`
+   - `eta`
+   - `nrounds`
+
+2. Adding sampling and regularisation to control overfitting:
+   - `subsample`
+   - `colsample_bytree`
+   - `min_child_weight`
+   - `gamma`
+
+3. Fine-tuning regularisation terms if needed:
+   - `lambda` (L2)
+   - `alpha` (L1)
+
+:::
+
+For the XGBoost learner, I'm going to use a predefined search space from
+`{mlr3tuningspaces}`. First, I'll give a list of these predefined spaces.
+
+```{r}
+mlr_tuning_spaces$keys()[grepl("xgboost", mlr_tuning_spaces$keys())]
+```
+
+I will use the `classif.xgboost.default` space.
+```{r}
+space = lts("classif.xgboost.default")
+space
+```
+
+Plugging this into `auto_tuner()` creates an `AutoTuner` object. I'm going to use
+5-fold CV in the inner resampling and a terminator based on run time (of 60
+seconds).
+
+```{r}
+# create terminator with time budget of 60 secs
+trm_rt = trm("run_time")
+trm_rt$param_set$values$secs = 60
+
+# create xgboost learner with prob predict_type
+# 'prob' required for brier score
+lrn_xgb = lrn("classif.xgboost", predict_type = "prob")
+
+at_xgb <- auto_tuner(learner = lrn_xgb,
+                    resampling = rsmp("cv", folds = 5),
+                    measure = msr("classif.bbrier"),
+                    terminator = trm_rt,
+                    tuner = tnr("random_search"),
+                    search_space = space)
+at_xgb
+```
+
+Now I can set up the outer resampling strategy (4-fold CV).
+
+```{r}
+outer_rsmp <- rsmp("cv", folds = 4)
+```
+
+I can create a benchmark grid and run it for the task to compare the two learners.
+
+```{r}
+# Benchmark both learners
+design = benchmark_grid(
+  tasks = tsk_spam,
+  learners = list(lrn_logreg, at_xgb),
+  resamplings = outer_rsmp
+)
+
+# run the benchmark design
+set.seed(101)
+bmr = benchmark(design)
+# the score for each of the 4-fold CV outer folds
+bmr$score(msr("classif.bbrier"))[, 
+         .(learner_id, resampling_id, iteration, classif.bbrier)
+         ]
+# the aggregate score for each learner
+bmr$aggregate(msr("classif.bbrier"))[,
+         .(learner_id, resampling_id, classif.bbrier)
+         ]
+```
+
+I can use `autoplot` to plot these results.
+```{r}
+autoplot(bmr, measure = msr("classif.bbrier"))
+```
+
+:::{.callout-note collapse="true"}
+# Summary of question 3 (XGBoost vs. logistic regression)
+
+I benchmarked a tuned XGBoost model against an untuned logistic regression model on the `spam` classification task using the Brier score.
+
+**Steps I took:**
+
+1. **Loading the task**  
+   I used the built-in `tsk("spam")`.
+
+2. **Logistic regression setup**  
+   I defined a `classif.log_reg` learner with `predict_type = "prob"` to enable Brier score calculation.
+
+3. **XGBoost setup with tuning**  
+   I used `classif.xgboost` with `predict_type = "prob"` and the predefined tuning space `lts("classif.xgboost.default")` from `{mlr3tuningspaces}`.
+
+4. **AutoTuner for XGBoost**  
+   I created an `AutoTuner` with:
+   - 5-fold CV for inner resampling,  
+   - 60-second time budget via `trm("run_time")`,  
+   - random search tuner,  
+   - Brier score as the measure.
+
+5. **Outer resampling**  
+   I used 4-fold CV for the outer loop.
+
+6. **Benchmark setup and execution**  
+   I created a benchmark grid comparing both learners on the task, ran the benchmark, and scored the results using the Brier score.
+
+7. **Results**  
+   I looked at individual fold scores using `bmr$score()` and aggregate performance using `bmr$aggregate()`. I also visualised the comparison with `autoplot()`.
+:::
+
+## Question4
+
+Write a function that implements an iterated random search procedure that drills down on the optimal configuration by applying random search to iteratively smaller search spaces. Your function should have seven inputs: `task`, `learner`, `search_space`, `resampling`, `measure`, `random_search_stages`, and `random_search_size`. You should only worry about programming this for fully numeric and bounded search spaces that have no dependencies. In pseudo-code:
+
+        a. Create a random design of size `random_search_size` from the given search space and evaluate the learner on it.
+        b. Identify the best configuration.
+        c. Create a smaller search space around this best config, where you define the new range for each parameter as: `new_range[i] = (best_conf[i] - 0.25 * current_range[i], best_conf[i] + 0.25*current_range[i])`. Ensure that this `new_range` respects the initial bound of the original `search_space` by taking the `max()` of the new and old lower bound, and the `min()` of the new and the old upper bound (“clipping”).
+        d. Iterate the previous steps `random_search_stages` times and at the end return the best configuration you have ever evaluated. As a stretch goal, look into `mlr3tuning`’s internal source code and turn your function into an R6 class inheriting from the `TunerBatch` class – test it out on a learner of your choice.
+
