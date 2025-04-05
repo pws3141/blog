@@ -11,7 +11,6 @@ format:
     code-fold: false
 execute:
   df-print: default
-  cache: true
 ---
 
 # Introduction
@@ -45,8 +44,6 @@ My previous posts cover:
 ## Prerequisites
 
 ```{r}
-#| cache: false
-
 library(mlr3)
 library(mlr3viz)
 library(mlr3learners)
@@ -63,8 +60,6 @@ make use of optimization, i.e., `{mlr3tuning}` or `{mlr3select}`, use the
 logger of their base package `{bbotk}`.]
 
 ```{r}
-#| cache: false
-
 lgr::get_logger("mlr3")$set_threshold("warn")
 lgr::get_logger("bbotk")$set_threshold("warn")
 ```
@@ -155,7 +150,7 @@ instance$result$learner_param_vals
 All 50 of the random search evaluations are stored in the `archive` slot of the
 `instance` object.
 ```{r}
-instance$archive[, .(mtry, sample.fraction, num.trees, regr.rmse)]
+as.data.table(instance$archive)[, .(mtry, sample.fraction, num.trees, regr.rmse)]
 ```
 
 Now let's visualise the effect of each hyperparameter using marginal plots.
