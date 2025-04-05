@@ -56,7 +56,27 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -235,6 +255,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#question4" id="toc-question4" class="nav-link" data-scroll-target="#question4">Question4</a></li>
   </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  <li><a href="#fin" id="toc-fin" class="nav-link" data-scroll-target="#fin">Fin</a></li>
   </ul>
 </nav>
 </nav>
@@ -251,6 +273,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introduction" class="level1 page-columns page-full">
 <h1>Introduction</h1>
+<p>I am attempting to learn how to use <code>{mlr3}</code> <span class="citation" data-cites="lang2019mlr3">(<a href="#ref-lang2019mlr3" role="doc-biblioref">Lang et al. 2019</a>)</span>, by reading through the book <a href="https://mlr3book.mlr-org.com/">Applied Machine Learning Using mlr3 in R</a> <span class="citation" data-cites="bischl2024usingmlr3">(<a href="#ref-bischl2024usingmlr3" role="doc-biblioref">Bischl et al. 2024</a>)</span>.</p>
+<div class="no-row-height column-margin column-container"><div id="ref-lang2019mlr3" class="csl-entry" role="listitem">
+Lang, Michel, Martin Binder, Jakob Richter, Patrick Schratz, Florian Pfisterer, Stefan Coors, Quay Au, Giuseppe Casalicchio, Lars Kotthoff, and Bernd Bischl. 2019. <span>“<span class="nocase">mlr3</span>: A Modern Object-Oriented Machine Learning Framework in <span>R</span>.”</span> <em>Journal of Open Source Software</em>, December. <a href="https://doi.org/10.21105/joss.01903">https://doi.org/10.21105/joss.01903</a>.
+</div><div id="ref-bischl2024usingmlr3" class="csl-entry" role="listitem">
+Bischl, Bernd, Raphael Sonabend, Lars Kotthoff, and Michel Lang, eds. 2024. <em>Applied Machine Learning Using <span class="nocase">m</span>lr3 in <span>R</span></em>. CRC Press. <a href="https://mlr3book.mlr-org.com">https://mlr3book.mlr-org.com</a>.
+</div><div id="ref-becker2024hyperparameter" class="csl-entry" role="listitem">
+Becker, Marc, Lennart Schneider, and Sebastian Fischer. 2024. <span>“Hyperparameter Optimization.”</span> In <em>Applied Machine Learning Using <span class="nocase">m</span>lr3 in <span>R</span></em>, edited by Bernd Bischl, Raphael Sonabend, Lars Kotthoff, and Michel Lang. CRC Press. <a href="https://mlr3book.mlr-org.com/hyperparameter_optimization.html">https://mlr3book.mlr-org.com/hyperparameter_optimization.html</a>.
+</div></div><p>In this post, I am working through the exercises given in <a href="https://mlr3book.mlr-org.com/chapters/chapter4/hyperparameter_optimization.html">Chapter 4</a> of the book <span class="citation" data-cites="becker2024hyperparameter">(<a href="#ref-becker2024hyperparameter" role="doc-biblioref">Becker, Schneider, and Fischer 2024</a>)</span>, which covers hyperparameter optimisation (HPO). This includes the following:</p>
+<ul>
+<li><strong>Q1:</strong> Tunes <code>regr.ranger</code> on <code>mtcars</code> using random search and 3-fold CV</li>
+<li><strong>Q2:</strong> Evaluates tuned model with nested resampling (3-fold CV outer, holdout inner)</li>
+<li><strong>Q3:</strong> Benchmarks tuned XGBoost vs logistic regression on <code>spam</code> using Brier score - Uses <code>AutoTuner</code>, predefined tuning spaces, and <code>benchmark()</code> for comparison</li>
+</ul>
+<p>My previous posts cover:</p>
+<ul>
+<li><a href="../../posts/05-mlr3_basic_modelling/index.html">Part one</a>:
+<ul>
+<li>Create a classification tree model to predict diabetes.</li>
+<li>Look at the confusion matrix and create measures without using {mlr3measures}.</li>
+<li>Change the thresholds in the model.</li>
+</ul></li>
+<li><a href="../../posts/08-mlr3_evaluation_benchmarking/index.html">Part two</a>:
+<ul>
+<li>Repeated cross-validation resampling.</li>
+<li>Using a custom resampling strategy.</li>
+<li>Creating a function that produces a ROC curve.</li>
+</ul></li>
+</ul>
 <section id="prerequisites" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="prerequisites">Prerequisites</h2>
 <div class="cell">
@@ -277,8 +327,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="exercises" class="level1 page-columns page-full">
 <h1>Exercises</h1>
 <ol type="1">
-<li><p>Tune the <code>mtry</code>, <code>sample.fraction</code>, and <code>num.trees</code> hyperparameters of <code>lrn("regr.ranger")</code> on <code>tsk("mtcars")</code>. Use a simple random search with 50 evaluations. Evaluate with a three-fold CV and the root mean squared error. Visualize the effects that each hyperparameter has on the performance via simple marginal plots, which plot a single hyperparameter versus the cross-validated MSE.</p></li>
-<li><p>Evaluate the performance of the model created in Exercise 1 with nested resampling. Use a holdout validation for the inner resampling and a three-fold CV for the outer resampling.</p></li>
+<li><p>Tune the <code>mtry</code>, <code>sample.fraction</code>, and <code>num.trees</code> hyperparameters of <code>lrn("regr.ranger")</code> on <code>tsk("mtcars")</code>. Use a simple random search with 50 evaluations. Evaluate with a 3-fold CV and the root mean squared error. Visualize the effects that each hyperparameter has on the performance via simple marginal plots, which plot a single hyperparameter versus the cross-validated MSE.</p></li>
+<li><p>Evaluate the performance of the model created in Exercise 1 with nested resampling. Use a holdout validation for the inner resampling and a 3-fold CV for the outer resampling.</p></li>
 <li><p>Tune and benchmark an XGBoost model against a logistic regression (without tuning the latter) and determine which has the best Brier score. Use <code>mlr3tuningspaces</code> and nested resampling, try to pick appropriate inner and outer resampling strategies that balance computational efficiency vs.&nbsp;stability of the results.</p></li>
 <li><p>(*) Write a function that implements an iterated random search procedure that drills down on the optimal configuration by applying random search to iteratively smaller search spaces. Your function should have seven inputs: <code>task</code>, <code>learner</code>, <code>search_space</code>, <code>resampling</code>, <code>measure</code>, <code>random_search_stages</code>, and <code>random_search_size</code>. You should only worry about programming this for fully numeric and bounded search spaces that have no dependencies. In pseudo-code:</p>
 <pre><code> a. Create a random design of size `random_search_size` from the given search space and evaluate the learner on it.
@@ -288,7 +338,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ol>
 <section id="question-1" class="level2">
 <h2 class="anchored" data-anchor-id="question-1">Question 1</h2>
-<p>Tune the <code>mtry</code>, <code>sample.fraction</code>, and <code>num.trees</code> hyperparameters of <code>lrn("regr.ranger")</code> on <code>tsk("mtcars")</code>. Use a simple random search with 50 evaluations. Evaluate with a three-fold CV and the root mean squared error. Visualize the effects that each hyperparameter has on the performance via simple marginal plots, which plot a single hyperparameter versus the cross-validated MSE.</p>
+<p>Tune the <code>mtry</code>, <code>sample.fraction</code>, and <code>num.trees</code> hyperparameters of <code>lrn("regr.ranger")</code> on <code>tsk("mtcars")</code>. Use a simple random search with 50 evaluations. Evaluate with a 3-fold CV and the root mean squared error. Visualize the effects that each hyperparameter has on the performance via simple marginal plots, which plot a single hyperparameter versus the cross-validated MSE.</p>
 <section id="answer" class="level3">
 <h3 class="anchored" data-anchor-id="answer">Answer</h3>
 <p>Let’s load the task and look at the properties of the <code>mtry</code>, <code>sample.fraction</code>, and <code>num.trees</code> parameters.</p>
@@ -317,14 +367,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Now I will set up the tuning of the <code>mtry</code>, <code>sample.fraction</code>, and <code>num.trees</code> hyperparameters.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>learner <span class="ot">&lt;-</span> <span class="fu">lrn</span>(<span class="st">"regr.ranger"</span>,</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">mtry =</span> <span class="fu">to_tune</span>(<span class="dv">1</span>, <span class="fl">1e1</span>),</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">num.trees =</span> <span class="fu">to_tune</span>(<span class="dv">1</span>, <span class="fl">1e5</span>),</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">mtry =</span> <span class="fu">to_tune</span>(<span class="fu">p_int</span>(<span class="dv">1</span>, <span class="dv">10</span>)),</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">num.trees =</span> <span class="fu">to_tune</span>(<span class="dv">20</span>, <span class="dv">2000</span>),</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">sample.fraction =</span> <span class="fu">to_tune</span>(<span class="fl">0.1</span>, <span class="dv">1</span>))</span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>learner</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&lt;LearnerRegrRanger:regr.ranger&gt;: Random Forest
 * Model: -
-* Parameters: mtry=&lt;RangeTuneToken&gt;, num.threads=1,
+* Parameters: mtry=&lt;ObjectTuneToken&gt;, num.threads=1,
   num.trees=&lt;RangeTuneToken&gt;, sample.fraction=&lt;RangeTuneToken&gt;
 * Packages: mlr3, mlr3learners, ranger
 * Predict Types:  [response], se, quantiles
@@ -333,14 +383,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   selected_features, weights</code></pre>
 </div>
 </div>
-<p>Setting up an instance to terminate the tuner after 50 evaluations, and to use three-fold CV.</p>
+<p>Setting up an instance to terminate the tuner after 50 evaluations, and to use 3-fold CV.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>instance <span class="ot">&lt;-</span> <span class="fu">ti</span>(<span class="at">task =</span> tsk_mtcars,</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">learner =</span> learner,</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">resampling =</span> <span class="fu">rsmp</span>(<span class="st">"cv"</span>, <span class="at">folds =</span> <span class="dv">3</span>),</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">measures =</span> <span class="fu">msr</span>(<span class="st">"regr.mse"</span>),</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">terminator =</span> <span class="fu">trm</span>(<span class="st">"evals"</span>, <span class="at">n_evals =</span> <span class="dv">50</span>))</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>instance</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>               <span class="co"># rmse gives interpretability in the original units (MPG) rather than squared units</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">measures =</span> <span class="fu">msr</span>(<span class="st">"regr.rmse"</span>), </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">terminator =</span> <span class="fu">trm</span>(<span class="st">"evals"</span>, <span class="at">n_evals =</span> <span class="dv">50</span>))</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>instance</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&lt;TuningInstanceBatchSingleCrit&gt;
 * State:  Not optimized
@@ -348,16 +399,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 * Search Space:
                 id    class lower upper nlevels
             &lt;char&gt;   &lt;char&gt; &lt;num&gt; &lt;num&gt;   &lt;num&gt;
-1:            mtry ParamInt   1.0 1e+01   1e+01
-2:       num.trees ParamInt   1.0 1e+05   1e+05
-3: sample.fraction ParamDbl   0.1 1e+00     Inf
+1:            mtry ParamInt   1.0    10      10
+2:       num.trees ParamInt  20.0  2000    1981
+3: sample.fraction ParamDbl   0.1     1     Inf
 * Terminator: &lt;TerminatorEvals&gt;</code></pre>
 </div>
 </div>
 <p>The tuning step uses 3-fold cross-validation:</p>
 <ul>
 <li>In each evaluation, two-thirds of the data is used for training,</li>
-<li>One-third is used for validation (i.e.&nbsp;to compute the MSE).</li>
+<li>One-third is used for validation (i.e.&nbsp;to compute the RMSE).</li>
 <li>This is repeated for 50 random configurations (as specified by the terminator).</li>
 </ul>
 <p>Now I can set up the tuning process (random search).</p>
@@ -378,11 +429,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">333</span>)</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>tuner<span class="sc">$</span><span class="fu">optimize</span>(instance)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>    mtry num.trees sample.fraction learner_param_vals  x_domain regr.mse
-   &lt;int&gt;     &lt;int&gt;           &lt;num&gt;             &lt;list&gt;    &lt;list&gt;    &lt;num&gt;
-1:     5      8460       0.9761367          &lt;list[4]&gt; &lt;list[3]&gt; 6.663052</code></pre>
+<pre><code>    mtry num.trees sample.fraction learner_param_vals  x_domain regr.rmse
+   &lt;int&gt;     &lt;int&gt;           &lt;num&gt;             &lt;list&gt;    &lt;list&gt;     &lt;num&gt;
+1:     5       187       0.9761367          &lt;list[4]&gt; &lt;list[3]&gt;  2.371042</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>instance<span class="sc">$</span>result<span class="sc">$</span>learner_param_vals</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>instance<span class="sc">$</span>result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    mtry num.trees sample.fraction learner_param_vals  x_domain regr.rmse
+   &lt;int&gt;     &lt;int&gt;           &lt;num&gt;             &lt;list&gt;    &lt;list&gt;     &lt;num&gt;
+1:     5       187       0.9761367          &lt;list[4]&gt; &lt;list[3]&gt;  2.371042</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>instance<span class="sc">$</span>result<span class="sc">$</span>learner_param_vals</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
 [[1]]$num.threads
@@ -392,60 +449,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 [1] 5
 
 [[1]]$num.trees
-[1] 8460
+[1] 187
 
 [[1]]$sample.fraction
 [1] 0.9761367</code></pre>
 </div>
 </div>
+<p>All 50 of the random search evaluations are stored in the <code>archive</code> slot of the <code>instance</code> object.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>instance<span class="sc">$</span>archive</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(instance<span class="sc">$</span>archive)[, .(mtry, sample.fraction, num.trees, regr.rmse)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>&lt;ArchiveBatchTuning&gt; with 50 evaluations
-     mtry num.trees sample.fraction regr.mse warnings errors batch_nr
-    &lt;int&gt;     &lt;int&gt;           &lt;num&gt;    &lt;num&gt;    &lt;int&gt;  &lt;int&gt;    &lt;int&gt;
- 1:     5      8460            0.98      6.7        0      0        1
- 2:     8     60940            0.38     11.6        0      0        2
- 3:     4     47422            0.90      6.9        0      0        3
- 4:    10     63785            0.88      6.9        0      0        4
- 5:     2      7150            0.27     35.2        0      0        5
----                                                                  
-46:     9     35348            0.20     35.2        0      0       46
-47:     7       782            0.61      8.1        0      0       47
-48:     4     74059            0.14     35.2        0      0       48
-49:     6     81636            0.71      7.5        0      0       49
-50:     3     14265            0.16     35.2        0      0       50
-     mtry num.trees sample.fraction regr.mse x_domain_mtry x_domain_num.trees
-    &lt;int&gt;     &lt;int&gt;           &lt;num&gt;    &lt;num&gt;         &lt;int&gt;              &lt;int&gt;
- 1:     5      8460            0.98      6.7             5               8460
- 2:     8     60940            0.38     11.6             8              60940
- 3:     4     47422            0.90      6.9             4              47422
- 4:    10     63785            0.88      6.9            10              63785
- 5:     2      7150            0.27     35.2             2               7150
----                                                                          
-46:     9     35348            0.20     35.2             9              35348
-47:     7       782            0.61      8.1             7                782
-48:     4     74059            0.14     35.2             4              74059
-49:     6     81636            0.71      7.5             6              81636
-50:     3     14265            0.16     35.2             3              14265
-    x_domain_sample.fraction warnings errors batch_nr
-                       &lt;num&gt;    &lt;int&gt;  &lt;int&gt;    &lt;int&gt;
- 1:                     0.98        0      0        1
- 2:                     0.38        0      0        2
- 3:                     0.90        0      0        3
- 4:                     0.88        0      0        4
- 5:                     0.27        0      0        5
----                                                  
-46:                     0.20        0      0       46
-47:                     0.61        0      0       47
-48:                     0.14        0      0       48
-49:                     0.71        0      0       49
-50:                     0.16        0      0       50</code></pre>
+<pre><code>     mtry sample.fraction num.trees regr.rmse
+    &lt;int&gt;           &lt;num&gt;     &lt;int&gt;     &lt;num&gt;
+ 1:     5       0.9761367       187  2.371042
+ 2:     8       0.3760474      1227  3.165695
+ 3:     4       0.9020999       959  2.387701
+ 4:    10       0.8781863      1283  2.446111
+ 5:     2       0.2718788       161  5.976847
+---                                          
+46:     9       0.2032898       720  5.989323
+47:     7       0.6087772        35  2.758711
+48:     4       0.1445110      1487  5.968638
+49:     6       0.7125770      1637  2.508655
+50:     3       0.1578512       302  5.936757</code></pre>
 </div>
 </div>
 <p>Now let’s visualise the effect of each hyperparameter using marginal plots.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(instance, <span class="at">type =</span> <span class="st">"marginal"</span>, <span class="at">cols_x =</span> <span class="fu">c</span>(<span class="st">"mtry"</span>, <span class="st">"sample.fraction"</span>, <span class="st">"num.trees"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(instance, <span class="at">type =</span> <span class="st">"marginal"</span>, <span class="at">cols_x =</span> <span class="fu">c</span>(<span class="st">"mtry"</span>, <span class="st">"sample.fraction"</span>, <span class="st">"num.trees"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -454,27 +485,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>As during the HPO stage, I used three-fold CV, the model has not seen the full data all at once. So, now I’ll train the model using the optimised hyperparameters.</p>
+<p>As during the HPO stage, I used 3-fold CV, the model has not seen the full data all at once. So, now I’ll train the model using the optimised hyperparameters.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>lrn_ranger_tuned <span class="ot">&lt;-</span> <span class="fu">lrn</span>(<span class="st">"regr.ranger"</span>)</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>lrn_ranger_tuned<span class="sc">$</span>param_set<span class="sc">$</span>values <span class="ot">=</span> instance<span class="sc">$</span>result_learner_param_vals</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>lrn_ranger_tuned<span class="sc">$</span><span class="fu">train</span>(tsk_mtcars)<span class="sc">$</span>model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>lrn_ranger_tuned <span class="ot">&lt;-</span> <span class="fu">lrn</span>(<span class="st">"regr.ranger"</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>lrn_ranger_tuned<span class="sc">$</span>param_set<span class="sc">$</span>values <span class="ot">=</span> instance<span class="sc">$</span>result_learner_param_vals</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>lrn_ranger_tuned<span class="sc">$</span><span class="fu">train</span>(tsk_mtcars)<span class="sc">$</span>model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Ranger result
 
 Call:
- ranger::ranger(dependent.variable.name = task$target_names, data = task$data(),      case.weights = task$weights$weight, mtry = 5L, num.threads = 1L,      num.trees = 8460L, sample.fraction = 0.976136745349504) 
+ ranger::ranger(dependent.variable.name = task$target_names, data = task$data(),      case.weights = task$weights$weight, mtry = 5L, num.threads = 1L,      num.trees = 187L, sample.fraction = 0.976136745349504) 
 
 Type:                             Regression 
-Number of trees:                  8460 
+Number of trees:                  187 
 Sample size:                      32 
 Number of independent variables:  10 
 Mtry:                             5 
 Target node size:                 5 
 Variable importance mode:         none 
 Splitrule:                        variance 
-OOB prediction error (MSE):       5.567214 
-R squared (OOB):                  0.846735 </code></pre>
+OOB prediction error (MSE):       5.910838 
+R squared (OOB):                  0.837275 </code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -508,11 +539,11 @@ Summary of question 1 (hyperparameter tuning with random search)
 <ul>
 <li>the <code>mtcars</code> task,</li>
 <li>3-fold cross-validation for resampling,</li>
-<li>mean squared error (MSE) as the evaluation metric,</li>
+<li>root mean squared error (RMSE) as the evaluation metric,</li>
 <li>a limit of 50 evaluations using a random search strategy.</li>
 </ul></li>
 <li><p><strong>Running the tuner</strong> I used <code>tnr("random_search")</code> and called <code>$optimize()</code> to run the search. I then extracted the best hyperparameter combination and the archive of evaluated configurations.</p></li>
-<li><p><strong>Visualising results</strong> I used marginal plots to visualise the effect of each hyperparameter on the cross-validated MSE.</p></li>
+<li><p><strong>Visualising results</strong> I used marginal plots to visualise the effect of each hyperparameter on the cross-validated RMSE.</p></li>
 <li><p><strong>Training the final model</strong> I retrained the <code>regr.ranger</code> model on the full dataset using the best parameters found.</p></li>
 </ol>
 </div>
@@ -522,21 +553,21 @@ Summary of question 1 (hyperparameter tuning with random search)
 </section>
 <section id="question-2" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="question-2">Question 2</h2>
-<p>Evaluate the performance of the model created in Exercise 1 with nested resampling. Use a holdout validation for the inner resampling and a three-fold CV for the outer resampling.</p>
+<p>Evaluate the performance of the model created in Exercise 1 with nested resampling. Use a holdout validation for the inner resampling and a 3-fold CV for the outer resampling.</p>
 <section id="answer-1" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="answer-1">Answer</h3>
-<p>OK, so here we need an outer and inner resampling strategy. The outer resampling strategy will be a three-fold CV, and the inner resampling strategy will be a holdout validation.</p>
+<p>OK, so here we need an outer and inner resampling strategy. The outer resampling strategy will be a 3-fold CV, and the inner resampling strategy will be a holdout validation.</p>
 <div id="fig-nested-resampling-example" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="quarto-float quarto-float-fig figure page-columns page-full">
 <div aria-describedby="fig-nested-resampling-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="./fig/nested_resampling.svg" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-nested-resampling-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: An illustration of nested resampling. The large blocks represent three-fold CV for the outer resampling for model evaluation and the small blocks represent four-fold CV for the inner resampling for HPO. The light blue blocks are the training sets and the dark blue blocks are the test sets.
+Figure&nbsp;1: An illustration of nested resampling. The large blocks represent 3-fold CV for the outer resampling for model evaluation and the small blocks represent 4-fold CV for the inner resampling for HPO. The light blue blocks are the training sets and the dark blue blocks are the test sets.
 </figcaption>
 </figure>
 </div>
-<p><a href="#fig-nested-resampling-example" class="quarto-xref">Figure&nbsp;1</a> shows an example of a nest resampling strategy (with three-fold CV on the outer and four-fold CV on the inner nest). Here, we need to do something slightly different as we are using the holdout resampling strategy on the inner nest.</p>
+<p><a href="#fig-nested-resampling-example" class="quarto-xref">Figure&nbsp;1</a> shows an example of a nest resampling strategy (with 3-fold CV on the outer and 4-fold CV on the inner nest). Here, we need to do something slightly different as we are using the holdout resampling strategy on the inner nest.</p>
 <ol type="1">
 <li>Outer resampling start
 <ul>
@@ -577,37 +608,38 @@ Figure&nbsp;1: An illustration of nested resampling. The large blocks represent 
 </ol>
 <p>I will use <code>AutoTuner</code> to do nested resampling, as that is what is done in <a href="https://mlr3book.mlr-org.com/chapters/chapter4/hyperparameter_optimization.html#sec-nested-resampling">Section 4.3.1</a> of the mlr3 tutorial.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="annotated-cell-13"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-13-1"><a href="#annotated-cell-13-1" aria-hidden="true" tabindex="-1"></a><span class="do">## create auto_tuner to resample a random forest </span></span>
-<span id="annotated-cell-13-2"><a href="#annotated-cell-13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># with 3-fold CV in outer resampling and </span></span>
-<span id="annotated-cell-13-3"><a href="#annotated-cell-13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># holdout validation in inner resampling</span></span>
-<span id="annotated-cell-13-4"><a href="#annotated-cell-13-4" aria-hidden="true" tabindex="-1"></a>at <span class="ot">&lt;-</span> <span class="fu">auto_tuner</span>(</span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-13" data-target-annotation="1">1</button><span id="annotated-cell-13-5" class="code-annotation-target"><a href="#annotated-cell-13-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">tuner =</span> <span class="fu">tnr</span>(<span class="st">"random_search"</span>),</span>
-<span id="annotated-cell-13-6"><a href="#annotated-cell-13-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">learner =</span> <span class="fu">lrn</span>(<span class="st">"regr.ranger"</span>,</span>
-<span id="annotated-cell-13-7"><a href="#annotated-cell-13-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">mtry =</span> <span class="fu">to_tune</span>(<span class="dv">1</span>, <span class="fl">1e1</span>),</span>
-<span id="annotated-cell-13-8"><a href="#annotated-cell-13-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">num.trees =</span> <span class="fu">to_tune</span>(<span class="dv">1</span>, <span class="fl">1e5</span>),</span>
-<span id="annotated-cell-13-9"><a href="#annotated-cell-13-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">sample.fraction =</span> <span class="fu">to_tune</span>(<span class="fl">0.1</span>, <span class="dv">1</span>)),</span>
-<span id="annotated-cell-13-10"><a href="#annotated-cell-13-10" aria-hidden="true" tabindex="-1"></a>         <span class="co"># inner resampling</span></span>
-<span id="annotated-cell-13-11"><a href="#annotated-cell-13-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">resampling =</span> <span class="fu">rsmp</span>(<span class="st">"holdout"</span>, <span class="at">ratio =</span> <span class="fl">0.7</span>),</span>
-<span id="annotated-cell-13-12"><a href="#annotated-cell-13-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">measure =</span> <span class="fu">msr</span>(<span class="st">"regr.mse"</span>),</span>
-<span id="annotated-cell-13-13"><a href="#annotated-cell-13-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">terminator =</span> <span class="fu">trm</span>(<span class="st">"evals"</span>, <span class="at">n_evals =</span> <span class="dv">50</span>)</span>
-<span id="annotated-cell-13-14"><a href="#annotated-cell-13-14" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="annotated-cell-13-15"><a href="#annotated-cell-13-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-13-16"><a href="#annotated-cell-13-16" aria-hidden="true" tabindex="-1"></a><span class="co"># resampling step</span></span>
-<span id="annotated-cell-13-17"><a href="#annotated-cell-13-17" aria-hidden="true" tabindex="-1"></a>rr <span class="ot">&lt;-</span> <span class="fu">resample</span>(tsk_mtcars, at, </span>
-<span id="annotated-cell-13-18"><a href="#annotated-cell-13-18" aria-hidden="true" tabindex="-1"></a>               <span class="co"># outer resampling</span></span>
-<span id="annotated-cell-13-19"><a href="#annotated-cell-13-19" aria-hidden="true" tabindex="-1"></a>               <span class="fu">rsmp</span>(<span class="st">"cv"</span>, <span class="at">folds =</span> <span class="dv">3</span>), </span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-13" data-target-annotation="2">2</button><span id="annotated-cell-13-20" class="code-annotation-target"><a href="#annotated-cell-13-20" aria-hidden="true" tabindex="-1"></a>               <span class="at">store_models =</span> <span class="cn">TRUE</span>)</span>
-<span id="annotated-cell-13-21"><a href="#annotated-cell-13-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-13-22"><a href="#annotated-cell-13-22" aria-hidden="true" tabindex="-1"></a>rr</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="annotated-cell-14"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-14-1"><a href="#annotated-cell-14-1" aria-hidden="true" tabindex="-1"></a><span class="do">## create auto_tuner to resample a random forest </span></span>
+<span id="annotated-cell-14-2"><a href="#annotated-cell-14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># with 3-fold CV in outer resampling and </span></span>
+<span id="annotated-cell-14-3"><a href="#annotated-cell-14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># holdout validation in inner resampling</span></span>
+<span id="annotated-cell-14-4"><a href="#annotated-cell-14-4" aria-hidden="true" tabindex="-1"></a>at <span class="ot">&lt;-</span> <span class="fu">auto_tuner</span>(</span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-14" data-target-annotation="1">1</button><span id="annotated-cell-14-5" class="code-annotation-target"><a href="#annotated-cell-14-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">tuner =</span> <span class="fu">tnr</span>(<span class="st">"random_search"</span>),</span>
+<span id="annotated-cell-14-6"><a href="#annotated-cell-14-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">learner =</span> <span class="fu">lrn</span>(<span class="st">"regr.ranger"</span>,</span>
+<span id="annotated-cell-14-7"><a href="#annotated-cell-14-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">mtry =</span> <span class="fu">to_tune</span>(<span class="dv">1</span>, <span class="fl">1e1</span>),</span>
+<span id="annotated-cell-14-8"><a href="#annotated-cell-14-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">num.trees =</span> <span class="fu">to_tune</span>(<span class="dv">1</span>, <span class="fl">1e5</span>),</span>
+<span id="annotated-cell-14-9"><a href="#annotated-cell-14-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">sample.fraction =</span> <span class="fu">to_tune</span>(<span class="fl">0.1</span>, <span class="dv">1</span>)),</span>
+<span id="annotated-cell-14-10"><a href="#annotated-cell-14-10" aria-hidden="true" tabindex="-1"></a>         <span class="co"># inner resampling</span></span>
+<span id="annotated-cell-14-11"><a href="#annotated-cell-14-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">resampling =</span> <span class="fu">rsmp</span>(<span class="st">"holdout"</span>, <span class="at">ratio =</span> <span class="fl">0.7</span>),</span>
+<span id="annotated-cell-14-12"><a href="#annotated-cell-14-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">measure =</span> <span class="fu">msr</span>(<span class="st">"regr.rmse"</span>),</span>
+<span id="annotated-cell-14-13"><a href="#annotated-cell-14-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">terminator =</span> <span class="fu">trm</span>(<span class="st">"evals"</span>, <span class="at">n_evals =</span> <span class="dv">50</span>)</span>
+<span id="annotated-cell-14-14"><a href="#annotated-cell-14-14" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="annotated-cell-14-15"><a href="#annotated-cell-14-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-14-16"><a href="#annotated-cell-14-16" aria-hidden="true" tabindex="-1"></a><span class="co"># resampling step</span></span>
+<span id="annotated-cell-14-17"><a href="#annotated-cell-14-17" aria-hidden="true" tabindex="-1"></a>rr <span class="ot">&lt;-</span> <span class="fu">resample</span>(<span class="fu">tsk</span>(<span class="st">"mtcars"</span>),</span>
+<span id="annotated-cell-14-18"><a href="#annotated-cell-14-18" aria-hidden="true" tabindex="-1"></a>               at, </span>
+<span id="annotated-cell-14-19"><a href="#annotated-cell-14-19" aria-hidden="true" tabindex="-1"></a>               <span class="co"># outer resampling</span></span>
+<span id="annotated-cell-14-20"><a href="#annotated-cell-14-20" aria-hidden="true" tabindex="-1"></a>               <span class="fu">rsmp</span>(<span class="st">"cv"</span>, <span class="at">folds =</span> <span class="dv">3</span>), </span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-14" data-target-annotation="2">2</button><span id="annotated-cell-14-21" class="code-annotation-target"><a href="#annotated-cell-14-21" aria-hidden="true" tabindex="-1"></a>               <span class="at">store_models =</span> <span class="cn">TRUE</span>)</span>
+<span id="annotated-cell-14-22"><a href="#annotated-cell-14-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-14-23"><a href="#annotated-cell-14-23" aria-hidden="true" tabindex="-1"></a>rr</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-annotation">
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-13" data-target-annotation="1">1</dt>
+<dt data-target-cell="annotated-cell-14" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-13" data-code-lines="5" data-code-annotation="1">The tuners and learners are the same as in the previous exercise, I’m just definining them again here for clarity.</span>
+<span data-code-cell="annotated-cell-14" data-code-lines="5" data-code-annotation="1">The tuners and learners are the same as in the previous exercise, I’m just defining them again here for clarity.</span>
 </dd>
-<dt data-target-cell="annotated-cell-13" data-target-annotation="2">2</dt>
+<dt data-target-cell="annotated-cell-14" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-13" data-code-lines="20" data-code-annotation="2">Set <code>store_models = TRUE</code> so that the <code>AutoTuner</code> models (fitted on the outer training data) are stored,</span>
+<span data-code-cell="annotated-cell-14" data-code-lines="21" data-code-annotation="2">Set <code>store_models = TRUE</code> so that the <code>AutoTuner</code> models (fitted on the outer training data) are stored,</span>
 </dd>
 </dl>
 </div>
@@ -623,9 +655,9 @@ Figure&nbsp;1: An illustration of nested resampling. The large blocks represent 
       0</code></pre>
 </div>
 </div>
-<p>Now I aggregate across the three outer folds to get the final perforance.</p>
+<p>Now I aggregate across the three outer folds to get the final performance.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>rr<span class="sc">$</span><span class="fu">aggregate</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>rr<span class="sc">$</span><span class="fu">aggregate</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>regr.mse 
 13.13362 </code></pre>
@@ -633,62 +665,62 @@ Figure&nbsp;1: An illustration of nested resampling. The large blocks represent 
 </div>
 <p>The inner tuning results can also be accessed, returning the optimal configurations (across all outer folds) and the full tuning archives.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># optimal configurations</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_inner_tuning_results</span>(rr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># optimal configurations</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_inner_tuning_results</span>(rr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>   iteration  mtry num.trees sample.fraction regr.mse learner_param_vals
-       &lt;int&gt; &lt;int&gt;     &lt;int&gt;           &lt;num&gt;    &lt;num&gt;             &lt;list&gt;
-1:         1     1     81784       0.6769030 8.322982          &lt;list[4]&gt;
-2:         2     5     73924       0.9194928 4.264315          &lt;list[4]&gt;
-3:         3     3     15719       0.7797092 3.268233          &lt;list[4]&gt;
+<pre><code>   iteration  mtry num.trees sample.fraction regr.rmse learner_param_vals
+       &lt;int&gt; &lt;int&gt;     &lt;int&gt;           &lt;num&gt;     &lt;num&gt;             &lt;list&gt;
+1:         1     1     81784       0.6769030  2.884958          &lt;list[4]&gt;
+2:         2     5     73924       0.9194928  2.065022          &lt;list[4]&gt;
+3:         3     3     15719       0.7797092  1.807826          &lt;list[4]&gt;
     x_domain task_id        learner_id resampling_id
       &lt;list&gt;  &lt;char&gt;            &lt;char&gt;        &lt;char&gt;
 1: &lt;list[3]&gt;  mtcars regr.ranger.tuned            cv
 2: &lt;list[3]&gt;  mtcars regr.ranger.tuned            cv
 3: &lt;list[3]&gt;  mtcars regr.ranger.tuned            cv</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># full tuning archives</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_inner_tuning_archives</span>(rr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># full tuning archives</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_inner_tuning_archives</span>(rr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>     iteration  mtry num.trees sample.fraction  regr.mse x_domain_mtry
+<pre><code>     iteration  mtry num.trees sample.fraction regr.rmse x_domain_mtry
          &lt;int&gt; &lt;int&gt;     &lt;int&gt;           &lt;num&gt;     &lt;num&gt;         &lt;int&gt;
-  1:         1     2     15547       0.3219244 26.171505             2
-  2:         1     8     23468       0.3020848 26.147901             8
-  3:         1     5     47564       0.3500007 26.169833             5
-  4:         1     9     14922       0.8105999 10.639386             9
-  5:         1     2     81447       0.1308460 26.265523             2
+  1:         1     2     15547       0.3219244  5.115809             2
+  2:         1     8     23468       0.3020848  5.113502             8
+  3:         1     5     47564       0.3500007  5.115646             5
+  4:         1     9     14922       0.8105999  3.261807             9
+  5:         1     2     81447       0.1308460  5.124990             2
  ---                                                                  
-146:         3     5     20556       0.5608060  4.334576             5
-147:         3     2      9179       0.8461799  3.487326             2
-148:         3     4     93847       0.1486419 13.940234             4
-149:         3     3     15719       0.7797092  3.268233             3
-150:         3     1     31967       0.2513883 13.982543             1
+146:         3     5     20556       0.5608060  2.081965             5
+147:         3     2      9179       0.8461799  1.867438             2
+148:         3     4     93847       0.1486419  3.733662             4
+149:         3     3     15719       0.7797092  1.807826             3
+150:         3     1     31967       0.2513883  3.739324             1
      x_domain_num.trees x_domain_sample.fraction runtime_learners
                   &lt;int&gt;                    &lt;num&gt;            &lt;num&gt;
-  1:              15547                0.3219244            0.055
-  2:              23468                0.3020848            0.090
-  3:              47564                0.3500007            0.193
-  4:              14922                0.8105999            0.116
-  5:              81447                0.1308460            0.356
+  1:              15547                0.3219244            0.068
+  2:              23468                0.3020848            0.096
+  3:              47564                0.3500007            0.202
+  4:              14922                0.8105999            0.115
+  5:              81447                0.1308460            0.388
  ---                                                             
 146:              20556                0.5608060            0.126
-147:               9179                0.8461799            0.056
-148:              93847                0.1486419            0.403
-149:              15719                0.7797092            0.100
-150:              31967                0.2513883            0.124
+147:               9179                0.8461799            0.053
+148:              93847                0.1486419            0.376
+149:              15719                0.7797092            0.096
+150:              31967                0.2513883            0.119
                timestamp warnings errors batch_nr  resample_result task_id
                   &lt;POSc&gt;    &lt;int&gt;  &lt;int&gt;    &lt;int&gt;           &lt;list&gt;  &lt;char&gt;
-  1: 2025-04-04 12:53:35        0      0        1 &lt;ResampleResult&gt;  mtcars
-  2: 2025-04-04 12:53:35        0      0        2 &lt;ResampleResult&gt;  mtcars
-  3: 2025-04-04 12:53:35        0      0        3 &lt;ResampleResult&gt;  mtcars
-  4: 2025-04-04 12:53:35        0      0        4 &lt;ResampleResult&gt;  mtcars
-  5: 2025-04-04 12:53:35        0      0        5 &lt;ResampleResult&gt;  mtcars
+  1: 2025-04-05 13:18:36        0      0        1 &lt;ResampleResult&gt;  mtcars
+  2: 2025-04-05 13:18:36        0      0        2 &lt;ResampleResult&gt;  mtcars
+  3: 2025-04-05 13:18:36        0      0        3 &lt;ResampleResult&gt;  mtcars
+  4: 2025-04-05 13:18:36        0      0        4 &lt;ResampleResult&gt;  mtcars
+  5: 2025-04-05 13:18:37        0      0        5 &lt;ResampleResult&gt;  mtcars
  ---                                                                      
-146: 2025-04-04 12:54:17        0      0       46 &lt;ResampleResult&gt;  mtcars
-147: 2025-04-04 12:54:17        0      0       47 &lt;ResampleResult&gt;  mtcars
-148: 2025-04-04 12:54:18        0      0       48 &lt;ResampleResult&gt;  mtcars
-149: 2025-04-04 12:54:18        0      0       49 &lt;ResampleResult&gt;  mtcars
-150: 2025-04-04 12:54:18        0      0       50 &lt;ResampleResult&gt;  mtcars
+146: 2025-04-05 13:19:17        0      0       46 &lt;ResampleResult&gt;  mtcars
+147: 2025-04-05 13:19:17        0      0       47 &lt;ResampleResult&gt;  mtcars
+148: 2025-04-05 13:19:17        0      0       48 &lt;ResampleResult&gt;  mtcars
+149: 2025-04-05 13:19:18        0      0       49 &lt;ResampleResult&gt;  mtcars
+150: 2025-04-05 13:19:18        0      0       50 &lt;ResampleResult&gt;  mtcars
             learner_id resampling_id
                 &lt;char&gt;        &lt;char&gt;
   1: regr.ranger.tuned            cv
@@ -739,20 +771,20 @@ Summary of question 2 (nested resampling)
 <p>Tune and benchmark an XGBoost model against a logistic regression (without tuning the latter) and determine which has the best Brier score. Use <code>mlr3tuningspaces</code> and nested resampling, try to pick appropriate inner and outer resampling strategies that balance computational efficiency vs.&nbsp;stability of the results.</p>
 <section id="answer-2" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="answer-2">Answer</h3>
-<p>Since the outcome is categorical, this is a classification task, and I’ll use the built-in <code>spam</code> task.</p>
+<p>I’ll use the built-in <code>spam</code> task – since the outcome is categorical, this is a classification task.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>tsk_spam <span class="ot">&lt;-</span> <span class="fu">tsk</span>(<span class="st">"spam"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>tsk_spam <span class="ot">&lt;-</span> <span class="fu">tsk</span>(<span class="st">"spam"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>First I’ll set up the logistic regression model (with no tuning).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># requires probs to compute the brier score</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>lrn_logreg <span class="ot">&lt;-</span> <span class="fu">lrn</span>(<span class="st">"classif.log_reg"</span>, <span class="at">predict_type =</span> <span class="st">"prob"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># requires probs to compute the brier score</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>lrn_logreg <span class="ot">&lt;-</span> <span class="fu">lrn</span>(<span class="st">"classif.log_reg"</span>, <span class="at">predict_type =</span> <span class="st">"prob"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 <div class="no-row-height column-margin column-container"><div class="">
 <p>The XGBoost model has lots of hyperparameters:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lrn</span>(<span class="st">"classif.xgboost"</span>)<span class="sc">$</span>param_set<span class="sc">$</span><span class="fu">ids</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lrn</span>(<span class="st">"classif.xgboost"</span>)<span class="sc">$</span>param_set<span class="sc">$</span><span class="fu">ids</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] "alpha"                       "approxcontrib"              
  [3] "base_score"                  "booster"                    
@@ -872,7 +904,7 @@ Summary of question 2 (nested resampling)
 </ol>
 </div></div><p>For the XGBoost learner, I’m going to use a predefined search space from <code>{mlr3tuningspaces}</code>. First, I’ll give a list of these predefined spaces.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>mlr_tuning_spaces<span class="sc">$</span><span class="fu">keys</span>()[<span class="fu">grepl</span>(<span class="st">"xgboost"</span>, mlr_tuning_spaces<span class="sc">$</span><span class="fu">keys</span>())]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>mlr_tuning_spaces<span class="sc">$</span><span class="fu">keys</span>()[<span class="fu">grepl</span>(<span class="st">"xgboost"</span>, mlr_tuning_spaces<span class="sc">$</span><span class="fu">keys</span>())]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "classif.xgboost.default" "classif.xgboost.rbv1"   
 [3] "classif.xgboost.rbv2"    "regr.xgboost.default"   
@@ -881,8 +913,8 @@ Summary of question 2 (nested resampling)
 </div>
 <p>I will use the <code>classif.xgboost.default</code> space.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>space <span class="ot">=</span> <span class="fu">lts</span>(<span class="st">"classif.xgboost.default"</span>)</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>space</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>space <span class="ot">=</span> <span class="fu">lts</span>(<span class="st">"classif.xgboost.default"</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>space</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&lt;TuningSpace:classif.xgboost.default&gt;: Classification XGBoost with Default
                   id lower upper levels logscale
@@ -899,21 +931,21 @@ Summary of question 2 (nested resampling)
 </div>
 <p>Plugging this into <code>auto_tuner()</code> creates an <code>AutoTuner</code> object. I’m going to use 5-fold CV in the inner resampling and a terminator based on run time (of 60 seconds).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create terminator with time budget of 60 secs</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>trm_rt <span class="ot">=</span> <span class="fu">trm</span>(<span class="st">"run_time"</span>)</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>trm_rt<span class="sc">$</span>param_set<span class="sc">$</span>values<span class="sc">$</span>secs <span class="ot">=</span> <span class="dv">60</span></span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="co"># create xgboost learner with prob predict_type</span></span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 'prob' required for brier score</span></span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>lrn_xgb <span class="ot">=</span> <span class="fu">lrn</span>(<span class="st">"classif.xgboost"</span>, <span class="at">predict_type =</span> <span class="st">"prob"</span>)</span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>at_xgb <span class="ot">&lt;-</span> <span class="fu">auto_tuner</span>(<span class="at">learner =</span> lrn_xgb,</span>
-<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>                    <span class="at">resampling =</span> <span class="fu">rsmp</span>(<span class="st">"cv"</span>, <span class="at">folds =</span> <span class="dv">5</span>),</span>
-<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>                    <span class="at">measure =</span> <span class="fu">msr</span>(<span class="st">"classif.bbrier"</span>),</span>
-<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>                    <span class="at">terminator =</span> trm_rt,</span>
-<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>                    <span class="at">tuner =</span> <span class="fu">tnr</span>(<span class="st">"random_search"</span>),</span>
-<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>                    <span class="at">search_space =</span> space)</span>
-<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>at_xgb</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create terminator with time budget of 60 secs</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>trm_rt <span class="ot">=</span> <span class="fu">trm</span>(<span class="st">"run_time"</span>)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>trm_rt<span class="sc">$</span>param_set<span class="sc">$</span>values<span class="sc">$</span>secs <span class="ot">=</span> <span class="dv">60</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="co"># create xgboost learner with prob predict_type</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 'prob' required for brier score</span></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>lrn_xgb <span class="ot">=</span> <span class="fu">lrn</span>(<span class="st">"classif.xgboost"</span>, <span class="at">predict_type =</span> <span class="st">"prob"</span>)</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>at_xgb <span class="ot">&lt;-</span> <span class="fu">auto_tuner</span>(<span class="at">learner =</span> lrn_xgb,</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>                    <span class="at">resampling =</span> <span class="fu">rsmp</span>(<span class="st">"cv"</span>, <span class="at">folds =</span> <span class="dv">5</span>),</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>                    <span class="at">measure =</span> <span class="fu">msr</span>(<span class="st">"classif.bbrier"</span>),</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>                    <span class="at">terminator =</span> trm_rt,</span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>                    <span class="at">tuner =</span> <span class="fu">tnr</span>(<span class="st">"random_search"</span>),</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>                    <span class="at">search_space =</span> space)</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>at_xgb</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&lt;AutoTuner:classif.xgboost.tuned&gt;
 * Model: list
@@ -938,30 +970,36 @@ Summary of question 2 (nested resampling)
 </div>
 <p>Now I can set up the outer resampling strategy (4-fold CV).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>outer_rsmp <span class="ot">&lt;-</span> <span class="fu">rsmp</span>(<span class="st">"cv"</span>, <span class="at">folds =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>outer_rsmp <span class="ot">&lt;-</span> <span class="fu">rsmp</span>(<span class="st">"cv"</span>, <span class="at">folds =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>I can create a benchmark grid and run it for the task to compare the two learners.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Benchmark both learners</span></span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>design <span class="ot">=</span> <span class="fu">benchmark_grid</span>(</span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">tasks =</span> tsk_spam,</span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">learners =</span> <span class="fu">list</span>(lrn_logreg, at_xgb),</span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamplings =</span> outer_rsmp</span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a><span class="co"># run the benchmark design</span></span>
-<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">101</span>)</span>
-<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>bmr <span class="ot">=</span> <span class="fu">benchmark</span>(design)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Benchmark both learners</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>design <span class="ot">=</span> <span class="fu">benchmark_grid</span>(</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">tasks =</span> tsk_spam,</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">learners =</span> <span class="fu">list</span>(lrn_logreg, at_xgb),</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamplings =</span> outer_rsmp</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>design</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     task               learner resampling
+   &lt;char&gt;                &lt;char&gt;     &lt;char&gt;
+1:   spam       classif.log_reg         cv
+2:   spam classif.xgboost.tuned         cv</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># run the benchmark design</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">101</span>)</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>bmr <span class="ot">=</span> <span class="fu">benchmark</span>(design)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
 Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
 Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
 Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># the score for each of the 4-fold CV outer folds</span></span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>bmr<span class="sc">$</span><span class="fu">score</span>(<span class="fu">msr</span>(<span class="st">"classif.bbrier"</span>))[, </span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>         .(learner_id, resampling_id, iteration, classif.bbrier)</span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>         ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># the score for each of the 4-fold CV outer folds</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>bmr<span class="sc">$</span><span class="fu">score</span>(<span class="fu">msr</span>(<span class="st">"classif.bbrier"</span>))[, </span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>         .(learner_id, resampling_id, iteration, classif.bbrier)</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>         ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>              learner_id resampling_id iteration classif.bbrier
                   &lt;char&gt;        &lt;char&gt;     &lt;int&gt;          &lt;num&gt;
@@ -969,25 +1007,25 @@ Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
 2:       classif.log_reg            cv         2     0.05802780
 3:       classif.log_reg            cv         3     0.05744753
 4:       classif.log_reg            cv         4     0.05651042
-5: classif.xgboost.tuned            cv         1     0.05362083
+5: classif.xgboost.tuned            cv         1     0.04560204
 6: classif.xgboost.tuned            cv         2     0.02618333
 7: classif.xgboost.tuned            cv         3     0.04326268
 8: classif.xgboost.tuned            cv         4     0.03606656</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># the aggregate score for each learner</span></span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>bmr<span class="sc">$</span><span class="fu">aggregate</span>(<span class="fu">msr</span>(<span class="st">"classif.bbrier"</span>))[,</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>         .(learner_id, resampling_id, classif.bbrier)</span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>         ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># the aggregate score for each learner</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>bmr<span class="sc">$</span><span class="fu">aggregate</span>(<span class="fu">msr</span>(<span class="st">"classif.bbrier"</span>))[,</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>         .(learner_id, resampling_id, classif.bbrier)</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>         ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>              learner_id resampling_id classif.bbrier
                   &lt;char&gt;        &lt;char&gt;          &lt;num&gt;
 1:       classif.log_reg            cv     0.05858693
-2: classif.xgboost.tuned            cv     0.03978335</code></pre>
+2: classif.xgboost.tuned            cv     0.03777865</code></pre>
 </div>
 </div>
 <p>I can use <code>autoplot</code> to plot these results.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(bmr, <span class="at">measure =</span> <span class="fu">msr</span>(<span class="st">"classif.bbrier"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(bmr, <span class="at">measure =</span> <span class="fu">msr</span>(<span class="st">"classif.bbrier"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -996,6 +1034,7 @@ Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
 </div>
 </div>
 </div>
+<p>So, XGBoost performs better than the logistic regression model on the <code>spam</code> task. But, the XGBoost model is much more computationally expensive, takes longer to train, and is less interpretable. So, the choice of model is a trade off between performance and interpretability.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1047,9 +1086,42 @@ I looked at individual fold scores using <code>bmr$score()</code> and aggregate 
     b. Identify the best configuration.
     c. Create a smaller search space around this best config, where you define the new range for each parameter as: `new_range[i] = (best_conf[i] - 0.25 * current_range[i], best_conf[i] + 0.25*current_range[i])`. Ensure that this `new_range` respects the initial bound of the original `search_space` by taking the `max()` of the new and old lower bound, and the `min()` of the new and the old upper bound (“clipping”).
     d. Iterate the previous steps `random_search_stages` times and at the end return the best configuration you have ever evaluated. As a stretch goal, look into `mlr3tuning`’s internal source code and turn your function into an R6 class inheriting from the `TunerBatch` class – test it out on a learner of your choice.</code></pre>
-
-
 </section>
+</section>
+<section id="summary" class="level1">
+<h1>Summary</h1>
+<p>Great. Let’s summarise what I’ve done in this post.</p>
+<p><strong>Exercise 1: Hyperparameter Tuning with Random Search</strong></p>
+<ul>
+<li>Tunes <code>regr.ranger</code> on <code>mtcars</code> dataset</li>
+<li>Parameters tuned: <code>mtry</code>, <code>num.trees</code>, <code>sample.fraction</code></li>
+<li>Uses 3-fold CV, 50 random evaluations, MSE as the measure</li>
+<li>Visualises marginal effects of hyperparameters</li>
+<li>Retrains final model on full data using best hyperparameters</li>
+</ul>
+<p><strong>Exercise 2: Nested Resampling</strong></p>
+<ul>
+<li>Evaluates tuned model’s performance with nested resampling</li>
+<li>Outer loop: 3-fold CV; Inner loop: holdout validation (70/30)</li>
+<li>Uses <code>AutoTuner</code> with same hyperparameter setup as Q1</li>
+<li>Aggregates performance across outer test folds</li>
+<li>Extracts inner tuning results and archives</li>
+</ul>
+<p><strong>Exercise 3: Benchmarking XGBoost vs Logistic Regression</strong></p>
+<ul>
+<li>Task: binary classification on <code>spam</code> dataset</li>
+<li>Logistic regression used as untuned baseline</li>
+<li>XGBoost tuned using <code>mlr3tuningspaces::lts("classif.xgboost.default")</code></li>
+<li>Inner loop: 5-fold CV with 60 sec time budget; Outer: 4-fold CV</li>
+<li>Evaluates models using Brier score</li>
+<li>Compares learners via tables and visualisation</li>
+</ul>
+</section>
+<section id="fin" class="level1">
+<h1>Fin</h1>
+
+
+
 </section>
 
 
