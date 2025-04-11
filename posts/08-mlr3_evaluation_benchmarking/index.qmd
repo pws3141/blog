@@ -3,7 +3,7 @@ title: "Getting Started with {mlr3}"
 subtitle: "02 Evaluation and Benchmarking"
 author:
   - name: Paul Smith
-date: "2025-03-21"
+date: "2025-03-17"
 categories: [code, r, machine learning, mlr3]
 image: "./fig/mlr3_logo.svg"
 format:

@@ -21,7 +21,7 @@ format:
     code-annotations: hover
 execute:
   echo: true
-  freeze: auto
+  freeze: false
 bibliography: ref.bib
 reference-location: margin
 citation-location: margin

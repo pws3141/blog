@@ -506,6 +506,164 @@ Write a function that implements an iterated random search procedure that drills
         c. Create a smaller search space around this best config, where you define the new range for each parameter as: `new_range[i] = (best_conf[i] - 0.25 * current_range[i], best_conf[i] + 0.25*current_range[i])`. Ensure that this `new_range` respects the initial bound of the original `search_space` by taking the `max()` of the new and old lower bound, and the `min()` of the new and the old upper bound (“clipping”).
         d. Iterate the previous steps `random_search_stages` times and at the end return the best configuration you have ever evaluated. As a stretch goal, look into `mlr3tuning`’s internal source code and turn your function into an R6 class inheriting from the `TunerBatch` class – test it out on a learner of your choice.
 
+### Answer
+
+#### Example on `mtcars` dataset
+
+Let's start by trying this out on the `mtcars` dataset, using the `regr.rpart` learner. I'll make it simpler by using the `to_tune()` function, which means I don't have to define the search space manually to be *e.g.* an integer, double *etc.*.
+
+First, I'll load the task and learner, and then look at the hyperparameters of this learner.
+
+```{r}
+#| cache: false
+task <- tsk("mtcars")
+learner <- lrn("regr.rpart")
+# look at the hyperparameters
+as.data.table(learner$param_set)[, .(id, class, lower, upper)]
+```
+
+:::{.column-margin}
+
+| ID           | Description                                                             | Typical Range           | Notes                                    |
+|--------------|-------------------------------------------------------------------------|--------------------------|-------------------------------------------|
+| `cp`         | Complexity parameter: controls cost of adding splits                    | [0.001, 0.1] (log-scale) | Lower values allow deeper trees           |
+| `maxdepth`   | Maximum depth of the tree                                               | 1–30                     | Prevents trees from growing too deep      |
+| `minsplit`   | Minimum number of observations required to attempt a split              | 2–20                     | Higher values make trees more conservative |
+| `minbucket`  | Minimum number of observations in any terminal node                     | 1–10                     | If not set, defaults to `minsplit / 3`    |
+
+: Common hyperparameters to tune for `regr.rpart` learner.
+
+:::
+
+**Part 1:** creating a search_space and evaluating the learner
+
+I'll now create a search space to tune the four hyperparameters `cp`,
+`maxdepth`, `minsplit`, and `minbucket`, using `to_tune()`.
+
+```{r}
+#| cache: false
+
+# use to_tune() to create the search space
+learner$param_set$values$cp <- to_tune(1e-4, 0.1)
+learner$param_set$values$maxdepth <- to_tune(1, 30)
+learner$param_set$values$minsplit <- to_tune(2, 20)
+learner$param_set$values$minbucket <- to_tune(1, 10)
+
+param_ids <- names(Filter(function(x) inherits(x, "TuneToken"), learner$param_set$values))
+# filter param_set bu param_names
+learner$param_set$values[param_ids]
+```
+
+Now I'll tune the learner on this search space using a random search with 50 evaluations and 3-fold CV. 
+
+```{r}
+#| cache: false
+
+# create random search tuner
+tuner <- tnr("random_search")
+
+# create tuning instance
+instance <- mlr3tuning::tune( # <1>
+  tuner = tuner,
+  task = task,
+  learner = learner,
+  resampling = rsmp("cv", folds = 3),
+  measure = msr("regr.rmse"),
+  terminator = trm("evals", n_evals = 50)
+)
+
+
+# run the tuning
+set.seed(333)
+tuner$optimize(instance)
+```
+1. I need to remember to call the correct `tune()` - the one from `{mlr3tuning}` instead of from `{e1701}`. If the latter is used, you get an error like `argument "train.x" is missing, with no default`.
+
+**Part 2:** Identifying the best configuration
+
+```{r}
+# get the best configuration
+best_config <- instance$result_learner_param_vals[param_ids]
+unlist(best_config)
+```
+
+**Part 3:** create a smaller search space around the best configuration
+
+```{r}
+# obtain new upper and lower bounds
+# helper function to adjust bounds
+
+adjust_bounds <- function(param_id, best_config, learner, shrink = 0.25) {
+  param = learner$param_set$values[[param_id]]$content
+  bounds = list(lower = param$lower, upper = param$upper)
+  best = best_config[[param_id]]
+  range = bounds$upper - bounds$lower
+  lower_bound <- best - shrink * range
+  upper_bound <- best + shrink * range
+  # if class is ParamInt, then set lower to be ceiling and upper to be floor
+  # obtain class of the parameter
+  param_class <- learner$param_set$params[id == param_id, setNames(cls, id)]
+  if (param_class == "ParamInt") {
+    lower_bound = ceiling(lower_bound)
+    upper_bound = floor(upper_bound)
+  }
+  lower_new = max(lower_bound, bounds$lower)
+  upper_new = min(upper_bound, bounds$upper)
+  list(lower = lower_new, upper = upper_new)
+}
+
+adjusted_bounds <- lapply(param_ids, 
+                          adjust_bounds,
+                          best_config = best_config,
+                          learner = learner)
+
+names(adjusted_bounds) <- param_ids
+
+# update learner
+learner$param_set$values$cp <- to_tune(adjusted_bounds$cp$lower, 
+                                       adjusted_bounds$cp$upper)
+learner$param_set$values$maxdepth <- to_tune(adjusted_bounds$maxdepth$lower,
+                                             adjusted_bounds$maxdepth$upper)
+learner$param_set$values$minsplit <- to_tune(adjusted_bounds$minsplit$lower,
+                                             adjusted_bounds$minsplit$upper)
+learner$param_set$values$minbucket <- to_tune(adjusted_bounds$minbucket$lower,
+                                              adjusted_bounds$minbucket$upper)
+Filter(function(x) inherits(x, "TuneToken"), learner$param_set$values)
+
+```
+
+**Part 4:** evaluate the learner on the new search space
+
+```{r}
+# create new tuning instance
+set.seed(333)
+instance <- mlr3tuning::tune(
+  tuner = tuner,
+  task = task,
+  learner = learner,
+  resampling = rsmp("cv", folds = 3),
+  measure = msr("regr.rmse"),
+  terminator = trm("evals", n_evals = 50),
+)
+
+tuner$optimize(instance)
+```
+
+Get the best configuration from this:
+
+```{r}
+# get the best configuration
+best_config <- instance$result_learner_param_vals[param_ids]
+unlist(best_config)
+```
+
+Cool, so I have a new best configuration. I can repeat this process iteratively
+on smaller subspaces.
+
+The next step is to create a function that does this for me.
+
+#### Creating a function
+
 # Summary
 
 Great. Let's summarise what I've done in this post.
