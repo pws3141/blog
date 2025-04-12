@@ -501,10 +501,10 @@ I benchmarked a tuned XGBoost model against an untuned logistic regression model
 
 Write a function that implements an iterated random search procedure that drills down on the optimal configuration by applying random search to iteratively smaller search spaces. Your function should have seven inputs: `task`, `learner`, `search_space`, `resampling`, `measure`, `random_search_stages`, and `random_search_size`. You should only worry about programming this for fully numeric and bounded search spaces that have no dependencies. In pseudo-code:
 
-        a. Create a random design of size `random_search_size` from the given search space and evaluate the learner on it.
-        b. Identify the best configuration.
-        c. Create a smaller search space around this best config, where you define the new range for each parameter as: `new_range[i] = (best_conf[i] - 0.25 * current_range[i], best_conf[i] + 0.25*current_range[i])`. Ensure that this `new_range` respects the initial bound of the original `search_space` by taking the `max()` of the new and old lower bound, and the `min()` of the new and the old upper bound (“clipping”).
-        d. Iterate the previous steps `random_search_stages` times and at the end return the best configuration you have ever evaluated. As a stretch goal, look into `mlr3tuning`’s internal source code and turn your function into an R6 class inheriting from the `TunerBatch` class – test it out on a learner of your choice.
+    a. Create a random design of size `random_search_size` from the given search space and evaluate the learner on it.
+    b. Identify the best configuration.
+    c. Create a smaller search space around this best config, where you define the new range for each parameter as: `new_range[i] = (best_conf[i] - 0.25 * current_range[i], best_conf[i] + 0.25*current_range[i])`. Ensure that this `new_range` respects the initial bound of the original `search_space` by taking the `max()` of the new and old lower bound, and the `min()` of the new and the old upper bound (“clipping”).
+    d. Iterate the previous steps `random_search_stages` times and at the end return the best configuration you have ever evaluated. As a stretch goal, look into `mlr3tuning`’s internal source code and turn your function into an R6 class inheriting from the `TunerBatch` class – test it out on a learner of your choice.
 
 ### Answer
 
@@ -561,31 +561,51 @@ Now I'll tune the learner on this search space using a random search with 50 eva
 
 # create random search tuner
 tuner <- tnr("random_search")
+# create measure
+measure <- msr("regr.rmse")
+# create resampling strategy
+resampling <- rsmp("cv", folds = 3)
+# create terminator
+terminator <- trm("evals", n_evals = 50)
 
-# create tuning instance
+# create tuning instance and run tuner
+set.seed(333)
 instance <- mlr3tuning::tune( # <1>
   tuner = tuner,
   task = task,
   learner = learner,
-  resampling = rsmp("cv", folds = 3),
-  measure = msr("regr.rmse"),
-  terminator = trm("evals", n_evals = 50)
+  resampling = resampling,
+  measure = measure,
+  terminator = terminator
 )
 
-
-# run the tuning
-set.seed(333)
-tuner$optimize(instance)
 ```
 1. I need to remember to call the correct `tune()` - the one from `{mlr3tuning}` instead of from `{e1701}`. If the latter is used, you get an error like `argument "train.x" is missing, with no default`.
 
 **Part 2:** Identifying the best configuration
 
+We can see the result be looking at the `instance` object.
+
+```{r}
+instance
+```
+
+The best configuration is stored in the `result_learner_param_vals` slot of the `instance` object.
+
 ```{r}
 # get the best configuration
-best_config <- instance$result_learner_param_vals[param_ids]
-unlist(best_config)
+best_config1 <- instance$result_learner_param_vals[param_ids]
+unlist(best_config1)
 ```
+
+The root mean-squared error is stored in `instance$result_y`:
+
+```{r}
+# get the RMSE
+best_rmse1 <- instance$result_y
+best_rmse1
+```
+
 
 **Part 3:** create a smaller search space around the best configuration
 
@@ -614,7 +634,7 @@ adjust_bounds <- function(param_id, best_config, learner, shrink = 0.25) {
 
 adjusted_bounds <- lapply(param_ids, 
                           adjust_bounds,
-                          best_config = best_config,
+                          best_config = best_config1,
                           learner = learner)
 
 names(adjusted_bounds) <- param_ids
@@ -628,41 +648,205 @@ learner$param_set$values$minsplit <- to_tune(adjusted_bounds$minsplit$lower,
                                              adjusted_bounds$minsplit$upper)
 learner$param_set$values$minbucket <- to_tune(adjusted_bounds$minbucket$lower,
                                               adjusted_bounds$minbucket$upper)
+# check the new search space
 Filter(function(x) inherits(x, "TuneToken"), learner$param_set$values)
-
 ```
 
 **Part 4:** evaluate the learner on the new search space
 
 ```{r}
-# create new tuning instance
-set.seed(333)
+# create new tuning instance and run tuner
+set.seed(222)
 instance <- mlr3tuning::tune(
   tuner = tuner,
   task = task,
   learner = learner,
-  resampling = rsmp("cv", folds = 3),
-  measure = msr("regr.rmse"),
-  terminator = trm("evals", n_evals = 50),
+  resampling = resampling,
+  measure = measure,
+  terminator = terminator
 )
-
-tuner$optimize(instance)
 ```
 
 Get the best configuration from this:
 
 ```{r}
 # get the best configuration
-best_config <- instance$result_learner_param_vals[param_ids]
-unlist(best_config)
+best_config2 <- instance$result_learner_param_vals[param_ids]
+unlist(best_config2)
 ```
 
-Cool, so I have a new best configuration. I can repeat this process iteratively
-on smaller subspaces.
+and the RMSE:
+
+```{r}
+# get the RMSE
+best_rmse2 <- instance$result_y
+best_rmse2
+```
+
+Cool, so I have a new best configuration. Does it perform better than the first?
+
+:::{.column-margin}
+```{r}
+# Best configuration from the first tuning
+best_config1
+# RMSE from the first configuration
+best_rmse1
+# Best configuration from the second tuning
+best_config2
+# RMSE from the second configuration
+best_rmse2
+```
+
+```{r}
+# compare the two RMSEs
+best_rmse2 - best_rmse1
+```
+
+No, it doesn't. I can repeat this process iteratively on smaller subspaces. At
+the end, choose the best configuration by selecting the one with the lowest
+RMSE.
 
 The next step is to create a function that does this for me.
 
 #### Creating a function
+
+So, this function has the following inputs:
+- `task`: the task to tune;
+- `learner`: the learner to tune;
+- `search_space`: the search space to tune;
+    - this should be a data.table of the hyperparameters to tune, with class, and the lower and upper bounds;
+- `resampling`: the resampling strategy to use;
+- `measure`: the measure to use;
+- `random_search_stages`: the number of random search stages to perform;
+- `random_search_size`: the number of random evaluations to perform in each stage.
+
+The function will return the best configuration found across all stages.
+
+First, I created a checker function to make sure all the inputs are valid.^[Actually I created this last, but it's required before my function so I'll put it here]
+
+```{r}
+.inputChecks <- function(task, learner, search_space, resampling, measure, 
+                         random_search_stages, random_search_size) {
+
+        ## error checking
+        # check input classes
+        stopifnot(inherits(task, "Task"))
+        stopifnot(inherits(learner, "Learner"))
+        stopifnot(inherits(resampling, "Resampling"))
+        stopifnot(inherits(measure, "Measure"))
+        # check search space: required columns exist and are numeric where needed
+        required_cols <- c("id", "lower", "upper")
+        missing_cols <- setdiff(required_cols, colnames(search_space))
+        if (length(missing_cols) > 0) {
+          stop("search_space must contain columns: ", paste(missing_cols, collapse = ", "))
+        }
+
+        if (!all(sapply(search_space[, .(lower, upper)], is.numeric))) {
+          stop("Columns 'lower' and 'upper' in search_space must be numeric")
+        }
+        # check ids match those in learner
+        invalid_ids <- setdiff(search_space$id, learner$param_set$ids())
+        if (length(invalid_ids) > 0) {
+          stop("Invalid parameter IDs in search_space: ", paste(invalid_ids, collapse = ", "))
+        }
+        # check iterations inputs
+        stopifnot(is.numeric(random_search_stages), random_search_stages >= 1)
+        stopifnot(is.numeric(random_search_size), random_search_size >= 1)
+}
+```
+
+Now, let's create the function.
+
+```{r}
+iterative_random_tuner <- function(task, learner, search_space,
+                                   resampling, measure,
+                                   random_search_stages, random_search_size,
+                                   verbose = TRUE, seed = TRUE) {
+
+  .inputChecks(task, learner, search_space, resampling, measure,
+               random_search_stages, random_search_size)
+
+  param_ids <- search_space$id
+  tuner <- tnr("random_search")
+  terminator <- trm("evals", n_evals = random_search_size)
+
+  # initialise search space on learner
+  learner$param_set$values[param_ids] <- Map(to_tune,
+                                             search_space$lower,
+                                             search_space$upper)
+
+  best_config_list <- list()
+
+  if (seed) set.seed(22)
+  for (stage in seq_len(random_search_stages)) {
+    if (stage > 1) {
+      # update search space based on previous best
+      adjusted_bounds <- lapply(param_ids, adjust_bounds,
+                                best_config = best_config,
+                                learner = learner)
+      names(adjusted_bounds) <- param_ids
+      learner$param_set$values[param_ids] <- Map(to_tune,
+                                                 lapply(adjusted_bounds, `[[`, "lower"),
+                                                 lapply(adjusted_bounds, `[[`, "upper"))
+    }
+
+    # tune
+    instance <- mlr3tuning::tune(
+      tuner = tuner,
+      task = task,
+      learner = learner,
+      resampling = resampling,
+      measure = measure,
+      terminator = terminator
+    )
+
+    best_config <- unlist(instance$result_learner_param_vals[param_ids])
+    best_score <- instance$result_y
+
+    best_config_list[[stage]] <- list(config = best_config, score = best_score)
+
+    if (verbose) cat(sprintf("Stage %d score: %.3f\n", stage, best_score))
+  }
+
+  # label the list
+  names(best_config_list) <- paste0("stage_", seq_along(best_config_list))
+
+  # return best config only
+  best_index <- if (measure$minimize) {
+    which.min(sapply(best_config_list, `[[`, "score"))
+  } else {
+    which.max(sapply(best_config_list, `[[`, "score"))
+  }
+
+  best_config_list[[best_index]]
+}
+```
+
+Now I can run this function on the `mtcars` dataset.
+
+```{r}
+# create search space
+search_space <- rbindlist(list(
+  list(id = "cp", lower = 1e-4, upper = 1),
+  list(id = "maxdepth", lower = 1,    upper = 30),
+  list(id = "minsplit", lower = 2,    upper = 20),
+  list(id = "minbucket", lower = 1,   upper = 10)
+))
+
+best_config <- iterative_random_tuner(
+        task = task,
+        learner = learner,
+        search_space = search_space,
+        resampling = rsmp("cv", folds = 3),
+        measure = msr("regr.rmse"),
+        random_search_stages = 5,
+        random_search_size = 50
+)
+
+best_config
+```
+
+Nice one.
 
 # Summary
 
