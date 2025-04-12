@@ -697,6 +697,8 @@ best_config2
 best_rmse2
 ```
 
+:::
+
 ```{r}
 # compare the two RMSEs
 best_rmse2 - best_rmse1
