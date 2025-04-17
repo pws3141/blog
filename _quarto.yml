@@ -5,6 +5,9 @@ website:
   title: "pblog"
   navbar:
     right:
+      - href: https://pws3141.github.io
+        text: Home
+        icon: house
       - about.qmd
       - icon: github
         href: https://github.com/pws3141/blog
