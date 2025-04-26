@@ -1,0 +1,140 @@
+---
+title: "Model Fitting and Validation"
+subtitle: "Model Validation using the Bootstrap"
+author:
+  - name: Paul Smith
+date: "2025-04-26"
+draft: true
+categories: [code, r, statistics, model fitting, model validation]
+format:
+  html:
+    code-fold: false
+execute:
+  df-print: default
+---
+
+This is *Part Three* of an $N$^[where $N$ is TBC] part series on model fitting and validation.
+
+- [Part One](../06-stepwise_datasplitting/index.qmd) considers some theoretical issues with data-splitting and using stepwise selection
+- [Part Two](../07-stepwise_datasplitting_simulation/index.qmd) looks at simulating the effect of data-splitting and stepwise selection in model building and validation on the `lung` dataset, including:
+    - The variability of model terms chosen and the coefficient estimates from data-splitting and using stepwise selection;
+    - The variability in the C-statistic obtained from the test set.
+
+# Introduction
+
+In this part, I look at using the bootstrap to validate a model. Much of this
+work is inspired by the excellent book by @harrell2001regression. Using the
+bootstrap to validate a model means that data-splitting is not required, and
+instead both model building and validation can be performed on the full
+dataset. As discussed by Harrell in
+a [post](https://www.fharrell.com/post/split-val/),
+
+> Data are too precious to not be used in model development/parameter
+estimation. Resampling methods allow the data to be used for both development
+and validation, and they do a good job in estimating the likely future
+performance of a model.
+
+:::{.callout-note collapse="true"}
+# The hierarchy of validation methods
+
+In @harrell2001regression[Chapter 5.2], a hierarchy of validation methods is
+given, from worst to best.^[Specifically, "one suggested hierarchy", so I'm
+unsure whether this is Harrell's suggested one or not...]
+
+
+1. Attempting several validations (internal or external) and reporting only the one that “worked”
+2. Reporting apparent performance on the training dataset (no validation)
+3. Reporting predictive accuracy on an undersized independent test sample
+4. Internal validation using data-splitting where at least one of the training
+and test samples is not huge and the investigator is not aware of the
+arbitrariness of variable selection done on a single sample
+5. Strong internal validation using 100 repeats of 10-fold cross-validation or
+   several hundred bootstrap resamples, repeating all analysis steps involving
+   $Y$ afresh at each re-sample and the arbitrariness of selected “important
+variables” is reported (if variable selection is used)
+6. External validation on a large test sample, done by the original research
+team
+7. Re-analysis by an independent research team using strong internal validation of the original dataset
+8. External validation using new test data, done by an independent research
+team
+9. External validation using new test data generated using different
+   instruments/technology, done by an independent research team
+
+In this post, I am looking at option (5). Currently at work we often rely on (3) or (4).
+
+:::
+
+
+## The method
+
+I will only consider complete-case data for now, and will consider two different scenarios.
+
+1. Model fitting where we already "know" the factors in the model.
+2. Model building and fitting, where we use the *lasso* to select the factors
+   in the model.
+
+:::{.callout-note collapse="true"}
+# Why the lasso?
+
+I am using the lasso here for two reasons:
+
+1. For a change -- we know stepwise is "bad" and although lasso doesn't solve all of the issues assocaited with the stepwise procedure, it should create more stable models.
+2. The lasso forces some coefficients to zero, so improves the interpretability of the model. This is useful in the area of work that I am involved in, where we are often interested in using models to inform clinical decision making.
+
+I'm waiting with baited breath for guidence from the [*STRengthening Analytical
+Thinking for Observational Studies*
+(STRATOS)](https://stratos-initiative.org/group_2) initiative on variable
+selection techniques for multivariate anaylsis, but I'm not sure it's coming
+anytime soon [@sauerbrei2020state]. 
+
+:::
+
+From @harrell2001regression[Chapter 5.3.5], the bootstrap validation method is as follows:
+
+>  From the original $X$ and $Y$ in the sample of size $n$, draw a sample with
+replacement also of size $n$. Derive a model in the bootstrap sample and apply
+it without change to the original sample. The accuracy index from the bootstrap
+sample minus the index computed on the original sample is an estimate of
+optimism. This process is repeated for $100$ or so bootstrap replications to
+obtain an average optimism, which is subtracted from the final model fit’s
+apparent accuracy to obtain the overfitting-corrected estimate.
+
+So, assuming we have some model $\mathcal{M}$ fit to the data $X$, the procedure for internal validation is:
+
+1. Calculate the accuracy of the model, $\mathcal{M}$, on the data $X$, to give $c$.
+2. For each $i = 1, 2, \ldots, B$.
+    a. Create bootstrap sample $X^{(i)}$.
+    b. Fit a model on $X^{(i)}$ -- using the same procedure as when fitting the original model^[That is, if stepwise selection was used, it has to be used again here. So, its highly likely that the factors in this model will differ to those in $\mathcal{M}$.] -- to obtain model $\mathcal{M}^{(i)}$.
+    c. Calculate the accuracy of the model $\mathcal{M}^{(i)}$ on the bootstrap sample $X^{(i)}$, to give $c^{(i)}_\text{boot}$.
+    d. Calculate the accuracy of the model $\mathcal{M}^{(i)}$ on the original data $X$, to give $c^{(i)}_X$.
+    e. Obtain the difference, $c^{(i)} = c^{(i)}_\text{boot} - c^{(i)}_X$.
+3. Calculate the mean difference, $\bar{c} = \frac{1}{B} \sum_{i = 1}^B c^{(i)}$.
+4. Calculate the overfitting-corrected estimate of accuracy as $c - \bar{c}$.
+
+## The data
+
+For this post I will use the `gbsg` (complete-case) dataset from the `survival` package:
+
+> The ‘gbsg’ data set contains patient records from a 1984-1989 trial conducted
+by the German Breast Cancer Study Group (GBSG) of 720 patients with node
+positive breast cancer; it retains the 686 patients with complete data for the
+prognostic variables.
+
+:::{.callout-tip collapse="true"}
+# The `gbsg` dataset
+
+A data set with 686 observations and 11 variables.
+
+- `pid` patient identifier
+- `age` age, years
+- `meno` menopausal status (0= premenopausal, 1= postmenopausal)
+- `size` tumor size, mm
+- `grade` tumor grade
+- `nodes` number of positive lymph nodes
+- `pgr` progesterone receptors (fmol/l)
+- `er` estrogen receptors (fmol/l)
+- `hormon` hormonal therapy, 0= no, 1= yes
+- `rfstime` recurrence free survival time; days to first of reccurence, death or last follow-up
+- `status` 0= alive without recurrence, 1= recurrence or death
+
+:::
