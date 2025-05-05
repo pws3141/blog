@@ -2,7 +2,7 @@ project:
   type: website
 
 website:
-  title: "pblog"
+  title: "Paul Smith"
   navbar:
     right:
       - href: https://pws3141.github.io
@@ -13,7 +13,7 @@ website:
         href: https://github.com/pws3141/blog
 format:
   html:
-    theme: flatly
+    theme: cosmo
     css: styles.css
     code-fold: show
     grid:
