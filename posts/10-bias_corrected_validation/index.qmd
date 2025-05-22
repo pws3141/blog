@@ -70,71 +70,405 @@ In this post, I am looking at option (5). Currently at work we often rely on (3)
 I will only consider complete-case data for now, and will consider two different scenarios.
 
 1. Model fitting where we already "know" the factors in the model.
-2. Model building and fitting, where we use the *lasso* to select the factors
+2. Model building and fitting, where we use stepwise to select the factors
    in the model.
 
 :::{.callout-note collapse="true"}
-# Why the lasso?
+# Why stepwise?
 
-I am using the lasso here for two reasons:
+I am using stepwise here for simplicity. The lasso would be better (although it still [shares some of stepwise's flaws](./post/06-stepwise_datasplitting.qmd)). Using expert judgement to choose variables is much better, and means it is much harder to hide behind the computer.
 
-1. For a change -- we know stepwise is "bad" and although lasso doesn't solve all of the issues assocaited with the stepwise procedure, it should create more stable models.
-2. The lasso forces some coefficients to zero, so improves the interpretability of the model. This is useful in the area of work that I am involved in, where we are often interested in using models to inform clinical decision making.
-
-I'm waiting with baited breath for guidence from the [*STRengthening Analytical
+I'm waiting with baited breath for guidance from the [*STRengthening Analytical
 Thinking for Observational Studies*
 (STRATOS)](https://stratos-initiative.org/group_2) initiative on variable
-selection techniques for multivariate anaylsis, but I'm not sure it's coming
+selection techniques for multivariate analysis, but I'm not sure it's coming
 anytime soon [@sauerbrei2020state]. 
 
 :::
 
-From @harrell2001regression[Chapter 5.3.5], the bootstrap validation method is as follows:
+The method for model validation in this article is based on @harrell2001regression[Chapter 5.3.5], which describes the process of calculating an optimism-corrected accuracy metric using bootstrap resampling as:
 
->  From the original $X$ and $Y$ in the sample of size $n$, draw a sample with
-replacement also of size $n$. Derive a model in the bootstrap sample and apply
-it without change to the original sample. The accuracy index from the bootstrap
-sample minus the index computed on the original sample is an estimate of
-optimism. This process is repeated for $100$ or so bootstrap replications to
-obtain an average optimism, which is subtracted from the final model fit’s
-apparent accuracy to obtain the overfitting-corrected estimate.
+> From the original $X$ and $Y$ in the sample of size $n$, draw a sample with replacement also of size $n$. Derive a model in the bootstrap sample and apply it without change to the original sample. The accuracy index from the bootstrap sample minus the index computed on the original sample is an estimate of optimism. This process is repeated for $100$ or so bootstrap replications to obtain an average optimism, which is subtracted from the final model fit’s apparent accuracy to obtain the overfitting-corrected estimate.
 
-So, assuming we have some model $\mathcal{M}$ fit to the data $X$, the procedure for internal validation is:
+He goes on...
 
-1. Calculate the accuracy of the model, $\mathcal{M}$, on the data $X$, to give $c$.
-2. For each $i = 1, 2, \ldots, B$.
-    a. Create bootstrap sample $X^{(i)}$.
-    b. Fit a model on $X^{(i)}$ -- using the same procedure as when fitting the original model^[That is, if stepwise selection was used, it has to be used again here. So, its highly likely that the factors in this model will differ to those in $\mathcal{M}$.] -- to obtain model $\mathcal{M}^{(i)}$.
-    c. Calculate the accuracy of the model $\mathcal{M}^{(i)}$ on the bootstrap sample $X^{(i)}$, to give $c^{(i)}_\text{boot}$.
-    d. Calculate the accuracy of the model $\mathcal{M}^{(i)}$ on the original data $X$, to give $c^{(i)}_X$.
-    e. Obtain the difference, $c^{(i)} = c^{(i)}_\text{boot} - c^{(i)}_X$.
-3. Calculate the mean difference, $\bar{c} = \frac{1}{B} \sum_{i = 1}^B c^{(i)}$.
-4. Calculate the overfitting-corrected estimate of accuracy as $c - \bar{c}$.
+> Note that bootstrapping validates the *process* that was used to fit the original model (as does cross-validation). It provides an estimate of the expected value of the optimism, which when subtracted from the original index, provides an estimate of the expected bias-corrected index. If stepwise variable selection is part of the bootstrap process (*as it must be if the final model is developed that way*), and not all resamples (samples with replacement or training samples in cross-validation) resulted in the same model (which is almost always the case), this internal validation process actually provides an unbiased estimate of the future performance of the process used to identify markers and scoring systems; it does not validate a single final model. But resampling does tend to provide good estimates of the future performance of the final model that was selected using the same procedure repeated in the resamples.
+
+A good introduction to model building and internal validation is given in @collins2024evaluation. See *Box 2* for a simple explanation of the bootstrapping internal validation method.
+
+I have clarified this procedure in @sec-complete-validation.
 
 ## The data
 
-For this post I will use the `gbsg` (complete-case) dataset from the `survival` package:
+The examples will be performed on the [`pbc`](https://stat.ethz.ch/R-manual/R-devel/library/survival/html/pbc.html) data from the `{survival}` package [@therneau2024survival]. This is a dataset of patients with primary biliary cirrhosis. 
 
-> The ‘gbsg’ data set contains patient records from a 1984-1989 trial conducted
-by the German Breast Cancer Study Group (GBSG) of 720 patients with node
-positive breast cancer; it retains the 686 patients with complete data for the
-prognostic variables.
+```{r}
+#| output: false
 
-:::{.callout-tip collapse="true"}
-# The `gbsg` dataset
+library(data.table)
+options(datatable.print.nrows = 20) # max # rows before truncating (default = 100)
+library(survival)
+library(rms) # for 'validate'
+library(mice)
 
-A data set with 686 observations and 11 variables.
+# load pbc dataset
+data(pbc)
+pbc <- as.data.table(pbc)
+pbc[, status := fifelse(status == 2, 1, 0)]
 
-- `pid` patient identifier
-- `age` age, years
-- `meno` menopausal status (0= premenopausal, 1= postmenopausal)
-- `size` tumor size, mm
-- `grade` tumor grade
-- `nodes` number of positive lymph nodes
-- `pgr` progesterone receptors (fmol/l)
-- `er` estrogen receptors (fmol/l)
-- `hormon` hormonal therapy, 0= no, 1= yes
-- `rfstime` recurrence free survival time; days to first of reccurence, death or last follow-up
-- `status` 0= alive without recurrence, 1= recurrence or death
+## used in 'step()' below
+# creating upper and lower model for stepwise selection
+# create upper scope (everything except 'id' and outcome variables)
+upper_names <- paste(setdiff(names(pbc), c("time", "status", "id")), 
+                             collapse = " + ")
+scope <- list(
+          upper = reformulate(upper_names),
+          lower = ~1
+        )
+
+# complete case
+pbc_complete <- na.omit(pbc)
+```
+
+:::{.callout-note collapse="true"}
+# The missingness in `pbc`
+
+From the help page (`?pbc`):
+
+> This data is from the Mayo Clinic trial in PBC conducted between 1974 and 1984. A total of 424 PBC patients, referred to Mayo Clinic during that ten-year interval, met eligibility criteria for the randomized placebo controlled trial of the drug D-penicillamine. The first 312 cases in the data set participated in the randomized trial and contain largely complete data. The additional 112 cases did not participate in the clinical trial, but consented to have basic measurements recorded and to be followed for survival. Six of those cases were lost to follow-up shortly after diagnosis, so the data here are on an additional 106 cases as well as the 312 randomized participants.
+
+This can be seen in the missingness visualisation shown in the margin.
+:::
+
+:::{.column-margin}
+The missingness in `pbc` can be visualised as follows:
+```{r}
+#| echo: false
+
+# plot missing data in pbc
+visdat::vis_miss(pbc)
+```
+:::
+
+Throughout this post I will use $B = 100$ bootstrap iterations.
+
+```{r}
+# number of bootstrap iterations
+B <- 100
+```
+
+# Analysis
+
+
+| Notation | Definition |
+|----------|------------|
+| $X \in \mathbb{R}^{n \times p}$ | dataset containing missingness (`pbc`) |
+| $\tilde{X} \in \mathbb{R}^{n \times \tilde{p}}$ | complete-case dataset (`pbc_complete`) |
+| $X^{(i)}$ (or $\tilde{X}^{(i)}$) | $i$-th bootstrap dataset (or complete-case dataset), $i = 1,\dots,B$ |
+
+## Choosing factors manually
+
+In this section, I consider building a model and validating it, when the factors are chosen in the model *a-priori*.
+
+### Model building {#sec-manual-building}
+
+$$
+\begin{align}
+  \text{Data:}\quad&\tilde{X}\\
+  &\\
+  &\downarrow \quad \color{gray}{\text{Factors chosen a-priori}}\\
+  &\\
+  \text{Model:}\quad&\mathcal{M}
+\end{align}
+$$
+
+#### The example
+
+I will build a model using the following factors: `age`, `ascites`, `edema`, `albumin`.
+
+```{r}
+# fit a Cox PH model to pbc
+cox1 <- coxph(Surv(time, status) ~ age + ascites + edema + albumin, 
+                  data = pbc_complete)
+summary(cox1)
+```
+
+### Model validation
+
+First, $B$ bootstrap datasets are created, and models fitted to each of these:
+
+$$
+\begin{align}
+  \text{Data:}\quad\quad\quad&\tilde{X}&&&&\\
+  \\
+  &\downarrow\\
+  \\
+  \text{Bootstrapped data:}\quad\quad&\tilde{X}^{(1)} \quad &&\tilde{X}^{(2)} \quad &&\ldots \quad &&\tilde{X}^{(B)}\\
+  \\
+  &\downarrow && \downarrow  &&\ldots &&\downarrow \quad\color{gray}{\text{Same factors as original model building (chosen a-priori)}}\\
+  \\
+  \text{Models:}\quad\quad &\mathcal{M}^{(1)} \quad &&\mathcal{M}^{(2)} \quad &&\ldots \quad &&\mathcal{M}^{(B)}\\
+\end{align}
+$$
+
+Then, calculating the optimism-corrected C-statistic involves:
+
+1. Calculate the C-statistic obtained from the original model $\mathcal{M}$ (from @sec-manual-building), fitted to the complete-case dataset $\tilde{X}$, denoted $c$.
+2. For $b = 1, 2, \ldots, B$:
+    i. Calculate the C-statistic from the $b^\text{th}$ bootstrap model $\mathcal{M}^{(b)}$, fitted to the $b^\text{th}$ bootstrap dataset $\tilde{X}^{(b)}$, denoted $c^{(b)}$.
+    ii. Calculate the C-statistic from the $b^\text{th}$ bootstrap model $\mathcal{M}^{(b)}$, fitted to the original dataset, $\tilde{X}$, denoted $c^{(b)}_X$.
+    iii. Calculate the optimism for the $b^\text{th}$ bootstrap model $o^{(b)} = c^{(b)} - c^{(b)}_X$.
+3. Calculate the mean optimism, $\bar{o} = \frac{1}{B} \sum_{b=1}^{B} o^{(b)}$.
+4. Calculate the optimism-corrected C-statistic,
+$$
+  c_\text{opt} = c - \bar{o}.
+$$
+
+#### The example
+
+First, I obtain the (optimistic) C-statistic.
+
+```{r}
+c1 <- concordance(cox1)$concordance
+```
+
+Then, we follow Steps (2) - (4) above to obtain the optimism-corrected C-statistic.
+
+```{r}
+# number of bootstrap samples
+B <- 100
+
+
+set.seed(10)
+
+c_boots1 <- rbindlist(
+  lapply(seq_len(B), function(b) {
+      
+      # 2a. create bootstrap sample
+      idx <- sample(nrow(pbc_complete), replace = TRUE)
+      pbc_boot <- pbc_complete[idx]
+      
+      # 2b. fit model
+      cox_boot <- coxph(Surv(time, status) ~ age + ascites + edema + albumin, 
+                        data = pbc_boot)
+
+      # 2c. 
+      # calculate concordance on bootstrap sample
+      c_stat_boot <- concordance(cox_boot)
+      
+      # 2d.
+      # predict on original data
+      lp_X <- predict(cox_boot, newdata = pbc_complete, type = "lp")
+      # calculate concordance on original data
+      c_stat_X <- concordance(Surv(time, status) ~ lp_X, 
+                              data = pbc_complete, reverse = TRUE)
+      c_boot <- c_stat_boot$concordance
+      c_x <- c_stat_X$concordance
+      
+      # save c stats and calculate optimism
+      data.table(c_boot = c_boot, c_x = c_x, optimism = c_boot - c_x)
+    }
+  )
+)
+
+print(c_boots1, topn = 5)
+```
+
+Now, we can compute the mean optimism, $\bar{o}$, and the overfitting-corrected estimate of accuracy.
+
+```{r}
+# 3. mean difference
+optimism_mean1 <- mean(c_boots1$optimism)
+
+# 4. overfitting-corrected estimate of accuracy
+c_opt1 <- c1 - optimism_mean1
+```
+So, the original C-statistic was `r round(c1, 4)`, compared to the bias-corrected estimate of `r round(c_opt1, 4)`.
+
+:::{.callout-note}
+# The quick code
+
+This can be done in a few lines lines, using the `{rms}` package.
+
+```{r}
+# validate
+set.seed(10)
+cox_step_cph <- rms::cph(Surv(time, status) ~ age + ascites + edema + albumin, 
+                         data = pbc_complete, x = TRUE, y = TRUE) # <1>
+bias_corrected_metrics <- rms::validate(cox_step_cph, B = 100)
+bias_corrected_metrics
+```
+1. `rms::validate()` requires the model to be fit using `rms::cph()` instead of `survival::coxph()`.
+
+For a detailed explanation of the metrics, see John Haman's [website](https://randomeffect.net/post/2021/05/02/the-rms-validate-function/).
+
+```{r}
+c1_rms <- (bias_corrected_metrics["Dxy", "index.corrected"] + 1) / 2
+c1_rms
+```
+:::
+
+## Analysis Using Stepwise Selection
+
+The model building stage (@sec-complete-building) is done using stepwise selection, and the model validation stage (@sec-complete-validation) is done using bootstrapping. The model building and validation stages are shown below.
+
+
+### Model building {#sec-complete-building}
+
+Here, I perform stepwise selection on the full (complete-case) dataset.
+
+$$
+\begin{align}
+  \text{Data:}\quad&\tilde{X}\\
+  &\\
+  &\downarrow \quad \color{gray}{\text{Stepwise selection}}\\
+  &\\
+  \text{Model:}\quad&\mathcal{M}
+\end{align}
+$$
+
+#### The example
+
+In the example, I'm using the complete case of the `pbc` dataset: `pbc_complete`. This has `r nrow(pbc_complete)` observations (compared to `r nrow(pbc)` observations in the full `pbc` dataset).
+
+:::{.panel-tabset}
+
+## The code
+
+```{r}
+#| code-fold: false
+
+
+# fit a Cox PH model to pbc: start with the null model
+cox_full <- coxph(Surv(time, status) ~ 1, data = pbc_complete)
+
+# use stepwise selection (minimising AIC)
+# creating upper and lower model for stepwise selection
+# create upper scope (everything except 'id' and outcome variables)
+upper_names <- paste(setdiff(names(pbc), c("time", "status", "id")), 
+                             collapse = " + ")
+scope <- list(
+          upper = reformulate(upper_names),
+          lower = ~1
+        )
+
+cox2 <- step(cox_full, scope = scope, trace = 0)
+```
+
+## The output
+
+```{r}
+# look at the model
+summary(cox2)
+```
 
 :::
+
+### Model validation {#sec-complete-validation}
+
+The model validation stage is done using bootstrapping. The bootstrap procedure -- starting from the complete-case dataset $\tilde{X}$ (which is the same as used in the model building stage) -- is as follows.
+
+First, $B$ bootstrap datasets are created, and models fitted to each of these (using the same stepwise procedure as in @sec-complete-building):
+
+$$
+\begin{align}
+  \text{Data:}\quad\quad\quad&\tilde{X}&&&&\\
+  \\
+  &\downarrow\\
+  \\
+  \text{Bootstrapped data:}\quad\quad&\tilde{X}^{(1)} \quad &&\tilde{X}^{(2)} \quad &&\ldots \quad &&\tilde{X}^{(B)}\\
+  \\
+  &\downarrow && \downarrow  &&\ldots &&\downarrow \quad\color{gray}{\text{Stepwise selection}}\\
+  \\
+  \text{Models:}\quad\quad &\mathcal{M}^{(1)} \quad &&\mathcal{M}^{(2)} \quad &&\ldots \quad &&\mathcal{M}^{(B)}\\
+\end{align}
+$$
+
+Then, calculating the optimism-corrected C-statistic involves:
+
+1. Calculate the C-statistic obtained from the original model $\mathcal{M}$ (from @sec-complete-building), fitted to the complete-case dataset $\tilde{X}$, denoted $c$.
+2. For $b = 1, 2, \ldots, B$:
+    i. Calculate the C-statistic from the $b^\text{th}$ bootstrap model $\mathcal{M}^{(b)}$, fitted to the $b^\text{th}$ bootstrap dataset $\tilde{X}^{(b)}$, denoted $c^{(b)}$.
+    ii. Calculate the C-statistic from the $b^\text{th}$ bootstrap model $\mathcal{M}^{(b)}$, fitted to the original dataset, $\tilde{X}$, denoted $c^{(b)}_X$.
+    iii. Calculate the optimism for the $b^\text{th}$ bootstrap model $o^{(b)} = c^{(b)} - c^{(b)}_X$.
+3. Calculate the mean optimism, $\bar{o} = \frac{1}{B} \sum_{b=1}^{B} o^{(b)}$.
+4. Calculate the optimism-corrected C-statistic,
+$$
+  c_\text{opt} = c - \bar{o}.
+$$
+
+
+#### The example
+
+First, I obtain the (optimistic) C-statistic^[The C-statistic obtained from the original model $\mathcal{M}$ (from @sec-complete-building), fitted to the complete-case dataset $\tilde{X}$.], as described in Step (1).
+
+```{r}
+c <- concordance(cox2)$concordance
+```
+
+Then, follow Step (2) to obtain the C-statistic from the $b^\text{th}$ bootstrap model $\mathcal{M}^{(b)}$, fitted to both the bootstrap dataset,$\tilde{X}^{(b)}$, and the original dataset, $\tilde{X}$. From these the $b^\text{th}$ bootstrap model optimism can be calculated.
+
+```{r}
+set.seed(10)
+
+# start time of execution
+total_time_start <- Sys.time()
+      
+c_boots <- rbindlist(
+  lapply(seq_len(B), function(b) {
+      
+      # start time of inner execution
+      start_time <- Sys.time()
+
+      # 2a. create bootstrap sample
+      idx <- sample(nrow(pbc_complete), replace = TRUE)
+      pbc_boot <- pbc_complete[idx]
+      
+      # 2b. fit null model
+      cox_boot_null <- coxph(Surv(time, status) ~ 1, data = pbc_boot)
+      # use stepwise selection (minimising AIC)
+      cox_boot <- step(cox_boot_null, scope = scope, trace = 0)
+
+      # 2c. 
+      c_boot <- concordance(cox_boot)$concordance
+      
+      # 2d.
+      # predict on original data
+      lp_X <- predict(cox_boot, newdata = pbc_complete, type = "lp")
+      # calculate concordance on original data
+      c_x <- concordance(Surv(time, status) ~ lp_X, 
+                              data = pbc_complete, reverse = TRUE)$concordance
+      
+      # end time of inner execution
+      end_time <- Sys.time()
+      time_taken <- end_time - start_time
+      
+      # save c stats and calculate optimism
+      data.table(c_boot = c_boot, c_x = c_x, optimism = c_boot - c_x,
+                 time = time_taken)
+    }
+  )
+)
+
+# end time of inner execution
+total_time_end <- Sys.time()
+total_time_taken <- total_time_end - total_time_start
+
+print(c_boots, topn = 5)
+```
+
+This process took `r round(as.numeric(total_time_taken), 2)` `r units(total_time_taken)` in total.
+
+Now, I compute the mean optimism, $\bar{o}$, and the overfitting-corrected estimate of accuracy.
+
+```{r}
+# (3) mean optimism
+optimism_mean <- mean(c_boots$optimism)
+
+# (4) optimism-corrected estimate of accuracy
+c_opt <- c - optimism_mean
+```
+
+So, the original C-statistic was $c =$ `r round(c, 4)`, compared to the bias-corrected estimate of $c_\text{opt}=$ `r round(c_opt, 4)`. The mean of the optimism was $\bar{o} =$ `r round(optimism_mean, 4)`.
+
+# Fin
