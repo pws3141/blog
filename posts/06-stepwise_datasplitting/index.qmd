@@ -71,7 +71,7 @@ Introduction to Statistical Learning* fame.] *lasso* procedure can be used
 including a constraint that the sum of absolute values of the coefficient
 estimates must be less than some $k$. Note that the lasso procedure shares many
 of stepwise's deficiencies, namely that there is a "low probability of
-selecting the 'correct' variables".
+selecting the 'correct' variables" (see [StackExchange](https://stats.stackexchange.com/questions/411035/does-lasso-suffer-from-the-same-problems-stepwise-regression-does/426805#426805) for some more information).
 
 @derksen1992backward found that when the stepwise procedure was used, the final
 model represented noise between $20\%$ and $74\%$ of the time, and the final

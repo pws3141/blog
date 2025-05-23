@@ -4,7 +4,6 @@ subtitle: "Model Validation using the Bootstrap"
 author:
   - name: Paul Smith
 date: "2025-04-26"
-draft: true
 categories: [code, r, statistics, model fitting, model validation]
 format:
   html:
@@ -76,7 +75,7 @@ I will only consider complete-case data for now, and will consider two different
 :::{.callout-note collapse="true"}
 # Why stepwise?
 
-I am using stepwise here for simplicity. The lasso would be better (although it still [shares some of stepwise's flaws](./post/06-stepwise_datasplitting.qmd)). Using expert judgement to choose variables is much better, and means it is much harder to hide behind the computer.
+I am using stepwise here for simplicity. The lasso would be better (although it still [shares many of stepwise's flaws](../06-stepwise_datasplitting/index.qmd)). Using expert judgement to choose variables is much better, and means it is much harder to hide behind the computer.
 
 I'm waiting with baited breath for guidance from the [*STRengthening Analytical
 Thinking for Observational Studies*
@@ -96,11 +95,15 @@ He goes on...
 
 A good introduction to model building and internal validation is given in @collins2024evaluation. See *Box 2* for a simple explanation of the bootstrapping internal validation method.
 
-I have clarified this procedure in @sec-complete-validation.
+I have clarified this procedure where appropriate in @sec-analysis.
 
 ## The data
 
-The examples will be performed on the [`pbc`](https://stat.ethz.ch/R-manual/R-devel/library/survival/html/pbc.html) data from the `{survival}` package [@therneau2024survival]. This is a dataset of patients with primary biliary cirrhosis. 
+The examples will be performed on the complete-case of
+[`pbc`](https://stat.ethz.ch/R-manual/R-devel/library/survival/html/pbc.html)
+data from the `{survival}` package [@therneau2024survival].^[In my next post
+I'll be considering the full dataset and use multiple imputation to handle the
+missing data.]
 
 ```{r}
 #| output: false
@@ -130,26 +133,9 @@ scope <- list(
 pbc_complete <- na.omit(pbc)
 ```
 
-:::{.callout-note collapse="true"}
-# The missingness in `pbc`
-
-From the help page (`?pbc`):
-
-> This data is from the Mayo Clinic trial in PBC conducted between 1974 and 1984. A total of 424 PBC patients, referred to Mayo Clinic during that ten-year interval, met eligibility criteria for the randomized placebo controlled trial of the drug D-penicillamine. The first 312 cases in the data set participated in the randomized trial and contain largely complete data. The additional 112 cases did not participate in the clinical trial, but consented to have basic measurements recorded and to be followed for survival. Six of those cases were lost to follow-up shortly after diagnosis, so the data here are on an additional 106 cases as well as the 312 randomized participants.
-
-This can be seen in the missingness visualisation shown in the margin.
-:::
-
-:::{.column-margin}
-The missingness in `pbc` can be visualised as follows:
-```{r}
-#| echo: false
-
-# plot missing data in pbc
-visdat::vis_miss(pbc)
-```
-:::
-
+This is a dataset of patients with primary biliary cirrhosis,
+and has `r nrow(pbc_complete)` observations (compared to `r nrow(pbc)`
+observations in the full `pbc` dataset).
 Throughout this post I will use $B = 100$ bootstrap iterations.
 
 ```{r}
@@ -157,7 +143,7 @@ Throughout this post I will use $B = 100$ bootstrap iterations.
 B <- 100
 ```
 
-# Analysis
+# Analysis {#sec-analysis}
 
 
 | Notation | Definition |
@@ -293,17 +279,18 @@ This can be done in a few lines lines, using the `{rms}` package.
 ```{r}
 # validate
 set.seed(10)
-cox_step_cph <- rms::cph(Surv(time, status) ~ age + ascites + edema + albumin, 
+cox1_cph <- rms::cph(Surv(time, status) ~ age + ascites + edema + albumin, 
                          data = pbc_complete, x = TRUE, y = TRUE) # <1>
-bias_corrected_metrics <- rms::validate(cox_step_cph, B = 100)
-bias_corrected_metrics
+bias_corrected_metrics1 <- rms::validate(cox1_cph, B = 100)
+bias_corrected_metrics1
 ```
 1. `rms::validate()` requires the model to be fit using `rms::cph()` instead of `survival::coxph()`.
 
-For a detailed explanation of the metrics, see John Haman's [website](https://randomeffect.net/post/2021/05/02/the-rms-validate-function/).
+For a detailed explanation of the `validate` output, see John Haman's
+[website](https://randomeffect.net/post/2021/05/02/the-rms-validate-function/).
 
 ```{r}
-c1_rms <- (bias_corrected_metrics["Dxy", "index.corrected"] + 1) / 2
+c1_rms <- (bias_corrected_metrics1["Dxy", "index.corrected"] + 1) / 2
 c1_rms
 ```
 :::
@@ -315,7 +302,7 @@ The model building stage (@sec-complete-building) is done using stepwise selecti
 
 ### Model building {#sec-complete-building}
 
-Here, I perform stepwise selection on the full (complete-case) dataset.
+Here, I perform stepwise selection on the complete-case dataset, starting from the null model.
 
 $$
 \begin{align}
@@ -327,9 +314,7 @@ $$
 \end{align}
 $$
 
-#### The example
-
-In the example, I'm using the complete case of the `pbc` dataset: `pbc_complete`. This has `r nrow(pbc_complete)` observations (compared to `r nrow(pbc)` observations in the full `pbc` dataset).
+#### The example {#sec-analysis-stepwise-building-example}
 
 :::{.panel-tabset}
 
@@ -340,7 +325,7 @@ In the example, I'm using the complete case of the `pbc` dataset: `pbc_complete`
 
 
 # fit a Cox PH model to pbc: start with the null model
-cox_full <- coxph(Surv(time, status) ~ 1, data = pbc_complete)
+cox_null <- coxph(Surv(time, status) ~ 1, data = pbc_complete)
 
 # use stepwise selection (minimising AIC)
 # creating upper and lower model for stepwise selection
@@ -352,7 +337,7 @@ scope <- list(
           lower = ~1
         )
 
-cox2 <- step(cox_full, scope = scope, trace = 0)
+cox2 <- step(cox_null, scope = scope, trace = 0)
 ```
 
 ## The output
@@ -396,7 +381,6 @@ Then, calculating the optimism-corrected C-statistic involves:
 $$
   c_\text{opt} = c - \bar{o}.
 $$
-
 
 #### The example
 
@@ -457,7 +441,7 @@ total_time_taken <- total_time_end - total_time_start
 print(c_boots, topn = 5)
 ```
 
-This process took `r round(as.numeric(total_time_taken), 2)` `r units(total_time_taken)` in total.
+This process took `r round(as.numeric(total_time_taken), 2)` `r units(total_time_taken)` in total.^[On my Macbook Air M3.]
 
 Now, I compute the mean optimism, $\bar{o}$, and the overfitting-corrected estimate of accuracy.
 
@@ -469,6 +453,51 @@ optimism_mean <- mean(c_boots$optimism)
 c_opt <- c - optimism_mean
 ```
 
-So, the original C-statistic was $c =$ `r round(c, 4)`, compared to the bias-corrected estimate of $c_\text{opt}=$ `r round(c_opt, 4)`. The mean of the optimism was $\bar{o} =$ `r round(optimism_mean, 4)`.
+So, the original C-statistic was $c =$ `r round(c, 4)`, compared to the
+bias-corrected estimate of $c_\text{opt}=$ `r round(c_opt, 4)`. The mean of the
+optimism was $\bar{o} =$ `r round(optimism_mean, 4)`.
+
+:::{.callout-important collapse="true"}
+# Using `rms::validate()`
+
+The `validate()` function cannot be used here; it doesn't validate the *whole
+process*, as the stepwise procedure is not repeated. That is, `validate` assumes
+the model is fixed for every bootstrap iteration. This means that the mean
+optimism will be smaller than the one obtained above, and therefore the
+'optimism-adjusted' C-statistic will be higher than it should be.
+
+The model found from the stepwise procedure in @sec-analysis-stepwise-building-example is,
+```{r}
+formula(cox2)
+```
+
+So, assuming this model form is constant throughout: 
+
+```{r}
+# validate
+set.seed(10)
+cox2_cph <- rms::cph(formula(cox2),
+                         data = pbc_complete, x = TRUE, y = TRUE) # <1>
+bias_corrected_metrics2 <- rms::validate(cox2_cph, B = 100)
+bias_corrected_metrics2
+c2_rms <- (bias_corrected_metrics2["Dxy", "index.corrected"] + 1) / 2
+c2_rms
+```
+:::
+
+# Summary
+
+**What I've done:** for both a predefined model and using a stepwise model building
+procedure, I have calculated the apparent performance C-statistic, and then
+adjusted for optimism. For the predefined model, it is possible to calculate
+the optimism easily using `rms::validate()`. However, when using a model building
+procedure it is required to do this manually as the whole process needs to be
+included in each bootstrap iteration.
+
+**Next steps:** model building and validation in the presence of missing data,
+using multiple imputation.
+
+
+
 
 # Fin
