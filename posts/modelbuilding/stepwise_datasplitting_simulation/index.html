@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.7.32">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -80,23 +80,23 @@ div.csl-indent {
 }</style>
 
 
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../../site_libs/quarto-html/popper.min.js"></script>
-<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-54b385dd2068b2e93273ea1ed4f27f83.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-39aa5599c175b676807642dbe23379f8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -155,14 +155,14 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../../../styles.css">
 <meta name="citation_title" content="Model Fitting and Validation">
 <meta name="citation_author" content="Paul Smith">
 <meta name="citation_publication_date" content="2025-03-15">
 <meta name="citation_cover_date" content="2025-03-15">
 <meta name="citation_year" content="2025">
 <meta name="citation_online_date" content="2025-03-15">
-<meta name="citation_fulltext_html_url" content="https://pws3141.github.io/blog/posts/07-stepwise_datasplitting_simulation/">
+<meta name="citation_fulltext_html_url" content="https://pws3141.github.io/blog/posts/modelbuilding/stepwise_datasplitting_simulation/">
 <meta name="citation_language" content="en">
 <meta name="citation_reference" content="citation_title=Clmnis: An r package for downloading data from the parliamentary members names information service;,citation_author=Noel Dempsey;,citation_publication_date=2025;,citation_cover_date=2025;,citation_year=2025;,citation_fulltext_html_url=https://github.com/houseofcommonslibrary/clmnis;">
 <meta name="citation_reference" content="citation_title=Highcharter: A wrapper for the ’highcharts’ library;,citation_author=Joshua Kunst;,citation_publication_date=2022;,citation_cover_date=2022;,citation_year=2022;,citation_fulltext_html_url=https://CRAN.R-project.org/package=highcharter;">
@@ -199,7 +199,7 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../../index.html">
+    <a class="navbar-brand" href="../../../index.html">
     <span class="navbar-title">Paul Smith</span>
     </a>
   </div>
@@ -215,7 +215,7 @@ window.Quarto = {
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../about.html"> 
+    <a class="nav-link" href="../../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
@@ -303,8 +303,8 @@ window.Quarto = {
 
 
 
-<p>This is <em>Part Two</em> of an <span class="math inline">\(N\)</span><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> part series on model fitting and validation. Part One can be found <a href="../../posts/06-stepwise_datasplitting/index.html">here</a>.</p>
-<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;where <span class="math inline">\(N\)</span> is TBC</p></div></div><section id="introduction" class="level1 page-columns page-full">
+<p>This is <em>Part Two</em> of an four part series on model fitting and validation. Part One can be found <a href="../../../posts/modelbuilding/stepwise_datasplitting/index.html">here</a>.</p>
+<section id="introduction" class="level1 page-columns page-full">
 <h1>Introduction</h1>
 <p>The aim of this article is to consider the effect of using data-splitting (to obtain a single training and test set) and stepwise selection (to obtain ‘significant’ factors) on the <code>lung</code> R dataset.</p>
 <p>In general – assuming we have data <span class="math inline">\(X \in \mathbb{R}^{n \times p}\)</span> – the process consists of the following steps:</p>
@@ -322,7 +322,7 @@ window.Quarto = {
 <li>We are answering the question: <em>Among all pairs of individuals, what fraction had predicted risks that were correctly ranked in the same order as their actual observed outcomes (event times)?</em></li>
 </ul></li>
 </ol>
-<p>There are many issues with this procedure, which I have discussed in a <a href="../../posts/06-stepwise_datasplitting/index.html">previous post</a>. In this article I will perform the above steps 100 times and obtain the following:</p>
+<p>There are many issues with this procedure, which I have discussed in a <a href="../../../posts/modelbuilding/stepwise_datasplitting/index.html">previous post</a>. In this article I will perform the above steps 100 times and obtain the following:</p>
 <ol type="1">
 <li>The amount of variability in the factors chosen in the model selection stage.
 <ul>
@@ -515,8 +515,8 @@ Calculating the C-statistic using <code>concordance()</code>
 <p>The <code>reverse = TRUE</code> argument in <code>concordance()</code> is important in <a href="#lst-model-building-validation" class="quarto-xref">Listing&nbsp;2</a>: if TRUE then assume that larger x values predict smaller response values y; a proportional hazards model is the common example of this, larger hazard = shorter survival.</p>
 </div>
 </div>
-<p>The <code>models</code> output from <a href="#lst-model-building-validation" class="quarto-xref">Listing&nbsp;2</a> has 7 columns. The <code>.id</code> variable refers back to the training sample obtained from <code>training_idx</code> in <a href="#lst-training-set-indices" class="quarto-xref">Listing&nbsp;1</a>, and the <code>term</code> variable gives the factors that have been selected in the model relating to the <code>.id</code>.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> The <code>c</code> variable is the C-index obtained from using the <code>.id</code><span class="math inline">\(^{\text{th}}\)</span> model to predict the test set events, so is identical for rows with the same <code>.id</code>’s.</p>
-<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;The <code>term</code> estimates can contain <code>NA</code>’s if there is complete separation or zero events in the split.</p></div><div class="">
+<p>The <code>models</code> output from <a href="#lst-model-building-validation" class="quarto-xref">Listing&nbsp;2</a> has 7 columns. The <code>.id</code> variable refers back to the training sample obtained from <code>training_idx</code> in <a href="#lst-training-set-indices" class="quarto-xref">Listing&nbsp;1</a>, and the <code>term</code> variable gives the factors that have been selected in the model relating to the <code>.id</code>.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> The <code>c</code> variable is the C-index obtained from using the <code>.id</code><span class="math inline">\(^{\text{th}}\)</span> model to predict the test set events, so is identical for rows with the same <code>.id</code>’s.</p>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;The <code>term</code> estimates can contain <code>NA</code>’s if there is complete separation or zero events in the split.</p></div><div class="">
 <p>Annoyingly, it appears to not be possible to both label / caption listings (using <code>#| lst-label</code> and <code>#| lst-cap</code>) and use code annotations (via <code># &lt;1&gt;</code>). I’m not sure why, but worth remember for the future.</p>
 <p>For example, if the code block contains the lines,</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| lst-cap: "An example of when the hover annotation doesn't work"</span></span>
@@ -886,15 +886,15 @@ Figure&nbsp;3: Histogram of the C-index values obtained on the test sets of the 
 
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{smith2025,
-  author = {Smith, Paul},
+  author = {Smith, Paul and Smith, Paul},
   title = {Model {Fitting} and {Validation}},
   date = {2025-03-15},
-  url = {https://pws3141.github.io/blog/posts/07-stepwise_datasplitting_simulation/},
+  url = {https://pws3141.github.io/blog/posts/modelbuilding/stepwise_datasplitting_simulation/},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-smith2025" class="csl-entry quarto-appendix-citeas" role="listitem">
-Smith, Paul. 2025. <span>“Model Fitting and Validation.”</span> March
-15, 2025. <a href="https://pws3141.github.io/blog/posts/07-stepwise_datasplitting_simulation/">https://pws3141.github.io/blog/posts/07-stepwise_datasplitting_simulation/</a>.
+Smith, Paul, and Paul Smith. 2025. <span>“Model Fitting and
+Validation.”</span> March 15, 2025. <a href="https://pws3141.github.io/blog/posts/modelbuilding/stepwise_datasplitting_simulation/">https://pws3141.github.io/blog/posts/modelbuilding/stepwise_datasplitting_simulation/</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {

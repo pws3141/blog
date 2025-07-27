@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Paul Smith">
-<meta name="dcterms.date" content="2025-01-11">
+<meta name="dcterms.date" content="2025-03-05">
 
-<title>A First Foray into Genetics, GWAS, and Mendelian Randomisation – Paul Smith</title>
+<title>Model Fitting and Validation – Paul Smith</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,26 +22,46 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../../site_libs/quarto-html/popper.min.js"></script>
-<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-39aa5599c175b676807642dbe23379f8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-39aa5599c175b676807642dbe23379f8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -100,14 +120,14 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="../../styles.css">
-<meta name="citation_title" content="A First Foray into Genetics, GWAS, and Mendelian Randomisation">
+<link rel="stylesheet" href="../../../styles.css">
+<meta name="citation_title" content="Model Fitting and Validation">
 <meta name="citation_author" content="Paul Smith">
-<meta name="citation_publication_date" content="2025-01-11">
-<meta name="citation_cover_date" content="2025-01-11">
+<meta name="citation_publication_date" content="2025-03-05">
+<meta name="citation_cover_date" content="2025-03-05">
 <meta name="citation_year" content="2025">
-<meta name="citation_online_date" content="2025-01-11">
-<meta name="citation_fulltext_html_url" content="https://pws3141.github.io/blog/posts/02-mandelian_randomisation/">
+<meta name="citation_online_date" content="2025-03-05">
+<meta name="citation_fulltext_html_url" content="https://pws3141.github.io/blog/posts/modelbuilding/stepwise_datasplitting/">
 <meta name="citation_language" content="en">
 <meta name="citation_reference" content="citation_title=Clmnis: An r package for downloading data from the parliamentary members names information service;,citation_author=Noel Dempsey;,citation_publication_date=2025;,citation_cover_date=2025;,citation_year=2025;,citation_fulltext_html_url=https://github.com/houseofcommonslibrary/clmnis;">
 <meta name="citation_reference" content="citation_title=Highcharter: A wrapper for the ’highcharts’ library;,citation_author=Joshua Kunst;,citation_publication_date=2022;,citation_cover_date=2022;,citation_year=2022;,citation_fulltext_html_url=https://CRAN.R-project.org/package=highcharter;">
@@ -144,7 +164,7 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../../index.html">
+    <a class="navbar-brand" href="../../../index.html">
     <span class="navbar-title">Paul Smith</span>
     </a>
   </div>
@@ -160,7 +180,7 @@ window.Quarto = {
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../about.html"> 
+    <a class="nav-link" href="../../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
@@ -179,11 +199,14 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">A First Foray into Genetics, GWAS, and Mendelian Randomisation</h1>
+      <h1 class="title">Model Fitting and Validation</h1>
+            <p class="subtitle lead">Some critiques of data-splitting and the stepwise procedure</p>
                                 <div class="quarto-categories">
-                <div class="quarto-category">genetics</div>
-                <div class="quarto-category">gwas</div>
-                <div class="quarto-category">mendelian randomisation</div>
+                <div class="quarto-category">code</div>
+                <div class="quarto-category">r</div>
+                <div class="quarto-category">statistics</div>
+                <div class="quarto-category">model fitting</div>
+                <div class="quarto-category">model validation</div>
               </div>
                   </div>
   </div>
@@ -201,7 +224,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">January 11, 2025</p>
+        <p class="date">March 5, 2025</p>
       </div>
     </div>
     
@@ -216,12 +239,13 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#genetics-for-dummys" id="toc-genetics-for-dummys" class="nav-link" data-scroll-target="#genetics-for-dummys">Genetics for dummys</a>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
   <ul class="collapse">
-  <li><a href="#a-short-history" id="toc-a-short-history" class="nav-link" data-scroll-target="#a-short-history">A short history</a></li>
+  <li><a href="#current-practice" id="toc-current-practice" class="nav-link" data-scroll-target="#current-practice">Current practice</a></li>
   </ul></li>
-  <li><a href="#mendelian-randomisation" id="toc-mendelian-randomisation" class="nav-link" data-scroll-target="#mendelian-randomisation">Mendelian Randomisation</a></li>
+  <li><a href="#issues-with-the-stepwise-procedure" id="toc-issues-with-the-stepwise-procedure" class="nav-link" data-scroll-target="#issues-with-the-stepwise-procedure">Issues with the stepwise procedure</a></li>
+  <li><a href="#issues-with-data-splitting" id="toc-issues-with-data-splitting" class="nav-link" data-scroll-target="#issues-with-data-splitting">Issues with data-splitting</a></li>
+  <li><a href="#fin" id="toc-fin" class="nav-link" data-scroll-target="#fin">Fin</a></li>
   </ul>
 </nav>
 </nav>
@@ -236,68 +260,109 @@ window.Quarto = {
 
 
 
-<section id="introduction" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>In the previous few weeks I have been trying to learn about Mendelian Randomisation, which has resulted in me doing a whistle-stop tour around genetics, codons, and genetic-wide association studies (GWAS). This post is a collection of my notes and thoughts.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
-<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;Please let me know if there are any mistakes or misconceptions</p></div></div></section>
-<section id="genetics-for-dummys" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="genetics-for-dummys">Genetics for dummys</h2>
+<section id="introduction" class="level1 page-columns page-full">
+<h1>Introduction</h1>
+<p>This post is partly a expansion of a comment I made about training/test sets in a <a href="../../../posts/05-mlr3_basic_modelling/index.html">previous post</a>. It is the first part of a four part series on model fitting and validation. At work, we often need to fit a model and validate it (using internal validation), in the presence of missing data. This short article ignores the missing data issue (I will look at this later), but instead focuses on fitting and validating a model.</p>
+<p>There are two main areas that I am looking at here, to try and improve current practice:</p>
+<ol type="1">
+<li>Fitting a model</li>
+<li>Validating the chosen model</li>
+</ol>
+<p>This short article collates some of the critiques in the way we currently do model building and validation.</p>
+<section id="current-practice" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="current-practice">Current practice</h2>
+<p>Currently, at work we use a stepwise procedure to chose explanatory variables in the model. This stepwise procedure is sometimes a mix of clinical judgement with some form of automated selection, and sometimes it is fully automated. This is often done on a <em>training</em> set which consists of around <span class="math inline">\(70\%\)</span> of the full data. The remaining <span class="math inline">\(30\%\)</span> of the data is the <em>test</em> set used for model validation.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;For an example of a fully automated stepwise procedure on a <span class="math inline">\(70\%\)</span> training set, with validation on the remaining <span class="math inline">\(30\%\)</span> test set, see <span class="citation" data-cites="collett2017factors">Collett, Friend, and Watson (<a href="#ref-collett2017factors" role="doc-biblioref">2017</a>)</span>.<br></p><div id="ref-collett2017factors" class="csl-entry" role="listitem">
+Collett, David, Peter J Friend, and Christopher JE Watson. 2017. <span>“Factors Associated with Short-and Long-Term Liver Graft Survival in the United Kingdom: Development of a UK Donor Liver Index.”</span> <em>Transplantation</em> 101 (4): 786–92.
+</div></div></div><p>There are lots of issues that result from this process: from the use of the stepwise procedure, and from not using all the data to fit the model (<em>data-splitting</em>).</p>
+</section>
+</section>
+<section id="issues-with-the-stepwise-procedure" class="level1 page-columns page-full">
+<h1>Issues with the stepwise procedure</h1>
+<p>There are lots of issues from using a stepwise procedure. Some of these are related to the procedure itself, and some related to the ability of the statistician to not have to think about the problem they are trying to solve. From <span class="citation" data-cites="harrell2001regression">Harrell et al. (<a href="#ref-harrell2001regression" role="doc-biblioref">2001, vol. 608, sec. 4.3</a>)</span>,</p>
+<div class="no-row-height column-margin column-container"></div><blockquote class="blockquote">
+<p>if [the stepwise] procedure had just been proposed as a statistical method, it would most likely be rejected because it violates every principle of statistical estimation and hypothesis testing.</p>
+</blockquote>
+<p>Some of the issues resulting from using a stepwise procedure are:<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;For a full list, see <span class="citation" data-cites="harrell2001regression">Harrell et al. (<a href="#ref-harrell2001regression" role="doc-biblioref">2001</a>)</span>.</p><div id="ref-harrell2001regression" class="csl-entry" role="listitem">
+Harrell, Frank E et al. 2001. <em>Regression Modeling Strategies: With Applications to Linear Models, Logistic Regression, and Survival Analysis</em>. Vol. 608. Springer.
+</div></div></div><ol type="1">
+<li>It yields <span class="math inline">\(R^2\)</span> values that are biased high.</li>
+<li>The <span class="math inline">\(F\)</span> and <span class="math inline">\(\chi^2\)</span> test statistics do not have the claimed distribution.</li>
+<li>The standard errors of regression coefficient estimates are biased low and confidence intervals for effects and predicted values are falsely narrow.</li>
+<li>It yields <span class="math inline">\(P\)</span>-values that are too small (due to severe multiple comparison problems).</li>
+<li>The regression coefficients are biased high in absolute value. That is, if <span class="math inline">\(\hat \beta &gt; 0\)</span>, <span class="math inline">\(E(\hat \beta | P &lt; 0.05, \hat \beta &gt; 0) &gt; \beta\)</span>.</li>
+</ol>
+<p><span class="citation" data-cites="copas1991estimating">Copas and Long (<a href="#ref-copas1991estimating" role="doc-biblioref">1991</a>)</span> explain how (5) occurs,</p>
+<div class="no-row-height column-margin column-container"><div id="ref-copas1991estimating" class="csl-entry" role="listitem">
+Copas, JB, and Tianyong Long. 1991. <span>“Estimating the Residual Variance in Orthogonal Regression with Variable Selection.”</span> <em>Journal of the Royal Statistical Society Series D: The Statistician</em> 40 (1): 51–59.
+</div></div><blockquote class="blockquote">
+<p>The choice of the variables to be included depends on estimated regression coefficients rather than their true values, and so <span class="math inline">\(X_j\)</span> is more likely to be included if its regression coefficient is over-estimated than if its regression coefficient is underestimated.</p>
+</blockquote>
+<p>To prevent regression coefficients being too large, Tibshirani’s<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> <em>lasso</em> procedure can be used <span class="citation" data-cites="tibshirani1996regression">(<a href="#ref-tibshirani1996regression" role="doc-biblioref">Tibshirani 1996</a>)</span>. This shrinks coefficient estimates towards zero by including a constraint that the sum of absolute values of the coefficient estimates must be less than some <span class="math inline">\(k\)</span>. Note that the lasso procedure shares many of stepwise’s deficiencies, namely that there is a “low probability of selecting the ‘correct’ variables” (see <a href="https://stats.stackexchange.com/questions/411035/does-lasso-suffer-from-the-same-problems-stepwise-regression-does/426805#426805">StackExchange</a> for some more information).</p>
+<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;of <em>An Introduction to Statistical Learning</em> fame.</p></div><div id="ref-tibshirani1996regression" class="csl-entry" role="listitem">
+Tibshirani, Robert. 1996. <span>“Regression Shrinkage and Selection via the Lasso.”</span> <em>Journal of the Royal Statistical Society Series B: Statistical Methodology</em> 58 (1): 267–88.
+</div><div id="ref-derksen1992backward" class="csl-entry" role="listitem">
+Derksen, Shelley, and Harvey J Keselman. 1992. <span>“Backward, Forward and Stepwise Automated Subset Selection Algorithms: Frequency of Obtaining Authentic and Noise Variables.”</span> <em>British Journal of Mathematical and Statistical Psychology</em> 45 (2): 265–82.
+</div></div><p><span class="citation" data-cites="derksen1992backward">Derksen and Keselman (<a href="#ref-derksen1992backward" role="doc-biblioref">1992</a>)</span> found that when the stepwise procedure was used, the final model represented noise between <span class="math inline">\(20\%\)</span> and <span class="math inline">\(74\%\)</span> of the time, and the final model contained less than half of the actual number of authentic predictors. To see this in action, Frank Harrell has some simulations as part of his ‘Regression Modelling Strategies’ <a href="https://hbiostat.org/rmsc/multivar#sec-multivar-variable-selection">course notes</a>.</p>
+</section>
+<section id="issues-with-data-splitting" class="level1 page-columns page-full">
+<h1>Issues with data-splitting</h1>
+<p>The issues with data-splitting are discussed in <span class="citation" data-cites="harrell2001regression">Harrell et al. (<a href="#ref-harrell2001regression" role="doc-biblioref">2001, vol. 608, sec. 5.3.3</a>)</span>. These include</p>
+<div class="no-row-height column-margin column-container"></div><ol type="1">
+<li>Data-splitting greatly reduces the sample size for both model development and model testing.</li>
+<li>Repeating the process with a different split can result in different assessments of predictive accuracy.</li>
+<li>It does not validate the final model, only a model developed on a subset of the data.</li>
+</ol>
+<p>Number (3) is discussed further <a href="https://www.fharrell.com/post/split-val/">here</a>, specifically:</p>
+<div class="page-columns page-full"><blockquote class="blockquote">
+<p>When feature selection is done, data splitting validates just one of a myriad of potential models. In effect it validates an example model. Resampling (repeated cross-validation or the bootstrap) validate the process that was used to develop the model. Resampling is honest in reporting the results because it depicts the uncertainty in feature selection, e.g., the disagreements in which variables are selected from one resample to the next.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
+</blockquote><div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;That is, for each bootstrap sample, some sort of variable selection is done (<em>e.g.</em> stepwise, or lasso). The proportion of bootstrap samples where each variable is chosen in the model can then be reported to give an idea of the uncertainty in variable selection.</p></div></div></div>
+<p>A good primer on the evaluation of clinical prediction models is given by <span class="citation" data-cites="collins2024evaluation">Collins et al. (<a href="#ref-collins2024evaluation" role="doc-biblioref">2024</a>)</span>. In this, the authors state,</p>
+<div class="no-row-height column-margin column-container"><div id="ref-collins2024evaluation" class="csl-entry" role="listitem">
+Collins, Gary S, Paula Dhiman, Jie Ma, Michael M Schlussel, Lucinda Archer, Ben Van Calster, Frank E Harrell, et al. 2024. <span>“Evaluation of Clinical Prediction Models (Part 1): From Development to External Validation.”</span> <em>Bmj</em> 384.
+</div></div><blockquote class="blockquote">
+<p>Randomly splitting obviously creates two smaller datasets, and often the full dataset is not even large enough to begin with. Having a dataset that is too small to develop the model increases the likelihood of overfitting and producing an unreliable model, and having a test set that is too small will not be able to reliably and precisely estimate model performance—this is a clear waste of precious information.</p>
+</blockquote>
+<p>Even more succinctly, <span class="citation" data-cites="steyerberg2018validation">Steyerberg (<a href="#ref-steyerberg2018validation" role="doc-biblioref">2018</a>)</span> states,</p>
+<div class="no-row-height column-margin column-container"><div id="ref-steyerberg2018validation" class="csl-entry" role="listitem">
+Steyerberg, Ewout W. 2018. <span>“Validation in Prediction Research: The Waste by Data Splitting.”</span> <em>Journal of Clinical Epidemiology</em> 103: 131–33.
+</div></div><blockquote class="blockquote">
+<p>random data splitting should be abolished for validation of prediction models.</p>
+</blockquote>
+<p>Well, that’s pretty clear!</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+But what about external validation?
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Before diving in, it’s worth remarking that the field of genetics was created before anyone had any idea about the structure of a cell, what DNA looked like, and what chromosomes were. This means the language around this topic can be somewhat confusing for a newcomer, as old terms are still floating around, and overlapping with newer more precise terms.</p>
+<p>There are not many situations where external validation is possible – the main one in my mind being another research group has access to different data than you. For information on internal and external validation, see the ‘Biostatistic for Biomedical Research’ <a href="https://hbiostat.org/bbr/reg.html#internal-vs.-external-model-validation">course notes</a>.</p>
 </div>
 </div>
-<p>Let’s start by describing the basic mechanics of genetic material and cells. In humans, most cell contains DNA, which is packaged in 23 chromosomes<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>. DNA is a long code created from four nucleotides – adenine (A), guanine (G), cytosine (C), and thymine (T) – which are paired with each other (AT and CG) to create base pairs. Parts of the DNA do a specific job, and are known as genes. These genes either code for proteins, or help control other genes. Genes are small sections of DNA that have the ability to be copied into an RNA sequence, which can then encode for proteins (or perform other tasks).</p>
-<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;by being tightly coiled around proteins known as histones</p></div><div id="fn3"><p><sup>3</sup>&nbsp;The full table showing these combinations can be seen <a href="https://en.wikipedia.org/wiki/DNA_and_RNA_codon_tables#Translation_table_1">here</a></p></div></div><p>A single-nucleotide polymorphism (SNP) is when there is a substitution in a single nucleotide. A SNP in a gene can create differences within populations, for example in the ability to metabolise alcohol. Most of the time, however, they do not create any differences, as when the RNA from genes are read, they are done in codons. A codon is a set of three base pairs, and therefore there are <span class="math inline">\(4^3 = 64\)</span> different combinations of the four nucleotides (<span class="math inline">\(61\)</span> of which specify amino acids). However, as there are only <span class="math inline">\(20\)</span> amino acids, there are many codons with different base pairs that produce the same amino acids. For example, UCU, UCC, UCA, UCG, AGU, AGC all produce the Serine amino acid.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
-<section id="a-short-history" class="level3 page-columns page-full">
-<h3 class="anchored" data-anchor-id="a-short-history">A short history</h3>
-<p>Lets start with Gregor Mendel – the “father of modern genetics” and well known for his experiments into the inheritance of pea plants. I won’t go into detail on him, as <a href="https://en.wikipedia.org/wiki/Gregor_Mendel">Wikipedia</a> can do that for me. However, two quick points to make:</p>
-<ol type="1">
-<li>The <a href="https://en.wikipedia.org/wiki/Mendelian_inheritance#Mendel's_laws_of_inheritance"><em>Laws of Inheritance</em></a> are important pre-requisite conditions for Mendelian Randomisation to work.</li>
-<li>The genius of Mendel was his ability to understand that the underlying process was random, and he was only observing a realisation of this random process.</li>
-</ol>
-<p>The double-helix structure of DNA was discovered by Rosalind Franklin, James Watson and Francis Crick in 1953. This knowledge of the structure allowed the further discoveries of how proteins are translated from RNA, which is transcribed by DNA.</p>
-<section id="biobanks" class="level4 page-columns page-full">
-<h4 class="anchored" data-anchor-id="biobanks">Biobanks</h4>
-<p>In the last twenty years or so, large biobanks have been created. These store the genetic and health information of individuals, either at a single point in time or with a temporal aspect. Two examples of large biobanks are:</p>
-<ol type="1">
-<li>The <a href="https://www.ukbiobank.ac.uk/">UK Biobank</a> has information on around half-a-million individuals aged between 40 and 69.</li>
-<li>The <a href="https://www.bristol.ac.uk/alspac/">Avon Longitudinal Study of Parents and Children</a>. Here, more than 14,000 pregnant women were recruited into the study in 1991/92, with their children, and grandchildren, being followed up in detail.</li>
-</ol>
-<p>One important caveat for these biobanks when using them for research is that they are not representative of the population of the UK. For example, it is known that the individuals in the UK Biobank are more likely to be in a higher social-economic bracket, with fewer lung cancers and other health issues than the general population. This makes performing analysis and obtaining generalisable result (using GWAS<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> and Mendelian Randomisation) more difficult.</p>
-<div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;genome-wise association studies</p></div></div></section>
-<section id="genome-wise-associated-studies" class="level4 page-columns page-full">
-<h4 class="anchored" data-anchor-id="genome-wise-associated-studies">Genome-wise associated studies</h4>
-<p>Genome-wide association studies (GWAS) attempt to find associations between genetic variants and phenotypes. The genetic variants considered are usually SNPs, as opposed to indels<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>. As biobank sequencing is normally short-read (<em>i.e.</em> only a small section of DNA is read at a time) and the location of these short-reads are random,<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a> it is trickier to notice indels compared to SNPs. It is also worth noting here that when an individual’s genome is sequenced, the result isn’t the sequence of DNA in a specific cell, but instead is an average. This means that the SNPs in the sequences obtained were present in most of the cells within the individual so most likely have been there since the very early cell division stages. Therefore, if certain SNPs are associated with phenotypes, then the relationship can be thought of a “lifetime” association.</p>
-<div class="no-row-height column-margin column-container"><div id="fn5"><p><sup>5</sup>&nbsp;<a href="https://www.sciencedirect.com/science/article/abs/pii/B9780124047488000095">insertions and deletions</a></p></div><div id="fn6"><p><sup>6</sup>&nbsp;I am not sure if they are truly random along the whole of the DNA - it might just be that there is some uncertainty in the exact location</p></div></div></section>
 </section>
-</section>
-<section id="mendelian-randomisation" class="level2">
-<h2 class="anchored" data-anchor-id="mendelian-randomisation">Mendelian Randomisation</h2>
+<section id="fin" class="level1">
+<h1>Fin</h1>
+
 
 
 </section>
 
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{smith2025,
-  author = {Smith, Paul},
-  title = {A {First} {Foray} into {Genetics,} {GWAS,} and {Mendelian}
-    {Randomisation}},
-  date = {2025-01-11},
-  url = {https://pws3141.github.io/blog/posts/02-mandelian_randomisation/},
+  author = {Smith, Paul and Smith, Paul},
+  title = {Model {Fitting} and {Validation}},
+  date = {2025-03-05},
+  url = {https://pws3141.github.io/blog/posts/modelbuilding/stepwise_datasplitting/},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-smith2025" class="csl-entry quarto-appendix-citeas" role="listitem">
-Smith, Paul. 2025. <span>“A First Foray into Genetics, GWAS, and
-Mendelian Randomisation.”</span> January 11, 2025. <a href="https://pws3141.github.io/blog/posts/02-mandelian_randomisation/">https://pws3141.github.io/blog/posts/02-mandelian_randomisation/</a>.
+Smith, Paul, and Paul Smith. 2025. <span>“Model Fitting and
+Validation.”</span> March 5, 2025. <a href="https://pws3141.github.io/blog/posts/modelbuilding/stepwise_datasplitting/">https://pws3141.github.io/blog/posts/modelbuilding/stepwise_datasplitting/</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {

@@ -1,12 +1,35 @@
 [
   {
-    "listing": "/index.html",
+    "listing": "/modelbuilding-series.html",
     "items": [
-      "/posts/10-bias_corrected_validation/index.html",
+      "/posts/modelbuilding/bias_corrected_validation/index.html",
+      "/posts/modelbuilding/stepwise_datasplitting_simulation/index.html",
+      "/posts/modelbuilding/stepwise_datasplitting/index.html"
+    ]
+  },
+  {
+    "listing": "/archive.html",
+    "items": [
+      "/posts/modelbuilding/bias_corrected_validation/index.html",
       "/posts/09-mlr3_hyperparameter/index.html",
       "/posts/08-mlr3_evaluation_benchmarking/index.html",
-      "/posts/07-stepwise_datasplitting_simulation/index.html",
-      "/posts/06-stepwise_datasplitting/index.html",
+      "/posts/modelbuilding/stepwise_datasplitting_simulation/index.html",
+      "/posts/modelbuilding/stepwise_datasplitting/index.html",
+      "/posts/05-mlr3_basic_modelling/index.html",
+      "/posts/04-highcharter_bar/index.html",
+      "/posts/03-highcharter_graphs/index.html",
+      "/posts/02-mandelian_randomisation/index.html",
+      "/posts/01-highcharter/index.html"
+    ]
+  },
+  {
+    "listing": "/index.html",
+    "items": [
+      "/posts/modelbuilding/bias_corrected_validation/index.html",
+      "/posts/09-mlr3_hyperparameter/index.html",
+      "/posts/08-mlr3_evaluation_benchmarking/index.html",
+      "/posts/modelbuilding/stepwise_datasplitting_simulation/index.html",
+      "/posts/modelbuilding/stepwise_datasplitting/index.html",
       "/posts/05-mlr3_basic_modelling/index.html",
       "/posts/04-highcharter_bar/index.html",
       "/posts/03-highcharter_graphs/index.html",

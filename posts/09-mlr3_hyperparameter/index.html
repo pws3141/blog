@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.7.32">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -93,10 +93,10 @@ div.csl-indent {
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-54b385dd2068b2e93273ea1ed4f27f83.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-39aa5599c175b676807642dbe23379f8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -443,13 +443,13 @@ Becker, Marc, Lennart Schneider, and Sebastian Fischer. 2024. <span>“Hyperpara
 <div class="cell-output cell-output-stdout">
 <pre><code>    mtry num.trees sample.fraction learner_param_vals  x_domain regr.rmse
    &lt;int&gt;     &lt;int&gt;           &lt;num&gt;             &lt;list&gt;    &lt;list&gt;     &lt;num&gt;
-1:     8       659       0.9213231          &lt;list[4]&gt; &lt;list[3]&gt;  2.281479</code></pre>
+1:     5       213       0.6735753          &lt;list[4]&gt; &lt;list[3]&gt;  2.960166</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>instance<span class="sc">$</span>result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    mtry num.trees sample.fraction learner_param_vals  x_domain regr.rmse
    &lt;int&gt;     &lt;int&gt;           &lt;num&gt;             &lt;list&gt;    &lt;list&gt;     &lt;num&gt;
-1:     8       659       0.9213231          &lt;list[4]&gt; &lt;list[3]&gt;  2.281479</code></pre>
+1:     5       213       0.6735753          &lt;list[4]&gt; &lt;list[3]&gt;  2.960166</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>instance<span class="sc">$</span>result<span class="sc">$</span>learner_param_vals</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -458,13 +458,13 @@ Becker, Marc, Lennart Schneider, and Sebastian Fischer. 2024. <span>“Hyperpara
 [1] 1
 
 [[1]]$mtry
-[1] 8
+[1] 5
 
 [[1]]$num.trees
-[1] 659
+[1] 213
 
 [[1]]$sample.fraction
-[1] 0.9213231</code></pre>
+[1] 0.6735753</code></pre>
 </div>
 </div>
 <p>All 50 of the random search evaluations are stored in the <code>archive</code> slot of the <code>instance</code> object.</p>
@@ -473,17 +473,17 @@ Becker, Marc, Lennart Schneider, and Sebastian Fischer. 2024. <span>“Hyperpara
 <div class="cell-output cell-output-stdout">
 <pre><code>     mtry sample.fraction num.trees regr.rmse
     &lt;int&gt;           &lt;num&gt;     &lt;int&gt;     &lt;num&gt;
- 1:     5       0.9761367       187  2.326994
- 2:     8       0.3760474      1227  3.273929
- 3:     4       0.9020999       959  2.375568
- 4:    10       0.8781863      1283  2.369357
- 5:     2       0.2718788       161  5.872510
+ 1:     5       0.9761367       187  3.089494
+ 2:     8       0.3760474      1227  3.486089
+ 3:     4       0.9020999       959  3.073204
+ 4:    10       0.8781863      1283  3.098450
+ 5:     2       0.2718788       161  6.148185
 ---                                          
-46:     9       0.2032898       720  5.862083
-47:     7       0.6087772        35  2.833661
-48:     4       0.1445110      1487  5.868978
-49:     6       0.7125770      1637  2.476398
-50:     3       0.1578512       302  5.884770</code></pre>
+46:     9       0.2032898       720  6.219048
+47:     7       0.6087772        35  3.160166
+48:     4       0.1445110      1487  6.236493
+49:     6       0.7125770      1637  3.062291
+50:     3       0.1578512       302  6.245020</code></pre>
 </div>
 </div>
 <p>Now let’s visualise the effect of each hyperparameter using marginal plots.</p>
@@ -506,18 +506,18 @@ Becker, Marc, Lennart Schneider, and Sebastian Fischer. 2024. <span>“Hyperpara
 <pre><code>Ranger result
 
 Call:
- ranger::ranger(dependent.variable.name = task$target_names, data = task$data(),      case.weights = task$weights$weight, mtry = 8L, num.threads = 1L,      num.trees = 659L, sample.fraction = 0.921323131560348) 
+ ranger::ranger(dependent.variable.name = task$target_names, data = task$data(),      case.weights = task$weights$weight, mtry = 5L, num.threads = 1L,      num.trees = 213L, sample.fraction = 0.673575255507603) 
 
 Type:                             Regression 
-Number of trees:                  659 
+Number of trees:                  213 
 Sample size:                      32 
 Number of independent variables:  10 
-Mtry:                             8 
+Mtry:                             5 
 Target node size:                 5 
 Variable importance mode:         none 
 Splitrule:                        variance 
-OOB prediction error (MSE):       5.687571 
-R squared (OOB):                  0.8434216 </code></pre>
+OOB prediction error (MSE):       5.829941 
+R squared (OOB):                  0.8395021 </code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -709,30 +709,30 @@ Figure&nbsp;1: An illustration of nested resampling. The large blocks represent 
 150:         3     1     31967       0.2513883  3.739324             1
      x_domain_num.trees x_domain_sample.fraction runtime_learners
                   &lt;int&gt;                    &lt;num&gt;            &lt;num&gt;
-  1:              15547                0.3219244            0.059
-  2:              23468                0.3020848            0.084
-  3:              47564                0.3500007            0.185
-  4:              14922                0.8105999            0.105
-  5:              81447                0.1308460            0.343
+  1:              15547                0.3219244            0.066
+  2:              23468                0.3020848            0.099
+  3:              47564                0.3500007            0.204
+  4:              14922                0.8105999            0.116
+  5:              81447                0.1308460            0.392
  ---                                                             
-146:              20556                0.5608060            0.118
-147:               9179                0.8461799            0.054
-148:              93847                0.1486419            0.370
-149:              15719                0.7797092            0.093
-150:              31967                0.2513883            0.118
+146:              20556                0.5608060            0.133
+147:               9179                0.8461799            0.057
+148:              93847                0.1486419            0.430
+149:              15719                0.7797092            0.100
+150:              31967                0.2513883            0.126
                timestamp warnings errors batch_nr  resample_result task_id
                   &lt;POSc&gt;    &lt;int&gt;  &lt;int&gt;    &lt;int&gt;           &lt;list&gt;  &lt;char&gt;
-  1: 2025-04-12 13:02:58        0      0        1 &lt;ResampleResult&gt;  mtcars
-  2: 2025-04-12 13:02:58        0      0        2 &lt;ResampleResult&gt;  mtcars
-  3: 2025-04-12 13:02:58        0      0        3 &lt;ResampleResult&gt;  mtcars
-  4: 2025-04-12 13:02:58        0      0        4 &lt;ResampleResult&gt;  mtcars
-  5: 2025-04-12 13:02:59        0      0        5 &lt;ResampleResult&gt;  mtcars
+  1: 2025-07-27 15:47:27        0      0        1 &lt;ResampleResult&gt;  mtcars
+  2: 2025-07-27 15:47:27        0      0        2 &lt;ResampleResult&gt;  mtcars
+  3: 2025-07-27 15:47:28        0      0        3 &lt;ResampleResult&gt;  mtcars
+  4: 2025-07-27 15:47:28        0      0        4 &lt;ResampleResult&gt;  mtcars
+  5: 2025-07-27 15:47:28        0      0        5 &lt;ResampleResult&gt;  mtcars
  ---                                                                      
-146: 2025-04-12 13:03:38        0      0       46 &lt;ResampleResult&gt;  mtcars
-147: 2025-04-12 13:03:38        0      0       47 &lt;ResampleResult&gt;  mtcars
-148: 2025-04-12 13:03:39        0      0       48 &lt;ResampleResult&gt;  mtcars
-149: 2025-04-12 13:03:39        0      0       49 &lt;ResampleResult&gt;  mtcars
-150: 2025-04-12 13:03:39        0      0       50 &lt;ResampleResult&gt;  mtcars
+146: 2025-07-27 15:48:10        0      0       46 &lt;ResampleResult&gt;  mtcars
+147: 2025-07-27 15:48:10        0      0       47 &lt;ResampleResult&gt;  mtcars
+148: 2025-07-27 15:48:10        0      0       48 &lt;ResampleResult&gt;  mtcars
+149: 2025-07-27 15:48:11        0      0       49 &lt;ResampleResult&gt;  mtcars
+150: 2025-07-27 15:48:11        0      0       50 &lt;ResampleResult&gt;  mtcars
             learner_id resampling_id
                 &lt;char&gt;        &lt;char&gt;
   1: regr.ranger.tuned            cv
@@ -1622,15 +1622,15 @@ regr.rmse
 
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{smith2025,
-  author = {Smith, Paul},
+  author = {Smith, Paul and Smith, Paul},
   title = {Getting {Started} with \{Mlr3\}},
   date = {2025-03-21},
   url = {https://pws3141.github.io/blog/posts/09-mlr3_hyperparameter/},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-smith2025" class="csl-entry quarto-appendix-citeas" role="listitem">
-Smith, Paul. 2025. <span>“Getting Started with {Mlr3}.”</span> March 21,
-2025. <a href="https://pws3141.github.io/blog/posts/09-mlr3_hyperparameter/">https://pws3141.github.io/blog/posts/09-mlr3_hyperparameter/</a>.
+Smith, Paul, and Paul Smith. 2025. <span>“Getting Started with
+{Mlr3}.”</span> March 21, 2025. <a href="https://pws3141.github.io/blog/posts/09-mlr3_hyperparameter/">https://pws3141.github.io/blog/posts/09-mlr3_hyperparameter/</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {

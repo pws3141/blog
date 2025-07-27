@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.7.32">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -80,23 +80,23 @@ div.csl-indent {
 }</style>
 
 
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../../site_libs/quarto-html/popper.min.js"></script>
-<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-54b385dd2068b2e93273ea1ed4f27f83.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-39aa5599c175b676807642dbe23379f8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -155,14 +155,14 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../../../styles.css">
 <meta name="citation_title" content="Model Fitting and Validation">
 <meta name="citation_author" content="Paul Smith">
 <meta name="citation_publication_date" content="2025-04-26">
 <meta name="citation_cover_date" content="2025-04-26">
 <meta name="citation_year" content="2025">
 <meta name="citation_online_date" content="2025-04-26">
-<meta name="citation_fulltext_html_url" content="https://pws3141.github.io/blog/posts/10-bias_corrected_validation/">
+<meta name="citation_fulltext_html_url" content="https://pws3141.github.io/blog/posts/modelbuilding/bias_corrected_validation/">
 <meta name="citation_language" content="en">
 <meta name="citation_reference" content="citation_title=Clmnis: An r package for downloading data from the parliamentary members names information service;,citation_author=Noel Dempsey;,citation_publication_date=2025;,citation_cover_date=2025;,citation_year=2025;,citation_fulltext_html_url=https://github.com/houseofcommonslibrary/clmnis;">
 <meta name="citation_reference" content="citation_title=Highcharter: A wrapper for the ’highcharts’ library;,citation_author=Joshua Kunst;,citation_publication_date=2022;,citation_cover_date=2022;,citation_year=2022;,citation_fulltext_html_url=https://CRAN.R-project.org/package=highcharter;">
@@ -199,7 +199,7 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../../index.html">
+    <a class="navbar-brand" href="../../../index.html">
     <span class="navbar-title">Paul Smith</span>
     </a>
   </div>
@@ -215,7 +215,7 @@ window.Quarto = {
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../about.html"> 
+    <a class="nav-link" href="../../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
@@ -308,10 +308,10 @@ window.Quarto = {
 
 
 
-<p>This is <em>Part Three</em> of an <span class="math inline">\(N\)</span><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> part series on model fitting and validation.</p>
-<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;where <span class="math inline">\(N\)</span> is TBC</p></div></div><ul>
-<li><a href="../../posts/06-stepwise_datasplitting/index.html">Part One</a> considers some theoretical issues with data-splitting and using stepwise selection</li>
-<li><a href="../../posts/07-stepwise_datasplitting_simulation/index.html">Part Two</a> looks at simulating the effect of data-splitting and stepwise selection in model building and validation on the <code>lung</code> dataset, including:
+<p>This is <em>Part Three</em> of a four part series on model fitting and validation.</p>
+<ul>
+<li><a href="../../../posts/modelbuilding/stepwise_datasplitting/index.html">Part One</a> considers some theoretical issues with data-splitting and using stepwise selection</li>
+<li><a href="../../../posts/modelbuilding/stepwise_datasplitting_simulation/index.html">Part Two</a> looks at simulating the effect of data-splitting and stepwise selection in model building and validation on the <code>lung</code> dataset, including:
 <ul>
 <li>The variability of model terms chosen and the coefficient estimates from data-splitting and using stepwise selection;</li>
 <li>The variability in the C-statistic obtained from the test set.</li>
@@ -335,7 +335,7 @@ The hierarchy of validation methods
 </div>
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>In <span class="citation" data-cites="harrell2001regression">Harrell et al. (<a href="#ref-harrell2001regression" role="doc-biblioref">2001, vol. 608, chap. 5.2</a>)</span>, a hierarchy of validation methods is given, from worst to best.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<p>In <span class="citation" data-cites="harrell2001regression">Harrell et al. (<a href="#ref-harrell2001regression" role="doc-biblioref">2001, vol. 608, chap. 5.2</a>)</span>, a hierarchy of validation methods is given, from worst to best.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <ol type="1">
 <li>Attempting several validations (internal or external) and reporting only the one that “worked”</li>
 <li>Reporting apparent performance on the training dataset (no validation)</li>
@@ -351,7 +351,7 @@ The hierarchy of validation methods
 </div>
 </div>
 </div>
-<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;Specifically, “one suggested hierarchy”, so I’m unsure whether this is Harrell’s suggested one or not…</p></div></div><div class="no-row-height column-margin column-container"></div><section id="the-method" class="level2 page-columns page-full">
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;Specifically, “one suggested hierarchy”, so I’m unsure whether this is Harrell’s suggested one or not…</p></div></div><div class="no-row-height column-margin column-container"></div><section id="the-method" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="the-method">The method</h2>
 <p>I will only consider complete-case data for now, and will consider two different scenarios.</p>
 <ol type="1">
@@ -370,7 +370,7 @@ Why stepwise?
 </div>
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>I am using stepwise here for simplicity. The lasso would be better (although it still <a href="../../posts/06-stepwise_datasplitting/index.html">shares many of stepwise’s flaws</a>). Using expert judgement to choose variables is much better, and means it is much harder to hide behind the computer.</p>
+<p>I am using stepwise here for simplicity. The lasso would be better (although it still <a href="../../../posts/modelbuilding/stepwise_datasplitting/index.html">shares many of stepwise’s flaws</a>). Using expert judgement to choose variables is much better, and means it is much harder to hide behind the computer.</p>
 <p>I’m waiting with baited breath for guidance from the <a href="https://stratos-initiative.org/group_2"><em>STRengthening Analytical Thinking for Observational Studies</em> (STRATOS)</a> initiative on variable selection techniques for multivariate analysis, but I’m not sure it’s coming anytime soon <span class="citation" data-cites="sauerbrei2020state">(<a href="#ref-sauerbrei2020state" role="doc-biblioref">Sauerbrei et al. 2020</a>)</span>.</p>
 </div>
 </div>
@@ -394,10 +394,10 @@ Collins, Gary S, Paula Dhiman, Jie Ma, Michael M Schlussel, Lucinda Archer, Ben 
 </section>
 <section id="the-data" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="the-data">The data</h2>
-<p>The examples will be performed on the complete-case of <a href="https://stat.ethz.ch/R-manual/R-devel/library/survival/html/pbc.html"><code>pbc</code></a> data from the <code>{survival}</code> package <span class="citation" data-cites="therneau2024survival">(<a href="#ref-therneau2024survival" role="doc-biblioref">Therneau 2024</a>)</span>.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
+<p>The examples will be performed on the complete-case of <a href="https://stat.ethz.ch/R-manual/R-devel/library/survival/html/pbc.html"><code>pbc</code></a> data from the <code>{survival}</code> package <span class="citation" data-cites="therneau2024survival">(<a href="#ref-therneau2024survival" role="doc-biblioref">Therneau 2024</a>)</span>.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
 <div class="no-row-height column-margin column-container"><div id="ref-therneau2024survival" class="csl-entry" role="listitem">
 Therneau, Terry M. 2024. <em>A Package for Survival Analysis in r</em>. <a href="https://CRAN.R-project.org/package=survival">https://CRAN.R-project.org/package=survival</a>.
-</div><div id="fn3"><p><sup>3</sup>&nbsp;In my next post I’ll be considering the full dataset and use multiple imputation to handle the missing data.</p></div></div><div class="cell">
+</div><div id="fn2"><p><sup>2</sup>&nbsp;In my next post I’ll be considering the full dataset and use multiple imputation to handle the missing data.</p></div></div><div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">datatable.print.nrows =</span> <span class="dv">20</span>) <span class="co"># max # rows before truncating (default = 100)</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survival)</span>
@@ -773,8 +773,8 @@ Score (logrank) test = 257.5  on 8 df,   p=&lt;2e-16</code></pre>
 </ol>
 <section id="the-example-2" class="level4 page-columns page-full">
 <h4 class="anchored" data-anchor-id="the-example-2">The example</h4>
-<p>First, I obtain the (optimistic) C-statistic<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>, as described in Step (1).</p>
-<div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;The C-statistic obtained from the original model <span class="math inline">\(\mathcal{M}\)</span> (from <a href="#sec-complete-building" class="quarto-xref">Section&nbsp;2.2.1</a>), fitted to the complete-case dataset <span class="math inline">\(\tilde{X}\)</span>.</p></div></div><div class="cell">
+<p>First, I obtain the (optimistic) C-statistic<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>, as described in Step (1).</p>
+<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;The C-statistic obtained from the original model <span class="math inline">\(\mathcal{M}\)</span> (from <a href="#sec-complete-building" class="quarto-xref">Section&nbsp;2.2.1</a>), fitted to the complete-case dataset <span class="math inline">\(\tilde{X}\)</span>.</p></div></div><div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>c <span class="ot">&lt;-</span> <span class="fu">concordance</span>(cox2)<span class="sc">$</span>concordance</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Then, follow Step (2) to obtain the C-statistic from the <span class="math inline">\(b^\text{th}\)</span> bootstrap model <span class="math inline">\(\mathcal{M}^{(b)}\)</span>, fitted to both the bootstrap dataset,<span class="math inline">\(\tilde{X}^{(b)}\)</span>, and the original dataset, <span class="math inline">\(\tilde{X}\)</span>. From these the <span class="math inline">\(b^\text{th}\)</span> bootstrap model optimism can be calculated.</p>
@@ -828,21 +828,21 @@ Score (logrank) test = 257.5  on 8 df,   p=&lt;2e-16</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>        c_boot       c_x     optimism           time
          &lt;num&gt;     &lt;num&gt;        &lt;num&gt;     &lt;difftime&gt;
-  1: 0.8538053 0.8443148  0.009490538 0.1903069 secs
-  2: 0.8293180 0.8343143 -0.004996320 0.2509501 secs
-  3: 0.8455517 0.8346268  0.010924944 0.1888931 secs
-  4: 0.8362208 0.8348872  0.001333566 0.2827499 secs
-  5: 0.8589161 0.8320225  0.026893555 0.1687860 secs
+  1: 0.8538053 0.8443148  0.009490538 0.1957340 secs
+  2: 0.8293180 0.8343143 -0.004996320 0.2602129 secs
+  3: 0.8455517 0.8346268  0.010924944 0.1965189 secs
+  4: 0.8362208 0.8348872  0.001333566 0.3568220 secs
+  5: 0.8589161 0.8320225  0.026893555 0.1705470 secs
  ---                                                
- 96: 0.8501148 0.8251992  0.024915579 0.1228180 secs
- 97: 0.8402561 0.8210323  0.019223753 0.3517611 secs
- 98: 0.8800687 0.8248346  0.055234084 0.2450161 secs
- 99: 0.8755016 0.8236366  0.051864931 0.3222780 secs
-100: 0.8329462 0.8116048  0.021341406 0.3348110 secs</code></pre>
+ 96: 0.8501148 0.8251992  0.024915579 0.1299031 secs
+ 97: 0.8402561 0.8210323  0.019223753 0.3777142 secs
+ 98: 0.8800687 0.8248346  0.055234084 0.2567770 secs
+ 99: 0.8755016 0.8236366  0.051864931 0.2583091 secs
+100: 0.8329462 0.8116048  0.021341406 0.2771111 secs</code></pre>
 </div>
 </div>
-<p>This process took 22.14 secs in total.<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a></p>
-<div class="no-row-height column-margin column-container"><div id="fn5"><p><sup>5</sup>&nbsp;On my Macbook Air M3.</p></div></div><p>Now, I compute the mean optimism, <span class="math inline">\(\bar{o}\)</span>, and the overfitting-corrected estimate of accuracy.</p>
+<p>This process took 23.42 secs in total.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
+<div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;On my Macbook Air M3.</p></div></div><p>Now, I compute the mean optimism, <span class="math inline">\(\bar{o}\)</span>, and the overfitting-corrected estimate of accuracy.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (3) mean optimism</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>optimism_mean <span class="ot">&lt;-</span> <span class="fu">mean</span>(c_boots<span class="sc">$</span>optimism)</span>
@@ -870,7 +870,7 @@ Using <code>rms::validate()</code>
 <div class="cell-output cell-output-stdout">
 <pre><code>Surv(time, status) ~ bili + stage + copper + albumin + protime + 
     age + edema + ast
-&lt;environment: 0x12583deb0&gt;</code></pre>
+&lt;environment: 0x1346d5190&gt;</code></pre>
 </div>
 </div>
 <p>So, assuming this model form is constant throughout:</p>
@@ -916,15 +916,15 @@ g         1.4660   1.5596 1.3985   0.1611          1.3049 100
 
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{smith2025,
-  author = {Smith, Paul},
+  author = {Smith, Paul and Smith, Paul},
   title = {Model {Fitting} and {Validation}},
   date = {2025-04-26},
-  url = {https://pws3141.github.io/blog/posts/10-bias_corrected_validation/},
+  url = {https://pws3141.github.io/blog/posts/modelbuilding/bias_corrected_validation/},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-smith2025" class="csl-entry quarto-appendix-citeas" role="listitem">
-Smith, Paul. 2025. <span>“Model Fitting and Validation.”</span> April
-26, 2025. <a href="https://pws3141.github.io/blog/posts/10-bias_corrected_validation/">https://pws3141.github.io/blog/posts/10-bias_corrected_validation/</a>.
+Smith, Paul, and Paul Smith. 2025. <span>“Model Fitting and
+Validation.”</span> April 26, 2025. <a href="https://pws3141.github.io/blog/posts/modelbuilding/bias_corrected_validation/">https://pws3141.github.io/blog/posts/modelbuilding/bias_corrected_validation/</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
