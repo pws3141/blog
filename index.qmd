@@ -1,14 +1,17 @@
 ---
-title: "Blog"
 listing:
   contents: posts
   sort: "date desc"
   type: default
   categories: true
-  sort-ui: false
-  filter-ui: false
+  sort-ui: true
+  filter-ui: true
 page-layout: full
 title-block-banner: false
 ---
 
+# Series
+
+##### [modelbuilding-series](modelbuilding-series.html)
+This series contains posts related to model building and validation, including topics such as why data-splitting is bad, issues with stepwise selection, and optimism-adjustment via bootstrapping.
 

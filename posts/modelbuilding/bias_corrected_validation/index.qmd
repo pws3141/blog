@@ -12,10 +12,10 @@ execute:
   df-print: default
 ---
 
-This is *Part Three* of an $N$^[where $N$ is TBC] part series on model fitting and validation.
+This is *Part Three* of a four part series on model fitting and validation.
 
-- [Part One](../06-stepwise_datasplitting/index.qmd) considers some theoretical issues with data-splitting and using stepwise selection
-- [Part Two](../07-stepwise_datasplitting_simulation/index.qmd) looks at simulating the effect of data-splitting and stepwise selection in model building and validation on the `lung` dataset, including:
+- [Part One](../stepwise_datasplitting/index.qmd) considers some theoretical issues with data-splitting and using stepwise selection
+- [Part Two](../stepwise_datasplitting_simulation/index.qmd) looks at simulating the effect of data-splitting and stepwise selection in model building and validation on the `lung` dataset, including:
     - The variability of model terms chosen and the coefficient estimates from data-splitting and using stepwise selection;
     - The variability in the C-statistic obtained from the test set.
 
@@ -75,7 +75,7 @@ I will only consider complete-case data for now, and will consider two different
 :::{.callout-note collapse="true"}
 # Why stepwise?
 
-I am using stepwise here for simplicity. The lasso would be better (although it still [shares many of stepwise's flaws](../06-stepwise_datasplitting/index.qmd)). Using expert judgement to choose variables is much better, and means it is much harder to hide behind the computer.
+I am using stepwise here for simplicity. The lasso would be better (although it still [shares many of stepwise's flaws](../stepwise_datasplitting/index.qmd)). Using expert judgement to choose variables is much better, and means it is much harder to hide behind the computer.
 
 I'm waiting with baited breath for guidance from the [*STRengthening Analytical
 Thinking for Observational Studies*

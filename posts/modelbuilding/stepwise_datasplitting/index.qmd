@@ -14,7 +14,7 @@ execute:
 
 # Introduction
 
-This post is partly a expansion of a comment I made about training/test sets in a [previous post](../05-mlr3_basic_modelling/index.qmd).
+This post is partly a expansion of a comment I made about training/test sets in a [previous post](../../05-mlr3_basic_modelling/index.qmd). It is the first part of a four part series on model fitting and validation.
 At work, we often need to fit a model and validate it (using internal validation), in the presence of missing data. This short article ignores the missing data issue (I will look at this later), but instead focuses on fitting and validating a model.
 
 There are two main areas that I am looking at here, to try and improve current practice:

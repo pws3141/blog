@@ -1,0 +1,27 @@
+---
+title: "Model Fitting and Validation"
+subtitle: "Model Validation using the Bootstrap and Multiple Imputation"
+author:
+  - name: Paul Smith
+date: "2025-07-27"
+categories: [code, r, statistics, model fitting, model validation]
+format:
+  html:
+    code-fold: false
+execute:
+  df-print: default
+draft: true
+---
+
+This is the final part of a four part series on model fitting and validation.
+
+- [Part One](../stepwise_datasplitting/index.qmd) considers some theoretical issues with data-splitting and using stepwise selection
+- [Part Two](../stepwise_datasplitting_simulation/index.qmd) looks at simulating the effect of data-splitting and stepwise selection in model building and validation on the `lung` dataset, including:
+    - The variability of model terms chosen and the coefficient estimates from data-splitting and using stepwise selection;
+    - The variability in the C-statistic obtained from the test set.
+- [Part Three](../bias_corrected_validation/index.qmd) considers calculating an optimism-adjusted C-statistic using the bootstrap, both without and with variable selection in the model building stage.
+
+# Introduction
+
+In this part, I will again look at using the bootstrap to validate a model. However, here multiple imputation will be used to create $M$ complete datasets.
+
