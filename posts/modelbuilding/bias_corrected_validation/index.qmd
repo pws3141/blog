@@ -1,6 +1,5 @@
 ---
-title: "Model Fitting and Validation"
-subtitle: "Model Validation using the Bootstrap"
+title: "Model Validation using the Bootstrap"
 author:
   - name: Paul Smith
 date: "2025-04-26"

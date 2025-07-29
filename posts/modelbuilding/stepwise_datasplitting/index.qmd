@@ -1,6 +1,5 @@
 ---
-title: "Model Fitting and Validation"
-subtitle: "Some critiques of data-splitting and the stepwise procedure"
+title: "Some critiques of data-splitting and the stepwise procedure"
 author:
   - name: Paul Smith
 date: "2025-03-05"

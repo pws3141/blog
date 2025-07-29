@@ -12,6 +12,12 @@ title-block-banner: false
 
 # Series
 
-##### [modelbuilding-series](modelbuilding-series.html)
-This series contains posts related to model building and validation, including topics such as why data-splitting is bad, issues with stepwise selection, and optimism-adjustment via bootstrapping.
+##### [Model Building and Validation](modelbuilding-series.html)
 
+This series contains posts related to model building and validation, including:
+
+- Why data-splitting is bad;
+- Issues with stepwise selection; and,
+- Optimism-adjustment via bootstrapping.
+
+# All blog posts

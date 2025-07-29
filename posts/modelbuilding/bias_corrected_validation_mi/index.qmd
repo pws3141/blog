@@ -1,6 +1,5 @@
 ---
-title: "Model Fitting and Validation"
-subtitle: "Model Validation using the Bootstrap and Multiple Imputation"
+title: "Model Validation using the Bootstrap and Multiple Imputation"
 author:
   - name: Paul Smith
 date: "2025-07-27"

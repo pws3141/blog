@@ -1,6 +1,5 @@
 ---
-title: "Model Fitting and Validation"
-subtitle: "Simulating the effect of data-splitting and stepwise selection on the `lung` dataset"
+title: "Simulating the effect of data-splitting and stepwise selection on the `lung` dataset"
 author:
   - name: Paul Smith
 date: "2025-03-15"
