@@ -9,7 +9,7 @@
 <meta name="author" content="Paul Smith">
 <meta name="dcterms.date" content="2025-04-26">
 
-<title>Model Fitting and Validation – Paul Smith</title>
+<title>Model Validation using the Bootstrap – Paul Smith</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -156,7 +156,7 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="../../../styles.css">
-<meta name="citation_title" content="Model Fitting and Validation">
+<meta name="citation_title" content="Model Validation using the Bootstrap">
 <meta name="citation_author" content="Paul Smith">
 <meta name="citation_publication_date" content="2025-04-26">
 <meta name="citation_cover_date" content="2025-04-26">
@@ -234,8 +234,7 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Model Fitting and Validation</h1>
-            <p class="subtitle lead">Model Validation using the Bootstrap</p>
+      <h1 class="title">Model Validation using the Bootstrap</h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">code</div>
                 <div class="quarto-category">r</div>
@@ -828,20 +827,20 @@ Score (logrank) test = 257.5  on 8 df,   p=&lt;2e-16</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>        c_boot       c_x     optimism           time
          &lt;num&gt;     &lt;num&gt;        &lt;num&gt;     &lt;difftime&gt;
-  1: 0.8538053 0.8443148  0.009490538 0.1957340 secs
-  2: 0.8293180 0.8343143 -0.004996320 0.2602129 secs
-  3: 0.8455517 0.8346268  0.010924944 0.1965189 secs
-  4: 0.8362208 0.8348872  0.001333566 0.3568220 secs
-  5: 0.8589161 0.8320225  0.026893555 0.1705470 secs
+  1: 0.8538053 0.8443148  0.009490538 0.1987031 secs
+  2: 0.8293180 0.8343143 -0.004996320 0.2695990 secs
+  3: 0.8455517 0.8346268  0.010924944 0.2656732 secs
+  4: 0.8362208 0.8348872  0.001333566 0.3547299 secs
+  5: 0.8589161 0.8320225  0.026893555 0.1707869 secs
  ---                                                
- 96: 0.8501148 0.8251992  0.024915579 0.1299031 secs
- 97: 0.8402561 0.8210323  0.019223753 0.3777142 secs
- 98: 0.8800687 0.8248346  0.055234084 0.2567770 secs
- 99: 0.8755016 0.8236366  0.051864931 0.2583091 secs
-100: 0.8329462 0.8116048  0.021341406 0.2771111 secs</code></pre>
+ 96: 0.8501148 0.8251992  0.024915579 0.1238530 secs
+ 97: 0.8402561 0.8210323  0.019223753 0.3700459 secs
+ 98: 0.8800687 0.8248346  0.055234084 0.2577620 secs
+ 99: 0.8755016 0.8236366  0.051864931 0.2591660 secs
+100: 0.8329462 0.8116048  0.021341406 0.2755342 secs</code></pre>
 </div>
 </div>
-<p>This process took 23.42 secs in total.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
+<p>This process took 23.74 secs in total.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
 <div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;On my Macbook Air M3.</p></div></div><p>Now, I compute the mean optimism, <span class="math inline">\(\bar{o}\)</span>, and the overfitting-corrected estimate of accuracy.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (3) mean optimism</span></span>
@@ -870,7 +869,7 @@ Using <code>rms::validate()</code>
 <div class="cell-output cell-output-stdout">
 <pre><code>Surv(time, status) ~ bili + stage + copper + albumin + protime + 
     age + edema + ast
-&lt;environment: 0x1346d5190&gt;</code></pre>
+&lt;environment: 0x12251e7e0&gt;</code></pre>
 </div>
 </div>
 <p>So, assuming this model form is constant throughout:</p>
@@ -917,14 +916,14 @@ g         1.4660   1.5596 1.3985   0.1611          1.3049 100
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{smith2025,
   author = {Smith, Paul and Smith, Paul},
-  title = {Model {Fitting} and {Validation}},
+  title = {Model {Validation} Using the {Bootstrap}},
   date = {2025-04-26},
   url = {https://pws3141.github.io/blog/posts/modelbuilding/bias_corrected_validation/},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-smith2025" class="csl-entry quarto-appendix-citeas" role="listitem">
-Smith, Paul, and Paul Smith. 2025. <span>“Model Fitting and
-Validation.”</span> April 26, 2025. <a href="https://pws3141.github.io/blog/posts/modelbuilding/bias_corrected_validation/">https://pws3141.github.io/blog/posts/modelbuilding/bias_corrected_validation/</a>.
+Smith, Paul, and Paul Smith. 2025. <span>“Model Validation Using the
+Bootstrap.”</span> April 26, 2025. <a href="https://pws3141.github.io/blog/posts/modelbuilding/bias_corrected_validation/">https://pws3141.github.io/blog/posts/modelbuilding/bias_corrected_validation/</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
