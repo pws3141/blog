@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.32">
+<meta name="generator" content="quarto-1.8.25">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -34,14 +34,15 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-39aa5599c175b676807642dbe23379f8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-ee2454d048948abefc36d740f7f9f97a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -113,7 +114,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -167,6 +168,8 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    </a>
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">Paul Smith</span>
     </a>
@@ -267,7 +270,7 @@ window.Quarto = {
     </div>
 </div>
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="Y29kZSUyQ3IlMkNzdGF0aXN0aWNzJTJDbW9kZWwlMjBmaXR0aW5nJTJDbW9kZWwlMjB2YWxpZGF0aW9u" data-listing-date-sort="1745625600000" data-listing-file-modified-sort="1753813580251" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15" data-listing-word-count-sort="2809">
+<div class="quarto-post image-right" data-index="0" data-categories="Y29kZSUyQ3IlMkNzdGF0aXN0aWNzJTJDbW9kZWwlMjBmaXR0aW5nJTJDbW9kZWwlMjB2YWxpZGF0aW9u" data-listing-date-sort="1745625600000" data-listing-file-modified-sort="1760468938206" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15" data-listing-word-count-sort="2809">
 <div class="thumbnail"><a href="./posts/modelbuilding/bias_corrected_validation/index.html" class="no-external">
 
 <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
@@ -308,7 +311,7 @@ Paul Smith
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="Y29kZSUyQ3IlMkNtYWNoaW5lJTIwbGVhcm5pbmclMkNtbHIz" data-listing-date-sort="1742515200000" data-listing-file-modified-sort="1753813580251" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="30" data-listing-word-count-sort="5999">
+<div class="quarto-post image-right" data-index="1" data-categories="Y29kZSUyQ3IlMkNtYWNoaW5lJTIwbGVhcm5pbmclMkNtbHIz" data-listing-date-sort="1742515200000" data-listing-file-modified-sort="1760468938206" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="30" data-listing-word-count-sort="5999">
 <div class="thumbnail"><a href="./posts/09-mlr3_hyperparameter/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/09-mlr3_hyperparameter/fig/mlr3_logo.svg" class="thumbnail-image">
@@ -347,7 +350,7 @@ Paul Smith
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="2" data-categories="Y29kZSUyQ3IlMkNtYWNoaW5lJTIwbGVhcm5pbmclMkNtbHIz" data-listing-date-sort="1742169600000" data-listing-file-modified-sort="1753813580249" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15" data-listing-word-count-sort="2873">
+<div class="quarto-post image-right" data-index="2" data-categories="Y29kZSUyQ3IlMkNtYWNoaW5lJTIwbGVhcm5pbmclMkNtbHIz" data-listing-date-sort="1742169600000" data-listing-file-modified-sort="1760468938203" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15" data-listing-word-count-sort="2873">
 <div class="thumbnail"><a href="./posts/08-mlr3_evaluation_benchmarking/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/08-mlr3_evaluation_benchmarking/fig/mlr3_logo.svg" class="thumbnail-image">
@@ -386,7 +389,7 @@ Paul Smith
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="3" data-categories="Y29kZSUyQ3IlMkNzdGF0aXN0aWNzJTJDbW9kZWwlMjBmaXR0aW5nJTJDbW9kZWwlMjB2YWxpZGF0aW9u" data-listing-date-sort="1741996800000" data-listing-file-modified-sort="1753813580252" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2619">
+<div class="quarto-post image-right" data-index="3" data-categories="Y29kZSUyQ3IlMkNzdGF0aXN0aWNzJTJDbW9kZWwlMjBmaXR0aW5nJTJDbW9kZWwlMjB2YWxpZGF0aW9u" data-listing-date-sort="1741996800000" data-listing-file-modified-sort="1760468938206" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2619">
 <div class="thumbnail"><a href="./posts/modelbuilding/stepwise_datasplitting_simulation/index.html" class="no-external">
 
 <p class="card-img-top"><img src="posts/modelbuilding/stepwise_datasplitting_simulation/index_files/figure-html/fig-coef-box-1.png"  class="thumbnail-image card-img"/></p>
@@ -427,7 +430,7 @@ Paul Smith
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="4" data-categories="Y29kZSUyQ3IlMkNzdGF0aXN0aWNzJTJDbW9kZWwlMjBmaXR0aW5nJTJDbW9kZWwlMjB2YWxpZGF0aW9u" data-listing-date-sort="1741132800000" data-listing-file-modified-sort="1753813580252" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="888">
+<div class="quarto-post image-right" data-index="4" data-categories="Y29kZSUyQ3IlMkNzdGF0aXN0aWNzJTJDbW9kZWwlMjBmaXR0aW5nJTJDbW9kZWwlMjB2YWxpZGF0aW9u" data-listing-date-sort="1741132800000" data-listing-file-modified-sort="1760468938206" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="888">
 <div class="thumbnail"><a href="./posts/modelbuilding/stepwise_datasplitting/index.html" class="no-external">
 
 <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
@@ -468,7 +471,7 @@ Paul Smith
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="5" data-categories="Y29kZSUyQ3IlMkNtYWNoaW5lJTIwbGVhcm5pbmclMkNtbHIz" data-listing-date-sort="1740960000000" data-listing-file-modified-sort="1753813580249" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1283">
+<div class="quarto-post image-right" data-index="5" data-categories="Y29kZSUyQ3IlMkNtYWNoaW5lJTIwbGVhcm5pbmclMkNtbHIz" data-listing-date-sort="1740960000000" data-listing-file-modified-sort="1760468938203" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1283">
 <div class="thumbnail"><a href="./posts/05-mlr3_basic_modelling/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/05-mlr3_basic_modelling/fig/mlr3_logo.svg" class="thumbnail-image">
@@ -507,7 +510,7 @@ Paul Smith
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="6" data-categories="Y29kZSUyQ2dyYXBoaWNzJTJDcg==" data-listing-date-sort="1739923200000" data-listing-file-modified-sort="1753813580249" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1257">
+<div class="quarto-post image-right" data-index="6" data-categories="Y29kZSUyQ2dyYXBoaWNzJTJDcg==" data-listing-date-sort="1739923200000" data-listing-file-modified-sort="1760468938203" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1257">
 <div class="thumbnail"><a href="./posts/04-highcharter_bar/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/04-highcharter_bar/fig/highcharter_logo.png" class="thumbnail-image">
@@ -544,7 +547,7 @@ Paul Smith
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="7" data-categories="Y29kZSUyQ2dyYXBoaWNzJTJDcg==" data-listing-date-sort="1736640000000" data-listing-file-modified-sort="1753813580248" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="19" data-listing-word-count-sort="3657">
+<div class="quarto-post image-right" data-index="7" data-categories="Y29kZSUyQ2dyYXBoaWNzJTJDcg==" data-listing-date-sort="1736640000000" data-listing-file-modified-sort="1760468938203" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="19" data-listing-word-count-sort="3657">
 <div class="thumbnail"><a href="./posts/03-highcharter_graphs/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/03-highcharter_graphs/fig/highcharter_logo.png" class="thumbnail-image">
@@ -581,7 +584,7 @@ Paul Smith
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="8" data-categories="Z2VuZXRpY3MlMkNnd2FzJTJDbWVuZGVsaWFuJTIwcmFuZG9taXNhdGlvbg==" data-listing-date-sort="1736553600000" data-listing-file-modified-sort="1753813580248" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="782">
+<div class="quarto-post image-right" data-index="8" data-categories="Z2VuZXRpY3MlMkNnd2FzJTJDbWVuZGVsaWFuJTIwcmFuZG9taXNhdGlvbg==" data-listing-date-sort="1736553600000" data-listing-file-modified-sort="1760468938202" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="782">
 <div class="thumbnail"><a href="./posts/02-mandelian_randomisation/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/02-mandelian_randomisation/fig/mendel.jpg" class="thumbnail-image">
@@ -618,7 +621,7 @@ Paul Smith
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="9" data-categories="Y29kZSUyQ2FjY2Vzc2liaWxpdHklMkNncmFwaGljcyUyQ3I=" data-listing-date-sort="1734307200000" data-listing-file-modified-sort="1753813580243" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2274">
+<div class="quarto-post image-right" data-index="9" data-categories="Y29kZSUyQ2FjY2Vzc2liaWxpdHklMkNncmFwaGljcyUyQ3I=" data-listing-date-sort="1734307200000" data-listing-file-modified-sort="1760468938198" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2274">
 <div class="thumbnail"><a href="./posts/01-highcharter/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/01-highcharter/fig/highcharter_logo.png" class="thumbnail-image">
@@ -718,13 +721,14 @@ n.d. <a href="https://pws3141.github.io/blog/">https://pws3141.github.io/blog/</
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy
