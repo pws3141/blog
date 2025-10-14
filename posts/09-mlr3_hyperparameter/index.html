@@ -902,13 +902,13 @@ See help("Deprecated")</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>    mtry num.trees sample.fraction learner_param_vals  x_domain regr.rmse
    &lt;int&gt;     &lt;int&gt;           &lt;num&gt;             &lt;list&gt;    &lt;list&gt;     &lt;num&gt;
-1:     7        35       0.6087772          &lt;list[4]&gt; &lt;list[3]&gt;  3.454571</code></pre>
+1:     5       128       0.9034749          &lt;list[4]&gt; &lt;list[3]&gt;  2.902555</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>instance<span class="sc">$</span>result</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    mtry num.trees sample.fraction learner_param_vals  x_domain regr.rmse
    &lt;int&gt;     &lt;int&gt;           &lt;num&gt;             &lt;list&gt;    &lt;list&gt;     &lt;num&gt;
-1:     7        35       0.6087772          &lt;list[4]&gt; &lt;list[3]&gt;  3.454571</code></pre>
+1:     5       128       0.9034749          &lt;list[4]&gt; &lt;list[3]&gt;  2.902555</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>instance<span class="sc">$</span>result<span class="sc">$</span>learner_param_vals</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -917,13 +917,13 @@ See help("Deprecated")</code></pre>
 [1] 1
 
 [[1]]$mtry
-[1] 7
+[1] 5
 
 [[1]]$num.trees
-[1] 35
+[1] 128
 
 [[1]]$sample.fraction
-[1] 0.6087772</code></pre>
+[1] 0.9034749</code></pre>
 </div>
 </div>
 <p>All 50 of the random search evaluations are stored in the <code>archive</code> slot of the <code>instance</code> object.</p>
@@ -932,17 +932,17 @@ See help("Deprecated")</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>     mtry sample.fraction num.trees regr.rmse
     &lt;int&gt;           &lt;num&gt;     &lt;int&gt;     &lt;num&gt;
- 1:     5       0.9761367       187  3.586177
- 2:     8       0.3760474      1227  3.947809
- 3:     4       0.9020999       959  3.512149
- 4:    10       0.8781863      1283  3.563702
- 5:     2       0.2718788       161  6.111638
+ 1:     5       0.9761367       187  2.991894
+ 2:     8       0.3760474      1227  3.805246
+ 3:     4       0.9020999       959  3.017864
+ 4:    10       0.8781863      1283  3.023117
+ 5:     2       0.2718788       161  6.198019
 ---                                          
-46:     9       0.2032898       720  6.120573
-47:     7       0.6087772        35  3.454571
-48:     4       0.1445110      1487  6.070834
-49:     6       0.7125770      1637  3.560493
-50:     3       0.1578512       302  6.040706</code></pre>
+46:     9       0.2032898       720  6.270351
+47:     7       0.6087772        35  3.368897
+48:     4       0.1445110      1487  6.233515
+49:     6       0.7125770      1637  3.075171
+50:     3       0.1578512       302  6.169974</code></pre>
 </div>
 </div>
 <p>Now let’s visualise the effect of each hyperparameter using marginal plots.</p>
@@ -970,18 +970,18 @@ See help("Deprecated")</code></pre>
 <pre><code>Ranger result
 
 Call:
- ranger::ranger(dependent.variable.name = task$target_names, data = task$data(),      case.weights = task$weights$weight, mtry = 7L, num.threads = 1L,      num.trees = 35L, sample.fraction = 0.608777224901132) 
+ ranger::ranger(dependent.variable.name = task$target_names, data = task$data(),      case.weights = task$weights$weight, mtry = 5L, num.threads = 1L,      num.trees = 128L, sample.fraction = 0.903474943945184) 
 
 Type:                             Regression 
-Number of trees:                  35 
+Number of trees:                  128 
 Sample size:                      32 
 Number of independent variables:  10 
-Mtry:                             7 
+Mtry:                             5 
 Target node size:                 5 
 Variable importance mode:         none 
 Splitrule:                        variance 
-OOB prediction error (MSE):       7.06059 
-R squared (OOB):                  0.8056224 </code></pre>
+OOB prediction error (MSE):       5.428537 
+R squared (OOB):                  0.8505527 </code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -1174,30 +1174,30 @@ Figure&nbsp;1: An illustration of nested resampling. The large blocks represent 
 150:         3     1     31967       0.2513883  3.739324             1
      x_domain_num.trees x_domain_sample.fraction runtime_learners
                   &lt;int&gt;                    &lt;num&gt;            &lt;num&gt;
-  1:              15547                0.3219244            0.058
-  2:              23468                0.3020848            0.092
-  3:              47564                0.3500007            0.216
-  4:              14922                0.8105999            0.115
-  5:              81447                0.1308460            0.385
+  1:              15547                0.3219244            0.055
+  2:              23468                0.3020848            0.096
+  3:              47564                0.3500007            0.208
+  4:              14922                0.8105999            0.110
+  5:              81447                0.1308460            0.372
  ---                                                             
-146:              20556                0.5608060            0.125
-147:               9179                0.8461799            0.058
-148:              93847                0.1486419            0.409
-149:              15719                0.7797092            0.101
-150:              31967                0.2513883            0.125
+146:              20556                0.5608060            0.120
+147:               9179                0.8461799            0.054
+148:              93847                0.1486419            0.398
+149:              15719                0.7797092            0.097
+150:              31967                0.2513883            0.118
                timestamp warnings errors batch_nr  resample_result task_id
                   &lt;POSc&gt;    &lt;int&gt;  &lt;int&gt;    &lt;int&gt;           &lt;list&gt;  &lt;char&gt;
-  1: 2025-10-14 19:58:43        0      0        1 &lt;ResampleResult&gt;  mtcars
-  2: 2025-10-14 19:58:43        0      0        2 &lt;ResampleResult&gt;  mtcars
-  3: 2025-10-14 19:58:44        0      0        3 &lt;ResampleResult&gt;  mtcars
-  4: 2025-10-14 19:58:44        0      0        4 &lt;ResampleResult&gt;  mtcars
-  5: 2025-10-14 19:58:44        0      0        5 &lt;ResampleResult&gt;  mtcars
+  1: 2025-10-14 20:20:12        0      0        1 &lt;ResampleResult&gt;  mtcars
+  2: 2025-10-14 20:20:12        0      0        2 &lt;ResampleResult&gt;  mtcars
+  3: 2025-10-14 20:20:12        0      0        3 &lt;ResampleResult&gt;  mtcars
+  4: 2025-10-14 20:20:12        0      0        4 &lt;ResampleResult&gt;  mtcars
+  5: 2025-10-14 20:20:12        0      0        5 &lt;ResampleResult&gt;  mtcars
  ---                                                                      
-146: 2025-10-14 19:59:26        0      0       46 &lt;ResampleResult&gt;  mtcars
-147: 2025-10-14 19:59:26        0      0       47 &lt;ResampleResult&gt;  mtcars
-148: 2025-10-14 19:59:27        0      0       48 &lt;ResampleResult&gt;  mtcars
-149: 2025-10-14 19:59:27        0      0       49 &lt;ResampleResult&gt;  mtcars
-150: 2025-10-14 19:59:27        0      0       50 &lt;ResampleResult&gt;  mtcars
+146: 2025-10-14 20:20:54        0      0       46 &lt;ResampleResult&gt;  mtcars
+147: 2025-10-14 20:20:54        0      0       47 &lt;ResampleResult&gt;  mtcars
+148: 2025-10-14 20:20:55        0      0       48 &lt;ResampleResult&gt;  mtcars
+149: 2025-10-14 20:20:55        0      0       49 &lt;ResampleResult&gt;  mtcars
+150: 2025-10-14 20:20:55        0      0       50 &lt;ResampleResult&gt;  mtcars
             learner_id resampling_id
                 &lt;char&gt;        &lt;char&gt;
   1: regr.ranger.tuned            cv
@@ -1487,7 +1487,7 @@ Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
 2:       classif.log_reg            cv         2     0.05802780
 3:       classif.log_reg            cv         3     0.05744753
 4:       classif.log_reg            cv         4     0.05651042
-5: classif.xgboost.tuned            cv         1     0.05362083
+5: classif.xgboost.tuned            cv         1     0.04560204
 6: classif.xgboost.tuned            cv         2     0.02618333
 7: classif.xgboost.tuned            cv         3     0.04326268
 8: classif.xgboost.tuned            cv         4     0.03606656</code></pre>
@@ -1500,7 +1500,7 @@ Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
 <pre><code>              learner_id resampling_id classif.bbrier
                   &lt;char&gt;        &lt;char&gt;          &lt;num&gt;
 1:       classif.log_reg            cv     0.05858693
-2: classif.xgboost.tuned            cv     0.03978335</code></pre>
+2: classif.xgboost.tuned            cv     0.03777865</code></pre>
 </div>
 </div>
 <p>I can use <code>autoplot</code> to plot these results.</p>

@@ -830,20 +830,20 @@ Score (logrank) test = 257.5  on 8 df,   p=&lt;2e-16</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>        c_boot       c_x     optimism           time
          &lt;num&gt;     &lt;num&gt;        &lt;num&gt;     &lt;difftime&gt;
-  1: 0.8538053 0.8443148  0.009490538 0.1960032 secs
-  2: 0.8293180 0.8343143 -0.004996320 0.2590430 secs
-  3: 0.8455517 0.8346268  0.010924944 0.1929460 secs
-  4: 0.8362208 0.8348872  0.001333566 0.2790179 secs
-  5: 0.8589161 0.8320225  0.026893555 0.1712260 secs
+  1: 0.8538053 0.8443148  0.009490538 0.1963270 secs
+  2: 0.8293180 0.8343143 -0.004996320 0.3416729 secs
+  3: 0.8455517 0.8346268  0.010924944 0.2054210 secs
+  4: 0.8362208 0.8348872  0.001333566 0.2911661 secs
+  5: 0.8589161 0.8320225  0.026893555 0.1826959 secs
  ---                                                
- 96: 0.8501148 0.8251992  0.024915579 0.1226380 secs
- 97: 0.8402561 0.8210323  0.019223753 0.3686609 secs
- 98: 0.8800687 0.8248346  0.055234084 0.2640350 secs
- 99: 0.8755016 0.8236366  0.051864931 0.2517462 secs
-100: 0.8329462 0.8116048  0.021341406 0.3443141 secs</code></pre>
+ 96: 0.8501148 0.8251992  0.024915579 0.1218820 secs
+ 97: 0.8402561 0.8210323  0.019223753 0.3778281 secs
+ 98: 0.8800687 0.8248346  0.055234084 0.2581172 secs
+ 99: 0.8755016 0.8236366  0.051864931 0.2584231 secs
+100: 0.8329462 0.8116048  0.021341406 0.3537149 secs</code></pre>
 </div>
 </div>
-<p>This process took 23.14 secs in total.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
+<p>This process took 23.32 secs in total.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
 <div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;On my Macbook Air M3.</p></div></div><p>Now, I compute the mean optimism, <span class="math inline">\(\bar{o}\)</span>, and the overfitting-corrected estimate of accuracy.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (3) mean optimism</span></span>
@@ -872,7 +872,7 @@ Score (logrank) test = 257.5  on 8 df,   p=&lt;2e-16</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>Surv(time, status) ~ bili + stage + copper + albumin + protime + 
     age + edema + ast
-&lt;environment: 0x11f7146a0&gt;</code></pre>
+&lt;environment: 0x1221cc5c0&gt;</code></pre>
 </div>
 </div>
 <p>So, assuming this model form is constant throughout:</p>
